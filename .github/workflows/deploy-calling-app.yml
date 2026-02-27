@@ -1,0 +1,54 @@
+name: Deploy Calling App to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            DEPLOY_DIR=/var/www/lms-calling
+
+            # ── Ensure deploy dir exists and is a git repo ───────────────────
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              mkdir -p "$DEPLOY_DIR"
+              git clone https://github.com/Ejaz-Mehmood/calling-app.git "$DEPLOY_DIR"
+            fi
+
+            cd "$DEPLOY_DIR"
+
+            # ── Pull latest code ─────────────────────────────────────────────
+            git fetch origin
+            git reset --hard origin/main
+
+            # ── Write .env from GitHub Secrets ───────────────────────────────
+            cat > .env << 'ENVEOF'
+            MEDIASOUP_ANNOUNCED_IP=${{ secrets.MEDIASOUP_ANNOUNCED_IP }}
+            CALLING_APP_API_SECRET=${{ secrets.CALLING_APP_API_SECRET }}
+            ENVEOF
+
+            # ── Build and restart Docker container ───────────────────────────
+            docker compose down || true
+            docker compose build --no-cache
+            docker compose up -d
+
+            # ── Verify ───────────────────────────────────────────────────────
+            echo "Container status:"
+            docker compose ps
+
+            echo "Last 20 log lines:"
+            docker compose logs --tail=20
