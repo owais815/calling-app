@@ -15,8 +15,8 @@ package-lock.json
 .cache
 
 # personal
-config.js
-docker-compose.yml
+# config.js — tracked (LMS customizations; secrets via env vars)
+# docker-compose.yml — tracked (production deployment)
 docker-push.sh
 rec
 rtmp
