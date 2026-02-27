@@ -10,7 +10,7 @@ set -e
 VPS_IP="${1}"
 DEPLOY_DIR="/var/www/lms-calling"
 DOMAIN="call.ejazmehmood.com"
-REPO="https://github.com/Ejaz-Mehmood/calling-app.git"
+REPO="https://github.com/owais815/calling-app.git"
 
 if [ -z "$VPS_IP" ]; then
     echo "ERROR: Provide your VPS public IP"

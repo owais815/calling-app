@@ -26,7 +26,7 @@ jobs:
             # ── Ensure deploy dir exists and is a git repo ───────────────────
             if [ ! -d "$DEPLOY_DIR/.git" ]; then
               mkdir -p "$DEPLOY_DIR"
-              git clone https://github.com/Ejaz-Mehmood/calling-app.git "$DEPLOY_DIR"
+              git clone https://github.com/owais815/calling-app.git "$DEPLOY_DIR"
             fi
 
             cd "$DEPLOY_DIR"
