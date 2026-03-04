@@ -914,14 +914,11 @@ async function whoAreYou() {
         BUTTONS.main.startScreenButton && show(initStartScreenButton);
     }
 
-    if (peer_name) {
-        checkMedia();
-        getPeerInfo();
-        joinRoom(peer_name, room_id);
-        return;
-    }
+    // Always show the pre-join screen; apply audio/video URL params to initial device state
+    checkMedia();
 
-    let default_name = window.localStorage.peer_name ? window.localStorage.peer_name : '';
+    // Pre-fill name from URL param (passed by LMS backend), fallback to localStorage/cookie
+    let default_name = peer_name || (window.localStorage.peer_name ? window.localStorage.peer_name : '');
     if (getCookie(room_id + '_name')) {
         default_name = getCookie(room_id + '_name');
     }
