@@ -925,6 +925,18 @@ async function whoAreYou() {
         default_name = getCookie(room_id + '_name');
     }
 
+    // When the LMS provides a name via URL, skip the join dialog entirely and go straight
+    // into the room. This prevents the cookie/localStorage from overriding the unique
+    // per-session name, eliminates the extra "Join meeting" click, and avoids the
+    // "Username already in use" collision caused by stale names being re-used.
+    if (peer_name) {
+        setCookie(room_id + '_name', peer_name, 30);
+        window.localStorage.peer_name = peer_name;
+        getPeerInfo();
+        joinRoom(peer_name, room_id);
+        return;
+    }
+
     if (!BUTTONS.main.startVideoButton) {
         isVideoAllowed = false;
         elemDisplay('initVideo', false);
@@ -985,11 +997,6 @@ async function whoAreYou() {
         joinRoom(peer_name, room_id);
     });
 
-    // When the LMS supplies a name via URL, auto-confirm the dialog so the user doesn't
-    // have to click "Join meeting" manually and can't accidentally change their unique name.
-    if (peer_name) {
-        setTimeout(() => Swal.clickConfirm(), 300);
-    }
 
     if (!isVideoAllowed) {
         elemDisplay('initVideo', false);
