@@ -419,17 +419,11 @@ class RoomClient {
                     console.log('00-WARNING ----> You are Banned from the Room!');
                     return this.isBanned();
                 }
-                const peers = new Map(JSON.parse(room.peers));
-                if (!peer_info.peer_token) {
-                    // hack...
-                    for (let peer of Array.from(peers.keys()).filter((id) => id !== this.peer_id)) {
-                        let peer_info = peers.get(peer).peer_info;
-                        if (peer_info.peer_name == this.peer_name) {
-                            console.log('00-WARNING ----> Username already in use');
-                            return this.userNameAlreadyInRoom();
-                        }
-                    }
-                }
+                // Username-collision check removed: LMS always supplies a unique
+                // per-join name (timestamp + random suffix), so blocking on duplicate
+                // names only causes false positives when MiroTalk's async peer cleanup
+                // races against a fast rejoin. Peers are keyed by socket-id anyway, so
+                // two peers with the same display name coexist without any real conflict.
                 await this.joinAllowed(room);
             })
             .catch((error) => {
