@@ -1062,16 +1062,28 @@ class RoomClient {
 
     refreshBrowser() {
         this.exit(true);
-        getPeerName() ? location.reload() : openURL(this.getReconnectDirectJoinURL());
+        // Always navigate to a fresh URL with a new unique name.
+        // Using location.reload() reuses the exact same name from the URL, which races
+        // against MiroTalk's async peer-cleanup on the server: the old peer (same name)
+        // may still be in the room when the reloaded page tries to join, triggering
+        // "Username already in use". Generating a new name suffix on every reconnect
+        // guarantees uniqueness and eliminates the collision entirely.
+        openURL(this.getReconnectDirectJoinURL());
     }
 
     getReconnectDirectJoinURL() {
         const { peer_audio, peer_video, peer_screen, peer_token } = this.peer_info;
         const baseUrl = `${window.location.origin}/join`;
+        // Strip the last LMS-added suffix (pattern: -[alphanumeric]{3,10} at end of name)
+        // and replace it with a fresh timestamp+random suffix so each reconnect uses a
+        // unique peer_name that cannot collide with any lingering peer from the old session.
+        const nameBase = this.peer_name.replace(/-[a-z0-9]{3,10}$/, '') || this.peer_name;
+        const freshSuffix = Date.now().toString(36).slice(-4) + Math.random().toString(36).slice(2, 5);
+        const freshName = `${nameBase}-${freshSuffix}`;
         const queryParams = {
             room: this.room_id,
             roomPassword: this.RoomPassword,
-            name: this.peer_name,
+            name: freshName,
             audio: peer_audio,
             video: peer_video,
             screen: peer_screen,
