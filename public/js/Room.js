@@ -917,9 +917,11 @@ async function whoAreYou() {
     // Always show the pre-join screen; apply audio/video URL params to initial device state
     checkMedia();
 
-    // Pre-fill name from URL param (passed by LMS backend), fallback to localStorage/cookie
+    // Pre-fill name from URL param (passed by LMS backend), fallback to localStorage/cookie.
+    // When the URL already supplies a name (LMS-generated with unique suffix), skip the cookie
+    // so the cookie never overrides it with a stale name that could still be active in the room.
     let default_name = peer_name || (window.localStorage.peer_name ? window.localStorage.peer_name : '');
-    if (getCookie(room_id + '_name')) {
+    if (!peer_name && getCookie(room_id + '_name')) {
         default_name = getCookie(room_id + '_name');
     }
 
@@ -982,6 +984,12 @@ async function whoAreYou() {
         getPeerInfo();
         joinRoom(peer_name, room_id);
     });
+
+    // When the LMS supplies a name via URL, auto-confirm the dialog so the user doesn't
+    // have to click "Join meeting" manually and can't accidentally change their unique name.
+    if (peer_name) {
+        setTimeout(() => Swal.clickConfirm(), 300);
+    }
 
     if (!isVideoAllowed) {
         elemDisplay('initVideo', false);
