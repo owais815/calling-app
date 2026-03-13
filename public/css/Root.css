@@ -1,28 +1,27 @@
 @import url('https://fonts.googleapis.com/css?family=Comfortaa:wght@500&display=swap');
 
 :root {
-    /* LMS brand dark theme */
-    --body-bg: linear-gradient(135deg, #0b0d1e 0%, #111428 100%);
-    --border: 1px solid rgba(46, 55, 164, 0.45);
+    --body-bg: #202124;
+    --border: 1px solid rgba(255, 255, 255, 0.12);
     --border-radius: 1rem;
     --msger-width: 800px;
     --msger-height: 700px;
     --msger-bubble-width: 85%;
-    --msger-bg: linear-gradient(135deg, #0b0d1e 0%, #111428 100%);
+    --msger-bg: #202124;
     --wb-width: 800px;
     --wb-height: 600px;
-    --wb-bg: linear-gradient(135deg, #0b0d1e 0%, #111428 100%);
-    --select-bg: #1a1c3a;
-    --left-msg-bg: #1e2247;
-    --right-msg-bg: #2e37a4;
+    --wb-bg: #202124;
+    --select-bg: #3c4043;
+    --left-msg-bg: #3c4043;
+    --right-msg-bg: #1a73e8;
     --private-msg-bg: #6b1226;
-    --box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.9);
-    --btns-hover-scale: scale(1.08);
-    --settings-bg: linear-gradient(135deg, #0e1025 0%, #141630 100%);
-    --tab-btn-active: rgba(46, 55, 164, 0.55);
-    --btns-bg-color: rgba(20, 23, 55, 0.88);
+    --box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.6);
+    --btns-hover-scale: scale(1.05);
+    --settings-bg: #2d2e31;
+    --tab-btn-active: rgba(255, 255, 255, 0.15);
+    --btns-bg-color: #3c4043;
 
-    /* Bottom control bar (Google Meet style) */
+    /* Bottom bar - Google Meet style */
     --btns-top: 94%;
     --btns-right: unset;
     --btns-left: 50%;
@@ -33,10 +32,9 @@
 
     --transcription-height: 680px;
     --transcription-width: 420px;
-    --transcription-bg: linear-gradient(135deg, #0b0d1e 0%, #111428 100%);
+    --transcription-bg: #2d2e31;
 
     --vmi-wh: 15vw;
-    /* https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit */
     --videoObjFit: cover;
 }
 
