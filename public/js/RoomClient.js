@@ -1788,7 +1788,8 @@ class RoomClient {
         if (isHideMeActive && this.isVideoPinned && myScreenPinBtn) myScreenPinBtn.click();
         if (myVideoWrap) myVideoWrap.style.display = isHideMeActive ? 'none' : 'block';
         if (myVideoWrapOff) myVideoWrapOff.style.display = isHideMeActive ? 'none' : 'block';
-        hideMeIcon.className = isHideMeActive ? html.hideMeOn : html.hideMeOff;
+        hideMeIcon.className = 'material-symbols-outlined';
+        hideMeIcon.textContent = isHideMeActive ? 'visibility_off' : 'visibility';
         hideMeIcon.style.color = isHideMeActive ? 'red' : 'white';
         isHideMeActive ? this.sound('left') : this.sound('joined');
         resizeVideoMedia();
@@ -3112,14 +3113,16 @@ class RoomClient {
                 document.documentElement.style.setProperty('--btns-margin-left', '0px');
                 document.documentElement.style.setProperty('--btns-width', '60px');
                 document.documentElement.style.setProperty('--btns-flex-direction', 'column');
+                document.documentElement.style.setProperty('--btns-transform', 'translate(0%, -50%)');
                 break;
             case 'horizontal':
-                document.documentElement.style.setProperty('--btns-top', '95%');
-                document.documentElement.style.setProperty('--btns-right', '25%');
+                document.documentElement.style.setProperty('--btns-top', '94%');
+                document.documentElement.style.setProperty('--btns-right', 'unset');
                 document.documentElement.style.setProperty('--btns-left', '50%');
-                document.documentElement.style.setProperty('--btns-margin-left', '-160px');
-                document.documentElement.style.setProperty('--btns-width', '320px');
+                document.documentElement.style.setProperty('--btns-margin-left', '0px');
+                document.documentElement.style.setProperty('--btns-width', 'auto');
                 document.documentElement.style.setProperty('--btns-flex-direction', 'row');
+                document.documentElement.style.setProperty('--btns-transform', 'translate(-50%, -50%)');
                 break;
             default:
                 break;
