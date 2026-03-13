@@ -21,7 +21,6 @@
     border-radius: 10px;
     box-shadow: var(--box-shadow);
     transition: background 1s;
-    /* border: 1px solid lime; */
 }
 
 /* Chat app container */
