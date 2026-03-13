@@ -1999,6 +1999,11 @@ async function changeCamera(deviceId) {
 // ####################################################
 
 function handleMediaError(mediaType, err) {
+    // User cancelled screen share picker — not an error, just ignore silently
+    if (err.name === 'NotAllowedError' && ['screen', 'screenType'].includes(mediaType)) {
+        return;
+    }
+
     sound('alert');
 
     let errMessage = err;
@@ -2633,7 +2638,7 @@ function loadSettingsFromLocalStorage() {
     screenFps.selectedIndex = localStorageSettings.screen_fps;
     BtnVideoObjectFit.selectedIndex = localStorageSettings.video_obj_fit;
     BtnVideoControls.selectedIndex = localStorageSettings.video_controls;
-    BtnsBarPosition.selectedIndex = localStorageSettings.buttons_bar;
+    BtnsBarPosition.selectedIndex = 1; // always horizontal
     pinVideoPosition.selectedIndex = localStorageSettings.pin_grid;
     rc.handleVideoObjectFit(BtnVideoObjectFit.value);
     rc.handleVideoControls(BtnVideoControls.value);
