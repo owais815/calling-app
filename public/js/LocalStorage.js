@@ -51,7 +51,7 @@ class LocalStorage {
             theme: 0, // dark
             theme_color: '#000000', // custom theme color
             theme_custom: false, // keep custom theme
-            buttons_bar: 0, // vertical
+            buttons_bar: 1, // horizontal
             pin_grid: 0, // vertical
         };
 
