@@ -46,6 +46,7 @@
         <!-- https://cdnjs.com/libraries/font-awesome -->
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
         <!-- https://animate.style 4 using for swal fadeIn-Out -->
 
@@ -162,40 +163,76 @@ access to use this app.
             </div>
         </section>
 
+        <!-- More Options Menu (outside #control to avoid transform stacking context) -->
+        <div id="moreOptionsMenu" class="more-options-menu hidden">
+            <button id="shareButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">share</span>
+                <span class="menu-item-label">Share room</span>
+            </button>
+            <button id="hideMeButton" class="hidden menu-item">
+                <span id="hideMeIcon" class="material-symbols-outlined">visibility_off</span>
+                <span class="menu-item-label">Hide self view</span>
+            </button>
+            <button id="swapCameraButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">flip_camera_ios</span>
+                <span class="menu-item-label">Flip camera</span>
+            </button>
+            <button id="startRecButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">radio_button_checked</span>
+                <span class="menu-item-label">Start recording</span>
+            </button>
+            <button id="stopRecButton" class="hidden menu-item">
+                <span class="material-symbols-outlined" style="color:#ea4335">stop_circle</span>
+                <span class="menu-item-label">Stop recording</span>
+            </button>
+            <button id="emojiRoomButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">sentiment_satisfied</span>
+                <span class="menu-item-label">Emoji reaction</span>
+            </button>
+            <button id="transcriptionButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">closed_caption</span>
+                <span class="menu-item-label">Captions</span>
+            </button>
+            <button id="whiteboardButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">draw</span>
+                <span class="menu-item-label">Whiteboard</span>
+            </button>
+            <button id="settingsButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="menu-item-label">Settings</span>
+            </button>
+            <button id="aboutButton" class="hidden menu-item">
+                <span class="material-symbols-outlined">help</span>
+                <span class="menu-item-label">About</span>
+            </button>
+        </div>
+
         <div id="control" class="fadein">
-            <button id="shareButton" class="hidden"><i class="fas fa-share-alt"></i></button>
-            <button id="hideMeButton" class="hidden"><i id="hideMeIcon" class="fas fa-user"></i></button>
-            <button id="swapCameraButton" class="hidden"><i class="fas fa-camera-rotate"></i></button>
-            <button id="startVideoButton" class="hidden"><i class="fas fa-video-slash"></i></button>
-            <button id="stopVideoButton" class="hidden"><i class="fas fa-video"></i></button>
-            <button id="startAudioButton" class="hidden"><i class="fas fa-microphone-slash"></i></button>
-            <button id="stopAudioButton" class="hidden"><i class="fas fa-microphone"></i></button>
-            <button id="startScreenButton" class="hidden"><i class="fas fa-desktop"></i></button>
-            <button id="stopScreenButton" class="hidden"><i class="fas fa-stop-circle"></i></button>
-            <button id="startRecButton" class="hidden"><i class="fas fa-record-vinyl"></i></button>
-            <button id="stopRecButton" class="hidden"><i class="fas fa-record-vinyl cr"></i></button>
-            <button id="raiseHandButton" class="hidden"><i class="fas fa-hand-paper"></i></button>
-            <button id="lowerHandButton" class="hidden"><i id="lowerHandIcon" class="fas fa-hand-paper"></i></button>
-            <button id="emojiRoomButton" class="hidden"><i class="fas fa-face-smile"></i></button>
-            <button id="chatButton" class="hidden"><i class="fas fa-comments"></i></button>
-            <button id="transcriptionButton" class="hidden"><i class="fas fa-closed-captioning"></i></button>
-            <button id="whiteboardButton" class="hidden"><i class="fas fa-chalkboard-teacher"></i></button>
-            <button id="settingsButton" class="hidden"><i class="fas fa-cogs"></i></button>
-            <button id="aboutButton" class="hidden"><i class="fas fa-question"></i></button>
-            <!-- <button id="restartICE" class="hidden"><i class="fas fa-satellite-dish"></i></button> -->
-            <button id="exitButton" class="hidden"><i class="fas fa-right-from-bracket"></i></button>
+            <!-- Primary controls -->
+            <button id="startAudioButton" class="hidden"><span class="material-symbols-outlined">mic_off</span></button>
+            <button id="stopAudioButton" class="hidden"><span class="material-symbols-outlined">mic</span></button>
+            <button id="startVideoButton" class="hidden"><span class="material-symbols-outlined">videocam_off</span></button>
+            <button id="stopVideoButton" class="hidden"><span class="material-symbols-outlined">videocam</span></button>
+            <button id="startScreenButton" class="hidden"><span class="material-symbols-outlined">present_to_all</span></button>
+            <button id="stopScreenButton" class="hidden"><span class="material-symbols-outlined">cancel_presentation</span></button>
+            <button id="raiseHandButton" class="hidden"><span class="material-symbols-outlined">back_hand</span></button>
+            <button id="lowerHandButton" class="hidden"><span id="lowerHandIcon" class="material-symbols-outlined">front_hand</span></button>
+            <button id="chatButton" class="hidden"><span class="material-symbols-outlined">chat</span></button>
+            <button id="moreOptionsBtn"><span class="material-symbols-outlined">more_vert</span></button>
+            <!-- End call -->
+            <button id="exitButton" class="hidden"><span class="material-symbols-outlined">call_end</span></button>
         </div>
 
         <div id="emojiPickerContainer" class="roomEmoji fadein">
             <div id="emojiPickerHeader" class="emojiPickerHeader">
-                <button id="closeEmojiPickerContainer" class="fas fa-times"></button>
+                <button id="closeEmojiPickerContainer"><span class="material-symbols-outlined">close</span></button>
             </div>
         </div>
         <div id="userEmoji" class="userEmoji"></div>
 
         <section id="mySettings" class="fadein center hidden">
             <header id="mySettingsHeader">
-                <button id="mySettingsCloseBtn" class="fas fa-times"></button>
+                <button id="mySettingsCloseBtn"><span class="material-symbols-outlined">close</span></button>
             </header>
             <main class="mySettingsMain">
                 <div class="tab">
@@ -1123,7 +1160,7 @@ access to use this app.
                         <br />
                         <select id="BtnsBarPosition" class="form-select text-light bg-dark">
                             <option value="vertical">Vertical</option>
-                            <option value="horizontal">Horizontal</option>
+                            <option value="horizontal" selected>Horizontal</option>
                         </select>
                         <br />
                         <div id="pinUnpinGridDiv" class="hidden">
@@ -1527,5 +1564,29 @@ access to use this app.
                 </div>
             </main>
         </section>
+
+        <script>
+            // More options menu toggle
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('moreOptionsBtn');
+                const menu = document.getElementById('moreOptionsMenu');
+                if (!btn || !menu) return;
+
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('hidden');
+                });
+
+                // Close menu when clicking a menu item
+                menu.addEventListener('click', function () {
+                    menu.classList.add('hidden');
+                });
+
+                // Close menu when clicking anywhere outside
+                document.addEventListener('click', function () {
+                    menu.classList.add('hidden');
+                });
+            });
+        </script>
     </body>
 </html>
