@@ -3087,14 +3087,29 @@ function getId(id) {
 
 function toggleWhiteboard() {
     if (!wbIsOpen) rc.sound('open');
-    whiteboardCenter();
     whiteboard.classList.toggle('show');
     wbIsOpen = !wbIsOpen;
+    // When whiteboard opens, hide video grid; when it closes, restore
+    if (wbIsOpen) {
+        videoMediaContainer.style.display = 'none';
+        // If chat is already pinned, whiteboard should respect that
+        if (rc.isChatPinned) {
+            whiteboard.classList.add('wb-chat-pinned');
+        }
+    } else {
+        videoMediaContainer.style.display = '';
+        whiteboard.classList.remove('wb-chat-pinned');
+        // Restore video container layout (chatPin may have resized it)
+        if (rc.isChatPinned) {
+            videoMediaContainer.style.top = 0;
+            videoMediaContainer.style.width = '75%';
+            videoMediaContainer.style.height = '100%';
+        }
+    }
 }
 
 function whiteboardCenter() {
-    whiteboard.style.top = '50%';
-    whiteboard.style.left = '50%';
+    // No-op: whiteboard now fills the main area as a full-screen overlay
 }
 
 function setupWhiteboard() {

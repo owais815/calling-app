@@ -1246,16 +1246,24 @@ progress {
 
 #whiteboard {
     z-index: 4;
-    position: absolute;
-    margin: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 90px);
+    margin: 0;
     padding: 10px;
-    width: var(--wb-width);
-    height: var(--wb-height);
     background: var(--wb-bg);
-    border: var(--border);
-    box-shadow: var(--box-shadow);
-    border-radius: 10px;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
     overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When chat is pinned alongside whiteboard */
+#whiteboard.wb-chat-pinned {
+    width: 75%;
 }
 
 .whiteboard-header {

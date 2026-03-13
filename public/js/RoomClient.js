@@ -3554,13 +3554,14 @@ class RoomClient {
             if (!this.isMobileDevice) {
                 BUTTONS.chat.chatMaxButton && show(chatMaxButton);
             }
-            this.chatCenter();
+            this.chatPin(); // open pinned to right side by default
             this.sound('open');
             this.showPeerAboutAndMessages('all', 'all');
+        } else {
+            this.chatUnpin();
         }
         isParticipantsListOpen = !isParticipantsListOpen;
         this.isChatOpen = !this.isChatOpen;
-        if (this.isChatPinned) this.chatUnpin();
         resizeChatRoom();
     }
 
@@ -3622,6 +3623,11 @@ class RoomClient {
             this.videoMediaContainer.style.width = '75%';
             this.videoMediaContainer.style.height = '100%';
         }
+        // If whiteboard is open, shrink it to leave room for chat sidebar
+        const whiteboard = document.getElementById('whiteboard');
+        if (whiteboard && typeof wbIsOpen !== 'undefined' && wbIsOpen) {
+            whiteboard.classList.add('wb-chat-pinned');
+        }
         this.chatPinned();
         this.isChatPinned = true;
         setColor(chatTogglePin, 'lime');
@@ -3638,6 +3644,11 @@ class RoomClient {
             this.videoMediaContainer.style.right = null;
             this.videoMediaContainer.style.width = '100%';
             this.videoMediaContainer.style.height = '100%';
+        }
+        // Restore whiteboard to full width when chat is unpinned
+        const whiteboard = document.getElementById('whiteboard');
+        if (whiteboard) {
+            whiteboard.classList.remove('wb-chat-pinned');
         }
         document.documentElement.style.setProperty('--msger-width', '800px');
         document.documentElement.style.setProperty('--msger-height', '700px');
