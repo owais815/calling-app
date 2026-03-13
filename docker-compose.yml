@@ -15,5 +15,7 @@ services:
             - PORT=3010
         volumes:
             - ./app/src/config.js:/src/app/src/config.js:ro
+            - /etc/letsencrypt/live/call.ejazmehmood.com/fullchain.pem:/src/app/ssl/cert.pem:ro
+            - /etc/letsencrypt/live/call.ejazmehmood.com/privkey.pem:/src/app/ssl/key.pem:ro
         # host network mode: required for mediasoup worker permissions + WebRTC UDP
         network_mode: host
