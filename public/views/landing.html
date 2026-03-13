@@ -1,132 +1,146 @@
 <!doctype html>
 <html lang="en" class="no-js">
+    <head>
+        <!-- Title and Icon -->
 
-<head>
-    <!-- Title and Icon -->
+        <title>Mualim Ul Quran, Video Calls, Messaging and Screen Sharing</title>
+        <link rel="shortcut icon" href="../images/logo.png" />
+        <link id="appleTouchIcon" rel="apple-touch-icon" href="../images/logo.png" />
 
-    <title  >Mualim Ul Quran, Video Calls, Messaging and Screen Sharing</title>
-    <link   rel="shortcut icon" href="../images/logo.png" />
-    <link id="appleTouchIcon" rel="apple-touch-icon" href="../images/logo.png" />
+        <!-- Meta Information -->
 
-    <!-- Meta Information -->
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            id="description"
+            name="description"
+            content="Mualim Ul Quran powered by WebRTC and mediasoup, Real-time Simple Secure Fast video calls, messaging and screen sharing capabilities in the browser."
+        />
+        <meta
+            id="keywords"
+            name="keywords"
+            content="webrtc, miro, mediasoup, mediasoup-client, self hosted, voip, sip, real-time communications, chat, messaging, meet, webrtc stun, webrtc turn, webrtc p2p, webrtc sfu, video meeting, video chat, video conference, multi video chat, multi video conference, peer to peer, p2p, sfu, rtc, alternative to, zoom, microsoft teams, google meet, jitsi, meeting"
+        />
 
-    <meta id="description" name="description"
-        content="Mualim Ul Quran powered by WebRTC and mediasoup, Real-time Simple Secure Fast video calls, messaging and screen sharing capabilities in the browser." />
-    <meta id="keywords" name="keywords"
-        content="webrtc, miro, mediasoup, mediasoup-client, self hosted, voip, sip, real-time communications, chat, messaging, meet, webrtc stun, webrtc turn, webrtc p2p, webrtc sfu, video meeting, video chat, video conference, multi video chat, multi video conference, peer to peer, p2p, sfu, rtc, alternative to, zoom, microsoft teams, google meet, jitsi, meeting" />
+        <!-- https://ogp.me -->
 
-    <!-- https://ogp.me -->
-
-    <meta id="ogType" property="og:type" content="app-webrtc" />
-    <meta id="ogSiteName" property="og:site_name" content="Mualim Ul Quran" />
-    <!-- <meta id="ogTitle" property="og:title" content="Click the link to make a call." /> -->
-    <meta id="ogDescription" property="og:description"
-        content="Mualim Ul Quran calling provides real-time video calls, messaging and screen sharing." />
-    <!-- <meta id="ogImage" property="og:image" content="https://sfu.mirotalk.com/images/mirotalksfu.png" />
+        <meta id="ogType" property="og:type" content="app-webrtc" />
+        <meta id="ogSiteName" property="og:site_name" content="Mualim Ul Quran" />
+        <!-- <meta id="ogTitle" property="og:title" content="Click the link to make a call." /> -->
+        <meta
+            id="ogDescription"
+            property="og:description"
+            content="Mualim Ul Quran calling provides real-time video calls, messaging and screen sharing."
+        />
+        <!-- <meta id="ogImage" property="og:image" content="https://sfu.mirotalk.com/images/mirotalksfu.png" />
     <meta id="ogUrl" property="og:url" content="https://sfu.mirotalk.com" /> -->
 
-    <!-- StyleSheet -->
+        <!-- StyleSheet -->
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-    <link rel="stylesheet" type="text/css" href="../css/landing.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/landing.css" />
 
-    <!-- Snow effects -->
+        <!-- Snow effects -->
 
-    <link rel="stylesheet" href="../css/Snow.css" />
-    <script async src="../js/Snow.js"></script>
+        <link rel="stylesheet" href="../css/Snow.css" />
+        <script async src="../js/Snow.js"></script>
 
-    <!-- Js scripts -->
-    <script defer src="../js/Brand.js"></script>
-    <script async src="../js/Umami.js"></script>
+        <!-- Js scripts -->
+        <script defer src="../js/Brand.js"></script>
+        <script async src="../js/Umami.js"></script>
 
-    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
-    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xss/dist/xss.min.js"></script>
-</head>
+        <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+        <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/xss/dist/xss.min.js"></script>
+    </head>
 
-<body class="is-boxed has-animations">
-    <div id="snow-container"></div>
-    <div class="body-wrap">
-        <header class="site-header">
-            <div class="container">
-                <div class="site-header-inner">
-                    <div class="brand header-brand">
-                        <div class="m-0">
-                            <a href="/">
-                                <img class="header-logo-image"  src="../images/logo.png" alt="mualimulquran-webrtc-logo" />
-                            </a>
+    <body class="is-boxed has-animations">
+        <div id="snow-container"></div>
+        <div class="body-wrap">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-header-inner">
+                        <div class="brand header-brand">
+                            <div class="m-0">
+                                <a href="/">
+                                    <img
+                                        class="header-logo-image"
+                                        src="../images/logo.png"
+                                        alt="mualimulquran-webrtc-logo"
+                                    />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <main>
-            <section class="hero reveal-from-bottom">
-                <div class="container">
-                    <div class="hero-inner">
-                        <div class="hero-copy">
-                            <h1 id="" class="hero-title mt-0">
-                                Mualim Ul Quran<br />browser-based Learning Management System for Quranic education.
-                            </h1>
-                            <p id="" class="hero-paragraph">
-                                <b> Effortless, Secure, Efficient.</b>
-                                <br />
-                            </p>
-                        </div>
-                        <div class="hero-figure anime-element">
-                            <svg class="placeholder" width="528" height="319" viewBox="0 0 528 396">
-                                <rect width="528" height="396" style="fill: transparent" />
-                            </svg>
-                            <div class="hero-figure-box hero-figure-box-01" data-rotation="45deg"></div>
-                            <div class="hero-figure-box hero-figure-box-02" data-rotation="-45deg"></div>
-                            <div class="hero-figure-box hero-figure-box-03" data-rotation="0deg"></div>
-                            <div class="hero-figure-box hero-figure-box-04" data-rotation="-135deg"></div>
-                            <div class="hero-figure-box hero-figure-box-05"></div>
-                            <div class="hero-figure-box hero-figure-box-06"></div>
-                            <div class="hero-figure-box hero-figure-box-07"></div>
-                            <div class="hero-figure-box hero-figure-box-08" data-rotation="-22deg"></div>
-                            <div class="hero-figure-box hero-figure-box-09" data-rotation="-52deg"></div>
-                            <div class="hero-figure-box hero-figure-box-10" data-rotation="-50deg"></div>
+            <main>
+                <section class="hero reveal-from-bottom">
+                    <div class="container">
+                        <div class="hero-inner">
+                            <div class="hero-copy">
+                                <h1 id="" class="hero-title mt-0">
+                                    Mualim Ul Quran<br />browser-based Learning Management System for Quranic education.
+                                </h1>
+                                <p id="" class="hero-paragraph">
+                                    <b> Effortless, Secure, Efficient.</b>
+                                    <br />
+                                </p>
+                            </div>
+                            <div class="hero-figure anime-element">
+                                <svg class="placeholder" width="528" height="319" viewBox="0 0 528 396">
+                                    <rect width="528" height="396" style="fill: transparent" />
+                                </svg>
+                                <div class="hero-figure-box hero-figure-box-01" data-rotation="45deg"></div>
+                                <div class="hero-figure-box hero-figure-box-02" data-rotation="-45deg"></div>
+                                <div class="hero-figure-box hero-figure-box-03" data-rotation="0deg"></div>
+                                <div class="hero-figure-box hero-figure-box-04" data-rotation="-135deg"></div>
+                                <div class="hero-figure-box hero-figure-box-05"></div>
+                                <div class="hero-figure-box hero-figure-box-06"></div>
+                                <div class="hero-figure-box hero-figure-box-07"></div>
+                                <div class="hero-figure-box hero-figure-box-08" data-rotation="-22deg"></div>
+                                <div class="hero-figure-box hero-figure-box-09" data-rotation="-52deg"></div>
+                                <div class="hero-figure-box hero-figure-box-10" data-rotation="-50deg"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="cta section">
-                <div class="container">
-                    <div class="cta-inner section-inner br-12">
-                        <h3 class="section-title mt-0">
-                            Pick a room name.<br />
-                            How about this one?
-                        </h3>
-                        <div>
-                            <div class="mb-24">
-                                <label for="roomName"></label>
-                                <div class="form-group-desktop">
-                                    <input id="roomName" class="form-input" type="text" maxlength="36" value="" />
-                                    <button id="genRoomButton"
-                                        class="button button-primary br-6 mr-8 mb-8 fas fa-arrows-rotate"></button>
-                                    <button id="joinRoomButton" class="button button-primary pulse">
-                                        Join Room
-                                    </button>
+                <section class="cta section">
+                    <div class="container">
+                        <div class="cta-inner section-inner br-12">
+                            <h3 class="section-title mt-0">
+                                Pick a room name.<br />
+                                How about this one?
+                            </h3>
+                            <div>
+                                <div class="mb-24">
+                                    <label for="roomName"></label>
+                                    <div class="form-group-desktop">
+                                        <input id="roomName" class="form-input" type="text" maxlength="36" value="" />
+                                        <button
+                                            id="genRoomButton"
+                                            class="button button-primary br-6 mr-8 mb-8 fas fa-arrows-rotate"
+                                        ></button>
+                                        <button id="joinRoomButton" class="button button-primary pulse">
+                                            Join Room
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="lastRoomContainer" class="last-room">
+                                    <span>Your recent room:</span>
+                                    <a id="lastRoom"></a>
                                 </div>
                             </div>
-                            <div id="lastRoomContainer" class="last-room">
-                                <span>Your recent room:</span>
-                                <a id="lastRoom"></a>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- <section id="features" class="features section">
+                <!-- <section id="features" class="features section">
                     <div class="container-sm">
                         <div class="pricing-header text-center reveal-from-bottom mt-32" data-reveal-delay="150">
                             <br />
@@ -289,7 +303,7 @@
                     </div>
                 </section> -->
 
-            <!-- <section id="teams" class="cta section">
+                <!-- <section id="teams" class="cta section">
                     <div class="container reveal-from-bottom">
                         <h2 class="tac">Meet the team</h2>
                         <br />
@@ -312,9 +326,9 @@
                     </div>
                 </section> -->
 
-            <br />
+                <br />
 
-            <!-- <section id="tryEasier" class="cta section">
+                <!-- <section id="tryEasier" class="cta section">
                     <div class="container">
                         <h2 class="tac">Try an easier, more secure way of calling.</h2>
                         <br />
@@ -324,9 +338,9 @@
                     </div>
                 </section> -->
 
-            <br /><br />
+                <br /><br />
 
-            <!-- <section id="poweredBy" class="clients section">
+                <!-- <section id="poweredBy" class="clients section">
                     <div class="container">
                         <h4 class="powered-by">Powered by</h4>
                         <div class="clients-inner section-inner has-animations has-top-divider has-bottom-divider">
@@ -346,7 +360,7 @@
                     </div>
                 </section> -->
 
-            <!-- <section id="sponsors" class="clients section">
+                <!-- <section id="sponsors" class="clients section">
                     <div class="container">
                         <h3 class="tac">Our sponsors</h3>
                         <br />
@@ -431,7 +445,7 @@
                     </div>
                 </section> -->
 
-            <!-- <section id="advertisers" class="clients section">
+                <!-- <section id="advertisers" class="clients section">
                     <div class="container">
                         <h3 class="tac">Our advertisers</h3>
                         <br />
@@ -451,29 +465,29 @@
                         </div>
                     </div>
                 </section> -->
-        </main>
+            </main>
 
-        <footer id="footer" class="site-footer">
-            <div class="container">
-                <div class="site-footer-inner">
-                    <div class="brand footer-brand">
-                        <a href="/">
-                            <img class="header-logo-image" src="../images/logo.png" alt="Logo" />
-                        </a>
-                    </div>
-                    <ul class="footer-links list-reset">
-                        <!-- <li>
+            <footer id="footer" class="site-footer">
+                <div class="container">
+                    <div class="site-footer-inner">
+                        <div class="brand footer-brand">
+                            <a href="/">
+                                <img class="header-logo-image" src="../images/logo.png" alt="Logo" />
+                            </a>
+                        </div>
+                        <ul class="footer-links list-reset">
+                            <!-- <li>
                                 <a href="/about">About</a>
                             </li> -->
-                        <!-- <li>
+                            <!-- <li>
                                 <a href="/privacy">Privacy Policy</a>
                             </li> -->
-                        <li>
-                            Contact:
-                            <a target="_blank" href="https://www.linkedin.com/in/alisherabbasi/">Ali Sher Abbasi</a>
-                        </li>
-                    </ul>
-                    <!-- <ul class="footer-social-links list-reset">
+                            <li>
+                                Contact:
+                                <a target="_blank" href="https://www.linkedin.com/in/alisherabbasi/">Ali Sher Abbasi</a>
+                            </li>
+                        </ul>
+                        <!-- <ul class="footer-social-links list-reset">
                             <li class="footer-social-icon">
                                 <a target="_blank" href="https://discord.gg/rgGYfeYW3N">
                                     <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -540,16 +554,15 @@
                                 >
                             </li>
                         </ul> -->
-                    <!-- <div class="footer-copyright">&copy; 2024 Mualim Ul Quran, all rights reserved</div> -->
+                        <!-- <div class="footer-copyright">&copy; 2024 Mualim Ul Quran, all rights reserved</div> -->
+                    </div>
                 </div>
-            </div>
-            <div class="footer-copyright">&copy; 2024 Mualim Ul Quran, all rights reserved</div>
-        </footer>
-    </div>
+                <div class="footer-copyright">&copy; 2024 Mualim Ul Quran, all rights reserved</div>
+            </footer>
+        </div>
 
-    <script defer src="../js/Landing.js"></script>
-    <script defer src="../js/Common.js"></script>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-</body>
-
+        <script defer src="../js/Landing.js"></script>
+        <script defer src="../js/Common.js"></script>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+    </body>
 </html>

@@ -1,7 +1,7 @@
 {
     "name": "mirotalk-rtmp-nms",
     "version": "1.0.0",
-"description": "Mualim Ul Quran RTMP Node Media Server",
+    "description": "Mualim Ul Quran RTMP Node Media Server",
     "main": "server.js",
     "scripts": {
         "start": "node src/server.js",

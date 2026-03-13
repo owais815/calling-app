@@ -997,7 +997,6 @@ async function whoAreYou() {
         joinRoom(peer_name, room_id);
     });
 
-
     if (!isVideoAllowed) {
         elemDisplay('initVideo', false);
         initVideoContainerShow(false);

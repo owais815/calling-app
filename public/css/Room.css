@@ -216,7 +216,11 @@ body {
     font-size: 22px;
     color: #e8eaed;
     user-select: none;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
 }
 
 #exitButton {
@@ -975,14 +979,13 @@ th {
 --------------------------------------------------------------*/
 
 .swal2-validation-message,
-
 .swal2-content,
 .swal2-input {
     text-align: center;
     color: #fff !important;
     background-color: transparent !important;
 }
-.swal2-title{
+.swal2-title {
     display: none !important;
 }
 .swal2-html-container {

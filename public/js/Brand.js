@@ -133,7 +133,7 @@ function elementDisplay(element, display, mode = 'block') {
 // APP customize
 function customizeApp() {
     if (appTitle) {
-        appTitle.innerHTML = "Mualim Ul Quran";
+        appTitle.innerHTML = 'Mualim Ul Quran';
     }
     if (appDescription) {
         appDescription.textContent = BRAND.app.description;
@@ -166,16 +166,16 @@ function customizeMetaTags() {
 // SOCIAL MEDIA SHARING metadata
 function customizeOpenGraph() {
     if (ogType) {
-        ogType.content = "Mualim Ul Quran";
+        ogType.content = 'Mualim Ul Quran';
     }
     if (ogSiteName) {
-        ogSiteName.content = "Mualim Ul Quran";
+        ogSiteName.content = 'Mualim Ul Quran';
     }
     if (ogTitle) {
-        ogTitle.content = "Mualim Ul Quran";
+        ogTitle.content = 'Mualim Ul Quran';
     }
     if (ogDescription) {
-        ogDescription.content = "Mualim Ul Quran";
+        ogDescription.content = 'Mualim Ul Quran';
     }
     if (ogImage) {
         ogImage.content = BRAND.og.image;

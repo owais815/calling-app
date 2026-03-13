@@ -310,8 +310,7 @@ module.exports = {
             app: {
                 name: 'Mualim Ul Quran',
                 title: 'Mualim Ul Quran<br />Free browser based Real-time video calls.<br />Simple, Secure, Fast.',
-                description:
-                    'Start your next video call with a single click.',
+                description: 'Start your next video call with a single click.',
             },
             site: {
                 title: 'Mualim Ul Quran, Free Video Calls, Messaging and Screen Sharing',
