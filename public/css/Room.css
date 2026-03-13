@@ -165,7 +165,7 @@ body {
     z-index: 3;
     position: absolute;
     display: flex;
-    padding: 5px;
+    padding: 10px 18px;
 
     top: var(--btns-top);
     right: var(--btns-right);
@@ -175,32 +175,60 @@ body {
     flex-direction: var(--btns-flex-direction);
 
     justify-content: center;
-    grid-gap: 0.4rem;
+    align-items: center;
+    grid-gap: 0.5rem;
 
-    -webkit-transform: translate(0%, -50%);
-    -ms-transform: translate(0%, -50%);
-    transform: translate(0%, -50%);
+    -webkit-transform: var(--btns-transform, translate(0%, -50%));
+    -ms-transform: var(--btns-transform, translate(0%, -50%));
+    transform: var(--btns-transform, translate(0%, -50%));
 
-    /* border: var(--border); */
-    border-radius: 10px;
+    background: rgba(12, 14, 35, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(46, 55, 164, 0.4);
+    border-radius: 40px;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(46, 55, 164, 0.15);
 }
 
 #control button {
     font-size: 1rem;
-    padding: 10px;
-    transition: all 0.3s ease-in-out;
-    background: var(--btns-bg-color);
-    border-radius: 10px;
-    border: var(--border);
-    /* box-shadow: var(--box-shadow); */
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    background: rgba(46, 55, 164, 0.18);
+    border-radius: 50%;
+    border: 1px solid rgba(46, 55, 164, 0.3);
+    color: #fff;
+}
+
+#control button:hover {
+    background: rgba(46, 55, 164, 0.55);
+    border-color: rgba(46, 55, 164, 0.8);
+    color: #fff;
+    transform: scale(1.1);
 }
 
 #control button i {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 #exitButton {
-    color: red;
+    background: rgba(220, 38, 38, 0.85) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    color: #fff !important;
+    width: 54px !important;
+    height: 46px !important;
+    border-radius: 24px !important;
+}
+
+#exitButton:hover {
+    background: rgba(220, 38, 38, 1) !important;
+    border-color: rgba(220, 38, 38, 1) !important;
+    transform: scale(1.08) !important;
 }
 
 /*--------------------------------------------------------------
@@ -1291,7 +1319,7 @@ progress {
 }
 
 ::-webkit-scrollbar-track {
-    background: #1a1b1f;
+    background: #0e1025;
 }
 
 /*--------------------------------------------------------------
