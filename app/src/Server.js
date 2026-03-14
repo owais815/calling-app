@@ -1324,6 +1324,12 @@ function startServer() {
             }
 
             cb(room.toJson());
+
+            // Notify all existing peers that a new participant joined
+            room.broadCast(socket.id, 'refreshParticipantsCount', {
+                room_id: socket.room_id,
+                peer_counts: room.getPeers().size,
+            });
         });
 
         socket.on('getRouterRtpCapabilities', (_, callback) => {

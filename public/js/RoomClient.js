@@ -899,11 +899,12 @@ class RoomClient {
         console.log('SocketOn Participants Count:', data);
         participantsCount = data.peer_counts;
         if (isBroadcastingEnabled) {
-            if (isParticipantsListOpen) getRoomParticipants();
             wbUpdate();
         } else {
             adaptAspectRatio(participantsCount);
         }
+        // Always refresh chat participants list when count changes (chat open or not)
+        if (this.isChatOpen) getRoomParticipants();
     };
 
     handleNewProducers = async (data) => {
@@ -3691,11 +3692,6 @@ class RoomClient {
     }
 
     sendMessage() {
-        if (!this.thereAreParticipants() && !isChatGPTOn) {
-            this.cleanMessage();
-            isChatPasteTxt = false;
-            return this.userLog('info', 'No participants in the room', 'top-end');
-        }
 
         // Prevent long messages
         if (this.chatMessageLengthCheck && chatMessage.value.length > this.chatMessageLength) {
@@ -3789,26 +3785,34 @@ class RoomClient {
         } else {
             const participantsList = this.getId('participantsList');
             const participantsListItems = participantsList.getElementsByTagName('li');
+            let activeLi = null;
             for (let i = 0; i < participantsListItems.length; i++) {
-                const li = participantsListItems[i];
-                if (li.classList.contains('active')) {
-                    data.to_peer_id = li.getAttribute('data-to-id');
-                    data.to_peer_name = li.getAttribute('data-to-name');
-                    console.log('Send message:', data);
-                    this.socket.emit('message', data);
-                    this.setMsgAvatar('left', this.peer_name);
-                    this.appendMessage(
-                        'left',
-                        this.leftMsgAvatar,
-                        this.peer_name,
-                        this.peer_id,
-                        peer_msg,
-                        data.to_peer_id,
-                        data.to_peer_name,
-                    );
-                    this.cleanMessage();
+                if (participantsListItems[i].classList.contains('active')) {
+                    activeLi = participantsListItems[i];
+                    break;
                 }
             }
+            // Fallback: if nothing is active, send to public chat
+            if (!activeLi) {
+                data.to_peer_id = 'all';
+                data.to_peer_name = 'all';
+            } else {
+                data.to_peer_id = activeLi.getAttribute('data-to-id');
+                data.to_peer_name = activeLi.getAttribute('data-to-name');
+            }
+            console.log('Send message:', data);
+            this.socket.emit('message', data);
+            this.setMsgAvatar('left', this.peer_name);
+            this.appendMessage(
+                'left',
+                this.leftMsgAvatar,
+                this.peer_name,
+                this.peer_id,
+                peer_msg,
+                data.to_peer_id,
+                data.to_peer_name,
+            );
+            this.cleanMessage();
         }
     }
 
