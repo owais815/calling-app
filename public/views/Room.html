@@ -228,7 +228,7 @@ access to use this app.
             </button>
             <button id="chatButton" class="hidden"><span class="material-symbols-outlined">chat</span></button>
             <button id="whiteboardButton" class="hidden"><span class="material-symbols-outlined">draw</span></button>
-            <button id="moreOptionsBtn"><span class="material-symbols-outlined">more_vert</span></button>
+<button id="moreOptionsBtn"><span class="material-symbols-outlined">more_vert</span></button>
             <!-- End call -->
             <button id="exitButton" class="hidden"><span class="material-symbols-outlined">call_end</span></button>
         </div>
@@ -1230,7 +1230,52 @@ access to use this app.
             <button id="receiveHideBtn"><i class="fas fa-eye-slash"></i>&nbsp; Hide</button>
         </div>
 
-        <section id="whiteboard" class="fadein center hidden">
+        <!-- LMS Course Materials Panel -->
+        <div id="materialsPanel" class="lms-panel hidden">
+            <div class="lms-panel-header">
+                <div class="lms-panel-title">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#60a5fa">menu_book</span>
+                    <span>Course Materials</span>
+                </div>
+                <button class="lms-panel-close" onclick="toggleLmsPanel('materials')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="lmsPdfList" class="lms-panel-body"></div>
+            <div id="lmsPdfPreview" class="lms-panel-preview hidden">
+                <iframe id="lmsPdfFrame" style="width:100%;height:100%;border:none;background:#0f172a"></iframe>
+            </div>
+        </div>
+
+        <!-- LMS Attendance Panel -->
+        <div id="attendancePanel" class="lms-panel hidden">
+            <div class="lms-panel-header">
+                <div class="lms-panel-title">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#4ade80">assignment_turned_in</span>
+                    <span>Attendance</span>
+                </div>
+                <button class="lms-panel-close" onclick="toggleLmsPanel('attendance')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="lmsAttendanceStats" class="lms-att-stats" style="display:none">
+                <span id="lmsAttPresentCount" class="lms-att-stat present">&#10003; 0 Present</span>
+                <span id="lmsAttAbsentCount" class="lms-att-stat absent">&#10007; 0 Absent</span>
+                <div class="lms-att-bulk">
+                    <button onclick="markAllAttendance('Present')" class="lms-bulk-btn present">All Present</button>
+                    <button onclick="markAllAttendance('Absent')" class="lms-bulk-btn absent">All Absent</button>
+                </div>
+            </div>
+            <div id="lmsAttendanceBody" class="lms-panel-body"></div>
+            <div class="lms-panel-footer">
+                <button id="lmsSaveAttendanceBtn" onclick="saveAttendance()" class="lms-save-btn">
+                    <span class="material-symbols-outlined" style="font-size:16px">save</span>
+                    Save Attendance
+                </button>
+            </div>
+        </div>
+
+        <section id="whiteboard" class="fadein hidden">
             <header id="whiteboardHeader" class="whiteboard-header">
                 <div id="whiteboardTitle" class="whiteboard-header-title">
                     <button id="whiteboardCloseBtn" class="fas fa-times"></button>

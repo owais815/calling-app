@@ -184,6 +184,22 @@ let lobbyParticipantsCount = 0;
 let chatMessagesId = 0;
 
 let room_id = getRoomId();
+
+// ####################################################
+// LMS INTEGRATION PARAMS
+// ####################################################
+
+const _lmsQs = new URLSearchParams(window.location.search);
+const lmsSessionId = _lmsQs.get('lmsSessionId') || '';
+const lmsCourseId  = _lmsQs.get('lmsCourseId')  || '';
+const lmsToken     = _lmsQs.get('lmsToken')      || '';
+const lmsApiUrl    = _lmsQs.get('lmsApiUrl')     || '';
+const lmsUserRole  = (_lmsQs.get('lmsUserRole')  || '').toLowerCase();
+
+let lmsAttendanceSheet = null;
+let lmsAttendanceStatuses = {};
+let lmsActivePanelId = null;
+
 let room_password = getRoomPassword();
 let peer_name = getPeerName();
 let peer_uuid = getPeerUUID();
@@ -1340,6 +1356,15 @@ function roomIsReady() {
         show(fullScreenButton);
     }
     BUTTONS.main.whiteboardButton && show(whiteboardButton);
+        // LMS panel buttons
+        if (lmsCourseId && lmsToken && lmsApiUrl) {
+            const materialsBtn = document.getElementById('lmsCourseMaterialsBtn');
+            if (materialsBtn) show(materialsBtn);
+        }
+        if (lmsSessionId && lmsToken && lmsApiUrl && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
+            const attendanceBtn = document.getElementById('lmsAttendanceBtn');
+            if (attendanceBtn) show(attendanceBtn);
+        }
     BUTTONS.main.settingsButton && show(settingsButton);
     isAudioAllowed ? show(stopAudioButton) : BUTTONS.main.startAudioButton && show(startAudioButton);
     isVideoAllowed ? show(stopVideoButton) : BUTTONS.main.startVideoButton && show(startVideoButton);
@@ -3079,6 +3104,392 @@ function isHtml(str) {
 
 function getId(id) {
     return document.getElementById(id);
+}
+
+// ####################################################
+// LMS PANELS (Course Materials + Attendance)
+// ####################################################
+
+function toggleLmsPanel(panelId) {
+    const panel = document.getElementById(panelId + 'Panel');
+    if (!panel) return;
+    if (lmsActivePanelId === panelId) {
+        panel.classList.add('hidden');
+        lmsActivePanelId = null;
+    } else {
+        if (lmsActivePanelId) {
+            const prev = document.getElementById(lmsActivePanelId + 'Panel');
+            if (prev) prev.classList.add('hidden');
+        }
+        lmsActivePanelId = panelId;
+        panel.classList.remove('hidden');
+        if (panelId === 'materials') loadCourseMaterials();
+        if (panelId === 'attendance') loadAttendanceSheet();
+    }
+}
+
+async function loadCourseMaterials() {
+    const listEl = document.getElementById('lmsPdfList');
+    if (!listEl || !lmsCourseId || !lmsToken || !lmsApiUrl) {
+        if (listEl) listEl.innerHTML = '<div class="lms-panel-empty">Course materials not available.</div>';
+        return;
+    }
+    listEl.innerHTML = '<div class="lms-panel-loading"><span class="lms-spinner"></span> Loading\u2026</div>';
+    try {
+        const res = await fetch(`${lmsApiUrl}/course-pdfs/${lmsCourseId}`, {
+            headers: { Authorization: `Bearer ${lmsToken}` },
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        renderPdfList(data.pdfs || []);
+    } catch (e) {
+        listEl.innerHTML = '<div class="lms-panel-empty">Failed to load course materials.</div>';
+    }
+}
+
+function renderPdfList(pdfs) {
+    const listEl = document.getElementById('lmsPdfList');
+    if (!listEl) return;
+    if (pdfs.length === 0) {
+        listEl.innerHTML = '<div class="lms-panel-empty">No course materials uploaded yet.</div>';
+        return;
+    }
+    listEl.innerHTML = pdfs.map(pdf => {
+        const fileUrl = `${lmsApiUrl}/resources/${pdf.filePath.replace(/^resources\//, '')}`;
+        return `<div class="lms-pdf-item" onclick="previewPdf('${escapeHtml(fileUrl)}', this)">
+            <span class="material-symbols-outlined lms-pdf-icon">picture_as_pdf</span>
+            <span class="lms-pdf-name">${escapeHtml(pdf.originalName)}</span>
+            <a href="${escapeHtml(fileUrl)}" target="_blank" onclick="event.stopPropagation()" class="lms-pdf-link" title="Open in new tab">
+                <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
+            </a>
+        </div>`;
+    }).join('');
+}
+
+function previewPdf(url, itemEl) {
+    const previewEl = document.getElementById('lmsPdfPreview');
+    const frameEl = document.getElementById('lmsPdfFrame');
+    if (!previewEl || !frameEl) return;
+    const wasSelected = itemEl.classList.contains('selected');
+    document.querySelectorAll('.lms-pdf-item').forEach(el => el.classList.remove('selected'));
+    if (wasSelected) {
+        previewEl.classList.add('hidden');
+        frameEl.src = '';
+    } else {
+        itemEl.classList.add('selected');
+        frameEl.src = url;
+        previewEl.classList.remove('hidden');
+    }
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadAttendanceSheet() {
+    const bodyEl = document.getElementById('lmsAttendanceBody');
+    if (!bodyEl || !lmsSessionId || !lmsToken || !lmsApiUrl) {
+        if (bodyEl) bodyEl.innerHTML = '<div class="lms-panel-empty">Attendance not available.</div>';
+        return;
+    }
+    bodyEl.innerHTML = '<div class="lms-panel-loading"><span class="lms-spinner"></span> Loading students\u2026</div>';
+    try {
+        const res = await fetch(`${lmsApiUrl}/attendance/session/${lmsSessionId}`, {
+            headers: { Authorization: `Bearer ${lmsToken}` },
+        });
+        if (!res.ok) throw new Error('Failed');
+        lmsAttendanceSheet = await res.json();
+        if (lmsAttendanceSheet && lmsAttendanceSheet.students) {
+            lmsAttendanceStatuses = {};
+            lmsAttendanceSheet.students.forEach(s => {
+                lmsAttendanceStatuses[s.studentId] = s.status || 'Present';
+            });
+        }
+        renderAttendanceSheet(lmsAttendanceSheet);
+    } catch (e) {
+        if (bodyEl) bodyEl.innerHTML = '<div class="lms-panel-empty">Failed to load attendance sheet.</div>';
+    }
+}
+
+function renderAttendanceSheet(sheet) {
+    const bodyEl = document.getElementById('lmsAttendanceBody');
+    const statsEl = document.getElementById('lmsAttendanceStats');
+    if (!bodyEl) return;
+    if (!sheet || !sheet.students || sheet.students.length === 0) {
+        if (statsEl) statsEl.style.display = 'none';
+        bodyEl.innerHTML = '<div class="lms-panel-empty">No enrolled students found.</div>';
+        return;
+    }
+    if (statsEl) statsEl.style.display = 'flex';
+    updateAttendanceStats();
+    bodyEl.innerHTML = sheet.students.map(s => {
+        const isPresent = (lmsAttendanceStatuses[s.studentId] || 'Present') === 'Present';
+        return `<div class="lms-att-row${isPresent ? '' : ' absent'}" id="lms-att-row-${s.studentId}">
+            <div class="lms-att-avatar">${escapeHtml((s.firstName||'?')[0])}${escapeHtml((s.lastName||'')[0]||'')}</div>
+            <span class="lms-att-name">${escapeHtml(s.firstName)} ${escapeHtml(s.lastName||'')}</span>
+            <button class="lms-att-toggle ${isPresent ? 'present' : 'absent'}" onclick="toggleStudentAttendance(${s.studentId})">
+                ${isPresent ? '\u2713 Present' : '\u2717 Absent'}
+            </button>
+        </div>`;
+    }).join('');
+}
+
+function toggleStudentAttendance(studentId) {
+    const current = lmsAttendanceStatuses[studentId] || 'Present';
+    lmsAttendanceStatuses[studentId] = current === 'Present' ? 'Absent' : 'Present';
+    const rowEl = document.getElementById(`lms-att-row-${studentId}`);
+    const btnEl = rowEl ? rowEl.querySelector('.lms-att-toggle') : null;
+    const isPresent = lmsAttendanceStatuses[studentId] === 'Present';
+    if (rowEl) rowEl.classList.toggle('absent', !isPresent);
+    if (btnEl) {
+        btnEl.className = `lms-att-toggle ${isPresent ? 'present' : 'absent'}`;
+        btnEl.textContent = isPresent ? '\u2713 Present' : '\u2717 Absent';
+    }
+    updateAttendanceStats();
+}
+
+function markAllAttendance(status) {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students) return;
+    lmsAttendanceSheet.students.forEach(s => { lmsAttendanceStatuses[s.studentId] = status; });
+    renderAttendanceSheet(lmsAttendanceSheet);
+}
+
+function updateAttendanceStats() {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students) return;
+    const presentEl = document.getElementById('lmsAttPresentCount');
+    const absentEl  = document.getElementById('lmsAttAbsentCount');
+    const presentCount = lmsAttendanceSheet.students.filter(s => (lmsAttendanceStatuses[s.studentId]||'Present') === 'Present').length;
+    const absentCount  = lmsAttendanceSheet.students.length - presentCount;
+    if (presentEl) presentEl.textContent = `\u2713 ${presentCount} Present`;
+    if (absentEl)  absentEl.textContent  = `\u2717 ${absentCount} Absent`;
+}
+
+async function saveAttendance() {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students || !lmsToken || !lmsApiUrl) return;
+    const saveBtn = document.getElementById('lmsSaveAttendanceBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving\u2026'; }
+    const records = lmsAttendanceSheet.students.map(s => ({
+        studentId: s.studentId,
+        courseDetailsId: s.courseDetailsId,
+        status: lmsAttendanceStatuses[s.studentId] || 'Present',
+    }));
+    try {
+        const res = await fetch(`${lmsApiUrl}/attendance/bulk-mark`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${lmsToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: Number(lmsSessionId), records }),
+        });
+        if (!res.ok) throw new Error('Failed');
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">check_circle</span> Saved!';
+            setTimeout(() => {
+                if (saveBtn) saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">save</span> Save Attendance';
+            }, 2500);
+        }
+        loadAttendanceSheet();
+    } catch (e) {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">save</span> Save Attendance'; }
+    }
+}
+
+// ####################################################
+// LMS PANELS (Course Materials + Attendance)
+// ####################################################
+
+// Listen for postMessage from the LMS parent (header buttons)
+window.addEventListener('message', (e) => {
+    if (!e.data || e.data.type !== 'toggleLmsPanel') return;
+    if (e.data.forceClose) {
+        const panel = document.getElementById(e.data.panel + 'Panel');
+        if (panel) panel.classList.add('hidden');
+        lmsActivePanelId = null;
+    } else {
+        toggleLmsPanel(e.data.panel);
+    }
+});
+
+function toggleLmsPanel(panelId) {
+    const panel = document.getElementById(panelId + 'Panel');
+    if (!panel) return;
+    if (lmsActivePanelId === panelId) {
+        panel.classList.add('hidden');
+        lmsActivePanelId = null;
+    } else {
+        if (lmsActivePanelId) {
+            const prev = document.getElementById(lmsActivePanelId + 'Panel');
+            if (prev) prev.classList.add('hidden');
+        }
+        lmsActivePanelId = panelId;
+        panel.classList.remove('hidden');
+        if (panelId === 'materials') loadCourseMaterials();
+        if (panelId === 'attendance') loadAttendanceSheet();
+    }
+}
+
+async function loadCourseMaterials() {
+    const listEl = document.getElementById('lmsPdfList');
+    if (!listEl || !lmsCourseId || !lmsToken || !lmsApiUrl) {
+        if (listEl) listEl.innerHTML = '<div class="lms-panel-empty">Course materials not available.</div>';
+        return;
+    }
+    listEl.innerHTML = '<div class="lms-panel-loading"><span class="lms-spinner"></span> Loading\u2026</div>';
+    try {
+        const res = await fetch(`${lmsApiUrl}/course-pdfs/${lmsCourseId}`, {
+            headers: { Authorization: `Bearer ${lmsToken}` },
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        renderPdfList(data.pdfs || []);
+    } catch (e) {
+        listEl.innerHTML = '<div class="lms-panel-empty">Failed to load course materials.</div>';
+    }
+}
+
+function renderPdfList(pdfs) {
+    const listEl = document.getElementById('lmsPdfList');
+    if (!listEl) return;
+    if (pdfs.length === 0) {
+        listEl.innerHTML = '<div class="lms-panel-empty">No course materials uploaded yet.</div>';
+        return;
+    }
+    listEl.innerHTML = pdfs.map(pdf => {
+        const fileUrl = `${lmsApiUrl}/resources/${pdf.filePath.replace(/^resources\//, '')}`;
+        return `<div class="lms-pdf-item" onclick="previewPdf('${escapeHtml(fileUrl)}', this)">
+            <span class="material-symbols-outlined lms-pdf-icon">picture_as_pdf</span>
+            <span class="lms-pdf-name">${escapeHtml(pdf.originalName)}</span>
+            <a href="${escapeHtml(fileUrl)}" target="_blank" onclick="event.stopPropagation()" class="lms-pdf-link" title="Open in new tab">
+                <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
+            </a>
+        </div>`;
+    }).join('');
+}
+
+function previewPdf(url, itemEl) {
+    const previewEl = document.getElementById('lmsPdfPreview');
+    const frameEl = document.getElementById('lmsPdfFrame');
+    if (!previewEl || !frameEl) return;
+    const wasSelected = itemEl.classList.contains('selected');
+    document.querySelectorAll('.lms-pdf-item').forEach(el => el.classList.remove('selected'));
+    if (wasSelected) {
+        previewEl.classList.add('hidden');
+        frameEl.src = '';
+    } else {
+        itemEl.classList.add('selected');
+        frameEl.src = url;
+        previewEl.classList.remove('hidden');
+    }
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function loadAttendanceSheet() {
+    const bodyEl = document.getElementById('lmsAttendanceBody');
+    if (!bodyEl || !lmsSessionId || !lmsToken || !lmsApiUrl) {
+        if (bodyEl) bodyEl.innerHTML = '<div class="lms-panel-empty">Attendance not available.</div>';
+        return;
+    }
+    bodyEl.innerHTML = '<div class="lms-panel-loading"><span class="lms-spinner"></span> Loading students\u2026</div>';
+    try {
+        const res = await fetch(`${lmsApiUrl}/attendance/session/${lmsSessionId}`, {
+            headers: { Authorization: `Bearer ${lmsToken}` },
+        });
+        if (!res.ok) throw new Error('Failed');
+        lmsAttendanceSheet = await res.json();
+        if (lmsAttendanceSheet && lmsAttendanceSheet.students) {
+            lmsAttendanceStatuses = {};
+            lmsAttendanceSheet.students.forEach(s => {
+                lmsAttendanceStatuses[s.studentId] = s.status || 'Present';
+            });
+        }
+        renderAttendanceSheet(lmsAttendanceSheet);
+    } catch (e) {
+        if (bodyEl) bodyEl.innerHTML = '<div class="lms-panel-empty">Failed to load attendance sheet.</div>';
+    }
+}
+
+function renderAttendanceSheet(sheet) {
+    const bodyEl = document.getElementById('lmsAttendanceBody');
+    const statsEl = document.getElementById('lmsAttendanceStats');
+    if (!bodyEl) return;
+    if (!sheet || !sheet.students || sheet.students.length === 0) {
+        if (statsEl) statsEl.style.display = 'none';
+        bodyEl.innerHTML = '<div class="lms-panel-empty">No enrolled students found.</div>';
+        return;
+    }
+    if (statsEl) statsEl.style.display = 'flex';
+    updateAttendanceStats();
+    bodyEl.innerHTML = sheet.students.map(s => {
+        const isPresent = (lmsAttendanceStatuses[s.studentId] || 'Present') === 'Present';
+        return `<div class="lms-att-row${isPresent ? '' : ' absent'}" id="lms-att-row-${s.studentId}">
+            <div class="lms-att-avatar">${escapeHtml((s.firstName || '?')[0])}${escapeHtml((s.lastName || '')[0] || '')}</div>
+            <span class="lms-att-name">${escapeHtml(s.firstName)} ${escapeHtml(s.lastName || '')}</span>
+            <button class="lms-att-toggle ${isPresent ? 'present' : 'absent'}" onclick="toggleStudentAttendance(${s.studentId})">
+                ${isPresent ? '\u2713 Present' : '\u2717 Absent'}
+            </button>
+        </div>`;
+    }).join('');
+}
+
+function toggleStudentAttendance(studentId) {
+    const current = lmsAttendanceStatuses[studentId] || 'Present';
+    lmsAttendanceStatuses[studentId] = current === 'Present' ? 'Absent' : 'Present';
+    const rowEl = document.getElementById(`lms-att-row-${studentId}`);
+    const btnEl = rowEl ? rowEl.querySelector('.lms-att-toggle') : null;
+    const isPresent = lmsAttendanceStatuses[studentId] === 'Present';
+    if (rowEl) rowEl.classList.toggle('absent', !isPresent);
+    if (btnEl) {
+        btnEl.className = `lms-att-toggle ${isPresent ? 'present' : 'absent'}`;
+        btnEl.textContent = isPresent ? '\u2713 Present' : '\u2717 Absent';
+    }
+    updateAttendanceStats();
+}
+
+function markAllAttendance(status) {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students) return;
+    lmsAttendanceSheet.students.forEach(s => { lmsAttendanceStatuses[s.studentId] = status; });
+    renderAttendanceSheet(lmsAttendanceSheet);
+}
+
+function updateAttendanceStats() {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students) return;
+    const presentEl = document.getElementById('lmsAttPresentCount');
+    const absentEl  = document.getElementById('lmsAttAbsentCount');
+    const presentCount = lmsAttendanceSheet.students.filter(s => (lmsAttendanceStatuses[s.studentId] || 'Present') === 'Present').length;
+    const absentCount  = lmsAttendanceSheet.students.length - presentCount;
+    if (presentEl) presentEl.textContent = `\u2713 ${presentCount} Present`;
+    if (absentEl)  absentEl.textContent  = `\u2717 ${absentCount} Absent`;
+}
+
+async function saveAttendance() {
+    if (!lmsAttendanceSheet || !lmsAttendanceSheet.students || !lmsToken || !lmsApiUrl) return;
+    const saveBtn = document.getElementById('lmsSaveAttendanceBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving\u2026'; }
+    const records = lmsAttendanceSheet.students.map(s => ({
+        studentId: s.studentId,
+        courseDetailsId: s.courseDetailsId,
+        status: lmsAttendanceStatuses[s.studentId] || 'Present',
+    }));
+    try {
+        const res = await fetch(`${lmsApiUrl}/attendance/bulk-mark`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${lmsToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: Number(lmsSessionId), records }),
+        });
+        if (!res.ok) throw new Error('Failed');
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">check_circle</span> Saved!';
+            setTimeout(() => {
+                if (saveBtn) saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">save</span> Save Attendance';
+            }, 2500);
+        }
+        loadAttendanceSheet();
+    } catch (e) {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">save</span> Save Attendance'; }
+    }
 }
 
 // ####################################################
