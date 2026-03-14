@@ -2075,7 +2075,10 @@ function handleMediaError(mediaType, err) {
         </ul>
     `;
 
-    const redirectURL = ['screen', 'screenType'].includes(mediaType) || !getUserMediaError ? false : '/';
+    // Never redirect on A/V hardware errors — joinRoomWithoutAudioVideo=true means
+    // users can still join without a mic/camera, so redirecting to '/' would
+    // navigate the iframe and cause the LMS to close the call unexpectedly.
+    const redirectURL = false;
 
     popupHtmlMessage(null, image.forbidden, 'Access denied', html, 'center', redirectURL);
 
@@ -2920,6 +2923,12 @@ function leaveFeedback() {
 }
 
 function redirectOnLeave() {
+    // When embedded inside the LMS iframe, notify the parent to close the modal
+    // instead of navigating (which would trigger an unwanted iframe reload event).
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'lmsLeaveCall' }, '*');
+        return;
+    }
     redirect && redirect.enabled ? openURL(redirect.url) : openURL('/newroom');
 }
 
