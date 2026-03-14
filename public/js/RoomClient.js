@@ -3534,6 +3534,8 @@ class RoomClient {
             }
             this.chatPin(); // open pinned to right side by default
             this.sound('open');
+            // Tell the LMS parent to close any open panel (Course Materials / Attendance)
+            window.parent.postMessage({ type: 'lmsClosePanels' }, '*');
             this.showPeerAboutAndMessages('all', 'all');
         } else {
             this.chatUnpin();

@@ -3106,28 +3106,6 @@ function getId(id) {
     return document.getElementById(id);
 }
 
-// ####################################################
-// LMS PANELS (Course Materials + Attendance)
-// ####################################################
-
-function toggleLmsPanel(panelId) {
-    const panel = document.getElementById(panelId + 'Panel');
-    if (!panel) return;
-    if (lmsActivePanelId === panelId) {
-        panel.classList.add('hidden');
-        lmsActivePanelId = null;
-    } else {
-        if (lmsActivePanelId) {
-            const prev = document.getElementById(lmsActivePanelId + 'Panel');
-            if (prev) prev.classList.add('hidden');
-        }
-        lmsActivePanelId = panelId;
-        panel.classList.remove('hidden');
-        if (panelId === 'materials') loadCourseMaterials();
-        if (panelId === 'attendance') loadAttendanceSheet();
-    }
-}
-
 async function loadCourseMaterials() {
     const listEl = document.getElementById('lmsPdfList');
     if (!listEl || !lmsCourseId || !lmsToken || !lmsApiUrl) {
@@ -3297,15 +3275,13 @@ async function saveAttendance() {
 // LMS PANELS (Course Materials + Attendance)
 // ####################################################
 
-// Listen for postMessage from the LMS parent (header buttons)
+// Listen for postMessage from the LMS parent
 window.addEventListener('message', (e) => {
-    if (!e.data || e.data.type !== 'toggleLmsPanel') return;
-    if (e.data.forceClose) {
-        const panel = document.getElementById(e.data.panel + 'Panel');
-        if (panel) panel.classList.add('hidden');
-        lmsActivePanelId = null;
-    } else {
-        toggleLmsPanel(e.data.panel);
+    if (!e.data) return;
+    // LMS panel opened from header → close calling-app chat if open
+    if (e.data.type === 'lmsCloseChat') {
+        if (rc && rc.isChatOpen) rc.toggleChat();
+        return;
     }
 });
 
