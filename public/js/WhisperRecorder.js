@@ -1,145 +1,92 @@
 'use strict';
 
 /**
- * WhisperRecorder
+ * WhisperRecorder (Google Web Speech API mode)
  *
- * Captures mixed session audio (local mic + all remote peers) using the
- * existing MixedAudioRecorder, then POSTs the recording to the calling-app's
- * /api/v1/transcribe endpoint, which forwards it to OpenAI Whisper and saves
- * the result to the LMS database.
+ * Uses the existing Transcription object (Web Speech API / Google) to collect
+ * speech text from the session, then POSTs the accumulated text to the calling-app
+ * proxy endpoint (/api/v1/save-transcript), which forwards it to the LMS backend.
  *
- * Usage (from Room.js):
- *   const wr = new WhisperRecorder({ rc, lmsSessionId, lmsApiUrl, apiSecret });
- *   wr.start();      // begin recording
- *   await wr.stop(); // stop + upload + transcribe
+ * The Transcription class already broadcasts each participant's recognised text
+ * via Socket.IO, so ALL participants' speech ends up in transcription.transcripts[].
+ *
+ * OpenAI Whisper implementation is commented out in Server.js — to switch back,
+ * uncomment that block and replace this file with the audio-recording version.
+ *
+ * Interface is identical to the original WhisperRecorder so Room.js needs no changes:
+ *   start()              — begin capturing (starts persistent Web Speech recognition)
+ *   stop()               — stop + upload transcript text to LMS (async)
+ *   stopAndUploadSync()  — best-effort pagehide upload via sendBeacon
+ *   isActive()           — returns true while recording
  */
 class WhisperRecorder {
-    constructor({ rc, lmsSessionId, lmsApiUrl, lmsToken }) {
-        this.rc = rc;                       // RoomClient instance
-        this.lmsSessionId = lmsSessionId;   // LMS session ID (string)
-        this.lmsApiUrl = lmsApiUrl;         // LMS backend base URL
-        this.lmsToken = lmsToken;           // JWT from the LMS (sent as x-lms-token)
-        this.mediaRecorder = null;
-        this.mixedAudioRecorder = null;
-        this.chunks = [];
-        this.isRecording = false;
-        this.mimeType = this._getSupportedMimeType();
+    constructor({ lmsSessionId, lmsApiUrl, lmsToken }) {
+        this.lmsSessionId = lmsSessionId;
+        this.lmsApiUrl    = lmsApiUrl || '';
+        this.lmsToken     = lmsToken  || '';
+        this.isRecording  = false;
     }
 
-    _getSupportedMimeType() {
-        const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', 'audio/mp4'];
-        for (const t of types) {
-            if (MediaRecorder.isTypeSupported(t)) return t;
-        }
-        return '';
-    }
-
-    /** Build the mixed audio stream from local mic + all remote peer audio */
-    _buildMixedStream() {
-        const streams = [];
-
-        // Local microphone
-        if (this.rc.localAudioStream) {
-            streams.push(this.rc.localAudioStream);
-        }
-
-        // All remote peer audio elements
-        const remoteStream = this.rc.getAudioStreamFromAudioElements();
-        remoteStream.getAudioTracks().forEach((track) => {
-            streams.push(new MediaStream([track]));
-        });
-
-        if (streams.length === 0) return null;
-
-        this.mixedAudioRecorder = new MixedAudioRecorder();
-        return this.mixedAudioRecorder.getMixedAudioStream(streams);
-    }
-
+    /** Start persistent Web Speech recognition */
     start() {
         if (this.isRecording) return;
-        try {
-            const mixedStream = this._buildMixedStream();
-            if (!mixedStream) {
-                userLog('warning', 'Whisper: No audio tracks found to record.', 'top-end', 4000);
-                return;
-            }
-
-            const options = this.mimeType ? { mimeType: this.mimeType } : {};
-            this.mediaRecorder = new MediaRecorder(mixedStream, options);
-            this.chunks = [];
-
-            this.mediaRecorder.ondataavailable = (e) => {
-                if (e.data && e.data.size > 0) this.chunks.push(e.data);
-            };
-
-            this.mediaRecorder.start(5000); // collect data every 5 s
-            this.isRecording = true;
-            userLog('info', 'Whisper transcript recording started', 'top-end', 3000);
-        } catch (err) {
-            console.error('[WhisperRecorder] start error:', err);
-            userLog('error', `Whisper start error: ${err.message}`, 'top-end', 5000);
+        if (typeof transcription === 'undefined' || !transcription.isSupported()) {
+            userLog('warning', 'Speech recognition not supported in this browser.', 'top-end', 5000);
+            return;
         }
+        // Enable persistent mode so recognition auto-restarts on silence
+        transcription.isPersistentMode = true;
+        transcription.start();
+        this.isRecording = true;
+        userLog('info', 'Session transcription started (Google Speech)', 'top-end', 3000);
     }
 
-    stop() {
-        return new Promise((resolve) => {
-            if (!this.mediaRecorder || !this.isRecording) {
-                resolve(null);
-                return;
-            }
-            this.mediaRecorder.onstop = async () => {
-                this.isRecording = false;
-                if (this.mixedAudioRecorder) {
-                    this.mixedAudioRecorder.stopMixedAudioStream();
-                    this.mixedAudioRecorder = null;
-                }
-                const blob = new Blob(this.chunks, { type: this.mimeType || 'audio/webm' });
-                this.chunks = [];
-                if (blob.size === 0) {
-                    userLog('warning', 'Whisper: No audio recorded.', 'top-end', 4000);
-                    resolve(null);
-                    return;
-                }
-                const result = await this._upload(blob);
-                resolve(result);
-            };
-            this.mediaRecorder.stop();
-        });
+    /** Stop recognition and upload collected text to LMS */
+    async stop() {
+        if (!this.isRecording) return;
+        this.isRecording = false;
+        if (typeof transcription !== 'undefined') {
+            transcription.isPersistentMode = false;
+            transcription.stop();
+        }
+        await this._upload();
     }
 
-    async _upload(blob) {
-        if (!this.lmsSessionId) {
-            console.warn('[WhisperRecorder] No lmsSessionId — skipping upload');
-            return null;
+    /** Format collected transcripts and POST to calling-app proxy */
+    async _upload() {
+        if (!this.lmsSessionId) return;
+        if (typeof transcription === 'undefined' || !transcription.transcripts || transcription.transcripts.length === 0) {
+            userLog('info', 'No transcript text collected for this session.', 'top-end', 4000);
+            return;
         }
 
-        userLog('info', 'Uploading session audio for transcription…', 'top-end', 4000);
+        const transcriptText = transcription.transcripts
+            .map(t => `[${t.time}] ${t.name}: ${t.caption}`)
+            .join('\n');
+
+        userLog('info', 'Saving session transcript…', 'top-end', 3000);
 
         try {
-            const params = new URLSearchParams({ lmsSessionId: this.lmsSessionId });
-            if (this.lmsApiUrl) params.set('lmsApiUrl', this.lmsApiUrl);
-
-            const resp = await fetch(`/api/v1/transcribe?${params}`, {
+            const resp = await fetch('/api/v1/save-transcript', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': this.mimeType || 'audio/webm',
-                    'x-lms-token': this.lmsToken || '',
+                    'Content-Type': 'application/json',
+                    'x-lms-token': this.lmsToken,
                 },
-                body: blob,
+                body: JSON.stringify({
+                    lmsSessionId: this.lmsSessionId,
+                    transcriptText,
+                    lmsApiUrl: this.lmsApiUrl,
+                }),
             });
 
             if (!resp.ok) {
-                const errText = await resp.text().catch(() => '');
-                throw new Error(`Server responded ${resp.status}: ${errText}`);
+                throw new Error(`Server responded ${resp.status}`);
             }
-
-            const { transcriptText } = await resp.json();
             userLog('success', 'Transcript saved! Accessible in the LMS schedule.', 'top-end', 6000);
-            return transcriptText;
         } catch (err) {
             console.error('[WhisperRecorder] upload error:', err);
-            userLog('error', `Transcript upload failed: ${err.message}`, 'top-end', 6000);
-            return null;
+            userLog('error', `Transcript save failed: ${err.message}`, 'top-end', 6000);
         }
     }
 
@@ -148,38 +95,24 @@ class WhisperRecorder {
     }
 
     /**
-     * Synchronous-style stop for pagehide / beforeunload.
-     * Flushes any buffered chunks and fires a keepalive fetch so the
-     * browser keeps the request alive even after the page is gone.
-     * Best-effort: keepalive is capped at ~64 KB — works for short sessions.
+     * Best-effort pagehide upload via sendBeacon.
+     * sendBeacon survives page unload but doesn't support custom headers,
+     * so we embed the lmsToken in the JSON body instead.
      */
     stopAndUploadSync() {
-        if (!this.mediaRecorder || !this.isRecording) return;
-        try {
-            this.mediaRecorder.requestData(); // flush remaining buffered data
-            this.mediaRecorder.stop();
-            this.isRecording = false;
+        if (!this.isRecording || !this.lmsSessionId) return;
+        this.isRecording = false;
 
-            if (this.chunks.length === 0 || !this.lmsSessionId) return;
+        if (typeof transcription === 'undefined' || !transcription.transcripts || transcription.transcripts.length === 0) return;
 
-            const blob = new Blob(this.chunks, { type: this.mimeType || 'audio/webm' });
-            this.chunks = [];
+        const transcriptText = transcription.transcripts
+            .map(t => `[${t.time}] ${t.name}: ${t.caption}`)
+            .join('\n');
 
-            const params = new URLSearchParams({ lmsSessionId: this.lmsSessionId });
-            if (this.lmsApiUrl) params.set('lmsApiUrl', this.lmsApiUrl);
-
-            // keepalive keeps the request alive after page unload
-            fetch(`/api/v1/transcribe?${params}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': this.mimeType || 'audio/webm',
-                    'x-lms-token': this.lmsToken || '',
-                },
-                body: blob,
-                keepalive: true,
-            }).catch(() => {});
-        } catch (err) {
-            console.warn('[WhisperRecorder] stopAndUploadSync error:', err);
-        }
+        const blob = new Blob(
+            [JSON.stringify({ lmsSessionId: this.lmsSessionId, transcriptText, lmsApiUrl: this.lmsApiUrl, lmsToken: this.lmsToken })],
+            { type: 'application/json' },
+        );
+        navigator.sendBeacon('/api/v1/save-transcript-beacon', blob);
     }
 }

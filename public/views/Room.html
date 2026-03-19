@@ -111,6 +111,7 @@
         <script defer src="../js/Helpers.js"></script>
         <script defer src="../js/SpeechRec.js"></script>
         <script defer src="../js/Transcription.js"></script>
+        <script defer src="../js/WhisperRecorder.js"></script>
         <script defer src="../js/VideoGrid.js"></script>
         <script defer src="../js/RoomClient.js"></script>
         <script defer src="../js/Room.js"></script>
@@ -195,6 +196,10 @@ access to use this app.
             <button id="transcriptionButton" class="hidden menu-item">
                 <span class="material-symbols-outlined">closed_caption</span>
                 <span class="menu-item-label">Captions</span>
+            </button>
+            <button id="whisperTranscriptBtn" class="hidden menu-item">
+                <span class="material-symbols-outlined">record_voice_over</span>
+                <span class="menu-item-label" id="whisperTranscriptLabel">Start Transcript</span>
             </button>
             <button id="settingsButton" class="hidden menu-item">
                 <span class="material-symbols-outlined">settings</span>
