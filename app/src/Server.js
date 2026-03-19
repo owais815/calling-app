@@ -685,6 +685,118 @@ function startServer() {
     });
 
     // ###############################################################
+    // WHISPER TRANSCRIPTION (OpenAI) — COMMENTED OUT
+    // Replaced by Google Web Speech API (browser-side) + /api/v1/save-transcript below.
+    // To re-enable: uncomment this block and comment out the save-transcript endpoint.
+    // ###############################################################
+    /*
+    app.post('/api/v1/transcribe', async (req, res) => {
+        if (!config.whisper.enabled) {
+            return res.status(503).json({ message: 'Whisper transcription is not enabled on this server.' });
+        }
+        if (!config.whisper.apiKey) {
+            return res.status(503).json({ message: 'OPENAI_API_KEY is not configured.' });
+        }
+        const providedSecret = req.headers['x-calling-secret'] || req.headers['authorization'];
+        const lmsToken = req.headers['x-lms-token'] || req.query.lmsToken;
+        const isServerAuth = providedSecret === config.api.keySecret;
+        const isBrowserAuth = typeof lmsToken === 'string' && lmsToken.length > 20;
+        if (!isServerAuth && !isBrowserAuth) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const lmsSessionId = req.query.lmsSessionId;
+        const lmsApiUrl = req.query.lmsApiUrl || config.whisper.lmsApiUrl;
+        if (!lmsSessionId) {
+            return res.status(400).json({ message: 'lmsSessionId query param is required' });
+        }
+        const tmpDir = path.join(__dirname, '../', 'tmp');
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+        const tmpFile = path.join(tmpDir, `whisper_${Date.now()}_${lmsSessionId}.webm`);
+        try {
+            await new Promise((resolve, reject) => {
+                const writeStream = fs.createWriteStream(tmpFile);
+                req.pipe(writeStream);
+                writeStream.on('finish', resolve);
+                writeStream.on('error', reject);
+            });
+            const { OpenAI } = require('openai');
+            const openai = new OpenAI({ apiKey: config.whisper.apiKey });
+            const transcription = await openai.audio.transcriptions.create({
+                file: fs.createReadStream(tmpFile),
+                model: config.whisper.model || 'whisper-1',
+                ...(config.whisper.language ? { language: config.whisper.language } : {}),
+            });
+            const transcriptText = transcription.text || '';
+            log.info(`[Whisper] Transcribed session ${lmsSessionId}: ${transcriptText.length} chars`);
+            try {
+                const lmsSaveUrl = `${lmsApiUrl}/api/class-schedule/sessions/${lmsSessionId}/transcript`;
+                const saveResp = await fetch(lmsSaveUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-calling-secret': config.api.keySecret },
+                    body: JSON.stringify({ transcriptText }),
+                });
+                if (!saveResp.ok) {
+                    const errText = await saveResp.text().catch(() => '');
+                    log.warn(`[Whisper] LMS save failed [${saveResp.status}]: ${errText}`);
+                }
+            } catch (saveErr) {
+                log.warn('[Whisper] Could not save transcript to LMS (non-fatal):', saveErr.message);
+            }
+            return res.json({ transcriptText });
+        } catch (err) {
+            log.error('[Whisper] Transcription error:', err.message);
+            return res.status(500).json({ message: 'Transcription failed', error: err.message });
+        } finally {
+            fs.unlink(tmpFile, () => {});
+        }
+    });
+    */
+
+    // ###############################################################
+    // GOOGLE SPEECH (Web Speech API) — TRANSCRIPT SAVE
+    // Browser collects transcript text via Web Speech API, then POSTs
+    // the text here. This endpoint proxies it to the LMS backend using
+    // the shared server secret (browser never sees the secret).
+    // Auth: x-lms-token header (JWT from LMS, length > 20)
+    // Body JSON: { lmsSessionId, transcriptText, lmsApiUrl? }
+    // ###############################################################
+
+    app.post('/api/v1/save-transcript', async (req, res) => {
+        const lmsToken = req.headers['x-lms-token'] || '';
+        if (typeof lmsToken !== 'string' || lmsToken.length <= 20) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const { lmsSessionId, transcriptText, lmsApiUrl: bodyApiUrl } = req.body;
+        if (!lmsSessionId) return res.status(400).json({ message: 'lmsSessionId is required' });
+        if (!transcriptText) return res.status(400).json({ message: 'transcriptText is required' });
+
+        const lmsApiUrl = bodyApiUrl || config.whisper.lmsApiUrl || 'http://localhost:8080';
+
+        try {
+            const lmsSaveUrl = `${lmsApiUrl}/api/class-schedule/sessions/${lmsSessionId}/transcript`;
+            const saveResp = await fetch(lmsSaveUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-calling-secret': config.api.keySecret,
+                },
+                body: JSON.stringify({ transcriptText }),
+            });
+            if (!saveResp.ok) {
+                const errText = await saveResp.text().catch(() => '');
+                log.warn(`[SpeechTranscript] LMS save failed [${saveResp.status}]: ${errText}`);
+                return res.status(502).json({ message: 'LMS save failed', detail: errText });
+            }
+            log.info(`[SpeechTranscript] Saved transcript for session ${lmsSessionId}: ${transcriptText.length} chars`);
+            return res.json({ message: 'Transcript saved' });
+        } catch (err) {
+            log.error('[SpeechTranscript] Error:', err.message);
+            return res.status(500).json({ message: 'Server error', error: err.message });
+        }
+    });
+
+    // ###############################################################
     // INCOMING STREAM (getUserMedia || getDisplayMedia) TO RTMP
     // ###############################################################
 
