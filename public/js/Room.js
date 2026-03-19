@@ -260,6 +260,7 @@ let scriptProcessor = null;
 const RoomURL = window.location.origin + '/join/' + room_id; // window.location.origin + '/join/?room=' + roomId + '&token=' + myToken
 
 let transcription;
+let whisperRecorder = null;
 
 let showFreeAvatars = true;
 
@@ -271,12 +272,31 @@ document.addEventListener('DOMContentLoaded', function () {
     initClient();
 });
 
+// Safety net: if teacher closes the tab without using the Exit button,
+// attempt to stop + upload the whisper recording.
+// Uses keepalive fetch (best-effort; may fail for very large audio blobs).
+window.addEventListener('pagehide', () => {
+    if (whisperRecorder && whisperRecorder.isActive()) {
+        whisperRecorder.stopAndUploadSync();
+    }
+});
+
 function initClient() {
     setTheme();
 
     // Transcription
     transcription = new Transcription();
     transcription.init();
+
+    // Whisper recorder — only for teacher/admin with an active LMS session
+    if (lmsSessionId && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
+        whisperRecorder = new WhisperRecorder({
+            rc: null, // set after rc is created in joinRoom()
+            lmsSessionId,
+            lmsApiUrl,
+            lmsToken,
+        });
+    }
 
     if (!DetectRTC.isMobileDevice) {
         refreshMainButtonsToolTipPlacement();
@@ -1274,6 +1294,13 @@ function joinRoom(peer_name, room_id) {
             roomIsReady,
         );
         handleRoomClientEvents();
+        // Inject rc into whisperRecorder now that it's available, then auto-start
+        if (whisperRecorder) {
+            whisperRecorder.rc = rc;
+            whisperRecorder.start();
+            const whisperLabel = document.getElementById('whisperTranscriptLabel');
+            if (whisperLabel) whisperLabel.textContent = 'Stop Transcript';
+        }
         //notify ? shareRoom() : sound('joined');
     }
 }
@@ -1364,6 +1391,10 @@ function roomIsReady() {
         if (lmsSessionId && lmsToken && lmsApiUrl && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
             const attendanceBtn = document.getElementById('lmsAttendanceBtn');
             if (attendanceBtn) show(attendanceBtn);
+        }
+        if (whisperRecorder) {
+            const whisperBtn = document.getElementById('whisperTranscriptBtn');
+            if (whisperBtn) show(whisperBtn);
         }
     BUTTONS.main.settingsButton && show(settingsButton);
     isAudioAllowed ? show(stopAudioButton) : BUTTONS.main.startAudioButton && show(startAudioButton);
@@ -1592,6 +1623,25 @@ function handleButtons() {
     transcriptionButton.onclick = () => {
         transcription.toggle();
     };
+
+    // Whisper transcript toggle
+    const whisperBtn = document.getElementById('whisperTranscriptBtn');
+    const whisperLabel = document.getElementById('whisperTranscriptLabel');
+    if (whisperBtn && whisperRecorder) {
+        whisperBtn.onclick = async () => {
+            if (!whisperRecorder.rc && rc) whisperRecorder.rc = rc;
+            if (whisperRecorder.isActive()) {
+                whisperBtn.disabled = true;
+                if (whisperLabel) whisperLabel.textContent = 'Saving Transcript…';
+                await whisperRecorder.stop();
+                whisperBtn.disabled = false;
+                if (whisperLabel) whisperLabel.textContent = 'Start Transcript';
+            } else {
+                whisperRecorder.start();
+                if (whisperLabel) whisperLabel.textContent = 'Stop Transcript';
+            }
+        };
+    }
     transcriptionCloseBtn.onclick = () => {
         transcription.toggle();
     };
@@ -2883,10 +2933,14 @@ function handleRoomClientEvents() {
         hide(stopRtmpURLButton);
         show(startRtmpURLButton);
     });
-    rc.on(RoomClient.EVENTS.exitRoom, () => {
+    rc.on(RoomClient.EVENTS.exitRoom, async () => {
         console.log('Room event: Client leave room');
         if (rc.isRecording() || recordingStatus.innerText != '0s') {
             rc.saveRecording('Room event: Client save recording before to exit');
+        }
+        // Auto-stop whisper transcript on room exit
+        if (whisperRecorder && whisperRecorder.isActive()) {
+            await whisperRecorder.stop();
         }
         if (survey && survey.enabled) {
             leaveFeedback();
