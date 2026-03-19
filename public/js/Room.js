@@ -291,7 +291,6 @@ function initClient() {
     // Whisper recorder — only for teacher/admin with an active LMS session
     if (lmsSessionId && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
         whisperRecorder = new WhisperRecorder({
-            rc: null, // set after rc is created in joinRoom()
             lmsSessionId,
             lmsApiUrl,
             lmsToken,
@@ -1294,9 +1293,8 @@ function joinRoom(peer_name, room_id) {
             roomIsReady,
         );
         handleRoomClientEvents();
-        // Inject rc into whisperRecorder now that it's available, then auto-start
+        // Auto-start speech transcript recording once the room is ready
         if (whisperRecorder) {
-            whisperRecorder.rc = rc;
             whisperRecorder.start();
             const whisperLabel = document.getElementById('whisperTranscriptLabel');
             if (whisperLabel) whisperLabel.textContent = 'Stop Transcript';
@@ -1629,7 +1627,6 @@ function handleButtons() {
     const whisperLabel = document.getElementById('whisperTranscriptLabel');
     if (whisperBtn && whisperRecorder) {
         whisperBtn.onclick = async () => {
-            if (!whisperRecorder.rc && rc) whisperRecorder.rc = rc;
             if (whisperRecorder.isActive()) {
                 whisperBtn.disabled = true;
                 if (whisperLabel) whisperLabel.textContent = 'Saving Transcript…';
