@@ -796,6 +796,25 @@ function startServer() {
         }
     });
 
+    // Beacon variant — token comes from JSON body (sendBeacon can't set headers)
+    app.post('/api/v1/save-transcript-beacon', async (req, res) => {
+        const { lmsSessionId, transcriptText, lmsApiUrl: bodyApiUrl, lmsToken } = req.body;
+        if (!lmsToken || lmsToken.length <= 20) return res.status(401).end();
+        if (!lmsSessionId || !transcriptText) return res.status(400).end();
+
+        const lmsApiUrl = bodyApiUrl || config.whisper.lmsApiUrl || 'http://localhost:8080';
+        try {
+            await fetch(`${lmsApiUrl}/api/class-schedule/sessions/${lmsSessionId}/transcript`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-calling-secret': config.api.keySecret },
+                body: JSON.stringify({ transcriptText }),
+            });
+        } catch (err) {
+            log.warn('[SpeechTranscript beacon] Error:', err.message);
+        }
+        res.status(204).end();
+    });
+
     // ###############################################################
     // INCOMING STREAM (getUserMedia || getDisplayMedia) TO RTMP
     // ###############################################################
