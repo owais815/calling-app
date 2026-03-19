@@ -208,6 +208,20 @@ module.exports = {
         max_tokens: 1000,
         temperature: 0,
     },
+    whisper: {
+        /*
+        OpenAI Whisper — post-session audio transcription
+            1. Set WHISPER_ENABLED=true and OPENAI_API_KEY in environment
+            2. Teacher clicks "Start Transcript" in the meeting room
+            3. On session end the audio is uploaded and transcribed automatically
+            4. Transcript is saved to the LMS database and downloadable from the schedule
+        */
+        enabled: process.env.WHISPER_ENABLED === 'true',
+        apiKey: process.env.OPENAI_API_KEY || '',
+        model: 'whisper-1',
+        language: '', // ISO-639-1 language code; leave blank for auto-detect (handles mixed English/Urdu/Arabic)
+        lmsApiUrl: process.env.LMS_API_URL || 'http://localhost:8080',
+    },
     videoAI: {
         /*
         HeyGen Video AI
