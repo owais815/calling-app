@@ -154,12 +154,12 @@ access to use this app.
                     ></video>
                 </div>
                 <div class="initComands">
-                    <button id="initVideoAudioRefreshButton" class="fas fa-rotate"></button>
-                    <button id="initVideoButton" class="fas fa-video"></button>
-                    <button id="initAudioButton" class="fas fa-microphone"></button>
-                    <button id="initAudioVideoButton" class="fas fa-eye"></button>
-                    <button id="initStartScreenButton" class="fas fa-desktop hidden"></button>
-                    <button id="initStopScreenButton" class="fas fa-stop-circle hidden"></button>
+                    <button id="initVideoAudioRefreshButton"><span class="material-symbols-outlined">refresh</span></button>
+                    <button id="initVideoButton"><span class="material-symbols-outlined">videocam</span></button>
+                    <button id="initAudioButton"><span class="material-symbols-outlined">mic</span></button>
+                    <button id="initAudioVideoButton"><span class="material-symbols-outlined">visibility</span></button>
+                    <button id="initStartScreenButton" class="hidden"><span class="material-symbols-outlined">desktop_windows</span></button>
+                    <button id="initStopScreenButton" class="hidden"><span class="material-symbols-outlined">stop_circle</span></button>
                     <select id="initVideoSelect" class="form-select text-light bg-dark"></select>
                     <select id="initMicrophoneSelect" class="form-select text-light bg-dark"></select>
                     <select id="initSpeakerSelect" class="form-select text-light bg-dark"></select>
@@ -205,10 +205,6 @@ access to use this app.
                 <span class="material-symbols-outlined">settings</span>
                 <span class="menu-item-label">Settings</span>
             </button>
-            <button id="aboutButton" class="hidden menu-item">
-                <span class="material-symbols-outlined">help</span>
-                <span class="menu-item-label">About</span>
-            </button>
         </div>
 
         <div id="control" class="fadein">
@@ -247,44 +243,60 @@ access to use this app.
 
         <section id="mySettings" class="fadein center hidden">
             <header id="mySettingsHeader">
+                <div class="settings-modal-title">
+                    <span class="material-symbols-outlined">settings</span>
+                    Settings
+                </div>
                 <button id="mySettingsCloseBtn"><span class="material-symbols-outlined">close</span></button>
             </header>
             <main class="mySettingsMain">
                 <div class="tab">
-                    <button id="tabRoomBtn" class="fas fa-home tablinks">
+                    <button id="tabRoomBtn" class="tablinks">
+                        <span class="material-symbols-outlined">meeting_room</span>
                         <p class="tabButtonText">Room</p>
                     </button>
-                    <button id="tabVideoDevicesBtn" class="fas fa-video tablinks">
+                    <button id="tabVideoDevicesBtn" class="tablinks">
+                        <span class="material-symbols-outlined">videocam</span>
                         <p class="tabButtonText">Video</p>
                     </button>
-                    <button id="tabAudioDevicesBtn" class="fas fa-microphone tablinks">
+                    <button id="tabAudioDevicesBtn" class="tablinks">
+                        <span class="material-symbols-outlined">mic</span>
                         <p class="tabButtonText">Audio</p>
                     </button>
-                    <button id="tabModeratorBtn" class="fas fa-m tablinks">
+                    <button id="tabModeratorBtn" class="tablinks">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
                         <p class="tabButtonText">Moderator</p>
                     </button>
-                    <button id="tabRecordingBtn" class="fas fa-record-vinyl tablinks">
+                    <button id="tabRecordingBtn" class="tablinks">
+                        <span class="material-symbols-outlined">radio_button_checked</span>
                         <p class="tabButtonText">Recording</p>
                     </button>
-                    <button id="tabVideoAIBtn" class="fab fa-airbnb tablinks">
+                    <button id="tabVideoAIBtn" class="tablinks">
+                        <span class="material-symbols-outlined">smart_toy</span>
                         <p class="tabButtonText">VideoAI</p>
                     </button>
-                    <button id="tabVideoShareBtn" class="fab fa-youtube tablinks">
+                    <button id="tabVideoShareBtn" class="tablinks">
+                        <span class="material-symbols-outlined">play_circle</span>
                         <p class="tabButtonText">Media</p>
                     </button>
-                    <button id="tabRTMPStreamingBtn" class="fa-solid fa-satellite-dish tablinks">
+                    <button id="tabRTMPStreamingBtn" class="tablinks">
+                        <span class="material-symbols-outlined">satellite_alt</span>
                         <p class="tabButtonText">RTMP</p>
                     </button>
-                    <button id="tabProfileBtn" class="fas fa-user tablinks">
+                    <button id="tabProfileBtn" class="tablinks">
+                        <span class="material-symbols-outlined">person</span>
                         <p class="tabButtonText">Profile</p>
                     </button>
-                    <button id="tabAspectBtn" class="fas fa-screwdriver-wrench tablinks">
+                    <button id="tabAspectBtn" class="tablinks">
+                        <span class="material-symbols-outlined">aspect_ratio</span>
                         <p class="tabButtonText">Aspect</p>
                     </button>
-                    <button id="tabStylingBtn" class="fas fa-palette tablinks">
+                    <button id="tabStylingBtn" class="tablinks">
+                        <span class="material-symbols-outlined">palette</span>
                         <p class="tabButtonText">Style</p>
                     </button>
-                    <button id="tabLanguagesBtn" class="fas fa-globe tablinks">
+                    <button id="tabLanguagesBtn" class="tablinks">
+                        <span class="material-symbols-outlined">language</span>
                         <p class="tabButtonText">Language</p>
                     </button>
                 </div>
@@ -292,25 +304,25 @@ access to use this app.
                 <div class="tabActions">
                     <div id="tabRoom" class="tabcontent">
                         <button id="fullScreenButton" class="hidden btn-custom">
-                            <i class="fas fa-expand-alt"></i>
+                            <span class="material-symbols-outlined">fullscreen</span>
                             <p>Full screen mode</p>
                         </button>
                         <br />
                         <button id="fileShareButton" class="hidden btn-custom">
-                            <i class="fas fa-folder-open"></i>
+                            <span class="material-symbols-outlined">folder_open</span>
                             <p>File sharing</p>
                         </button>
                         <br />
                         <button id="lockRoomButton" class="hidden btn-custom">
-                            <i class="fas fa-lock-open"></i>
+                            <span class="material-symbols-outlined">lock_open</span>
                             <p>Lock room</p>
                         </button>
                         <button id="unlockRoomButton" class="hidden btn-custom">
-                            <i class="fas fa-lock"></i>
+                            <span class="material-symbols-outlined">lock</span>
                             <p>Unlock room</p>
                         </button>
                         <button id="sendEmailInvitation" class="hidden btn-custom">
-                            <i class="fas fa-envelope-circle-check"></i>
+                            <span class="material-symbols-outlined">mark_email_read</span>
                             <p id="roomSendEmail" class="cp">Send email invitation</p>
                         </button>
                         <hr />
@@ -318,7 +330,7 @@ access to use this app.
                             <tr id="broadcastingButton" class="hidden">
                                 <td class="custom-width">
                                     <div class="title">
-                                        <i class="fa-solid fa-wifi"></i>
+                                        <span class="material-symbols-outlined">wifi</span>
                                         <p>Broadcast</p>
                                     </div>
                                 </td>
@@ -331,7 +343,7 @@ access to use this app.
                             <tr id="lobbyButton" class="hidden">
                                 <td class="custom-width">
                                     <div class="title">
-                                        <i class="fas fa-shield-halved"></i>
+                                        <span class="material-symbols-outlined">shield</span>
                                         <p>Lobby</p>
                                     </div>
                                 </td>
@@ -344,7 +356,7 @@ access to use this app.
                             <tr id="pitchBarButton">
                                 <td class="custom-width">
                                     <div class="title">
-                                        <i class="fas fa-microphone-lines"></i>
+                                        <span class="material-symbols-outlined">graphic_eq</span>
                                         <p>Volume bar</p>
                                     </div>
                                 </td>
@@ -357,7 +369,7 @@ access to use this app.
                             <tr id="soundsButton">
                                 <td class="custom-width">
                                     <div class="title">
-                                        <i class="fas fa-music"></i>
+                                        <span class="material-symbols-outlined">music_note</span>
                                         <p>Sounds</p>
                                     </div>
                                 </td>
@@ -370,7 +382,7 @@ access to use this app.
                             <tr id="shareOnJoinButton">
                                 <td class="custom-width">
                                     <div class="title">
-                                        <i class="fas fa-share-alt"></i>
+                                        <span class="material-symbols-outlined">share</span>
                                         <p>Share</p>
                                     </div>
                                 </td>
@@ -386,7 +398,7 @@ access to use this app.
                             <tr>
                                 <td>
                                     <div class="title">
-                                        <i class="fa-solid fa-person-shelter"></i>
+                                        <span class="material-symbols-outlined">meeting_room</span>
                                         <p id="roomId" class="cp">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</p>
                                     </div>
                                 </td>
@@ -394,7 +406,7 @@ access to use this app.
                             <tr>
                                 <td>
                                     <div class="title">
-                                        <i class="fas fa-clock"></i>
+                                        <span class="material-symbols-outlined">schedule</span>
                                         <p id="sessionTime">00:00:00</p>
                                     </div>
                                 </td>
@@ -404,18 +416,18 @@ access to use this app.
 
                     <div id="tabVideoDevices" class="tabcontent">
                         <button id="refreshVideoDevices" class="btn-custom">
-                            <i class="fas fa-rotate"></i>
+                            <span class="material-symbols-outlined">refresh</span>
                             <p>Refresh video devices</p>
                         </button>
                         <br /><br />
                         <div class="title">
-                            <i class="fas fa-video"></i>
+                            <span class="material-symbols-outlined">videocam</span>
                             <p>Video Source:</p>
                         </div>
                         <select id="videoSelect" class="form-select text-light bg-dark"></select>
                         <br />
                         <div class="title">
-                            <i class="fas fa-palette"></i>
+                            <span class="material-symbols-outlined">tune</span>
                             <p>Video Quality:</p>
                         </div>
                         <select id="videoQuality" class="form-select text-light bg-dark">
@@ -429,7 +441,7 @@ access to use this app.
                         </select>
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-camera"></i>
+                            <span class="material-symbols-outlined">photo_camera</span>
                             <p>Camera FPS:</p>
                         </div>
                         <br />
@@ -442,7 +454,7 @@ access to use this app.
                         <br />
                         <div id="ScreenFpsDiv" class="hidden">
                             <div class="title">
-                                <i class="fa-solid fa-desktop"></i>
+                                <span class="material-symbols-outlined">desktop_windows</span>
                                 <p>Screen FPS:</p>
                             </div>
                             <br />
@@ -457,12 +469,12 @@ access to use this app.
 
                     <div id="tabAudioDevices" class="tabcontent">
                         <button id="refreshAudioDevices" class="btn-custom">
-                            <i class="fas fa-rotate"></i>
+                            <span class="material-symbols-outlined">refresh</span>
                             <p>Refresh audio devices</p>
                         </button>
                         <br /><br />
                         <div class="title">
-                            <i class="fas fa-microphone"></i>
+                            <span class="material-symbols-outlined">mic</span>
                             <p>Microphone:</p>
                         </div>
                         <select id="microphoneSelect" class="form-select text-light bg-dark"></select>
@@ -488,7 +500,7 @@ access to use this app.
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
-                                <i class="fas fa-screwdriver-wrench"></i>
+                                <span class="material-symbols-outlined">build</span>
                                 <p>Advance options</p>
                             </button>
                             <div class="dropdown-menu text-start" aria-labelledby="micOptionsButton">
@@ -657,13 +669,13 @@ access to use this app.
                         <div id="speakerSelectDiv">
                             <hr />
                             <div class="title">
-                                <i class="fas fa-headphones"></i>
+                                <span class="material-symbols-outlined">headphones</span>
                                 <p>Speaker:</p>
                             </div>
                             <select id="speakerSelect" class="form-select text-light bg-dark"></select>
                             <hr />
                             <button id="speakerTestBtn" class="btn-custom">
-                                <i class="fa-solid fa-circle-play"></i>
+                                <span class="material-symbols-outlined">play_circle</span>
                                 <p>Test speaker</p>
                             </button>
                             <br />
@@ -674,7 +686,7 @@ access to use this app.
                                 <tr>
                                     <td class="width-150">
                                         <div class="title">
-                                            <i class="fa-solid fa-hand-pointer"></i>
+                                            <span class="material-symbols-outlined">touch_app</span>
                                             <p>Push to talk</p>
                                         </div>
                                     </td>
@@ -695,7 +707,7 @@ access to use this app.
                             <tr id="everyoneMuteBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-microphone-slash"></i>
+                                        <span class="material-symbols-outlined">mic_off</span>
                                         <p>Everyone starts muted</p>
                                     </div>
                                 </td>
@@ -708,7 +720,7 @@ access to use this app.
                             <tr id="everyoneHideBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-video-slash"></i>
+                                        <span class="material-symbols-outlined">videocam_off</span>
                                         <p>Everyone starts hidden</p>
                                     </div>
                                 </td>
@@ -731,7 +743,7 @@ access to use this app.
                             <tr id="everyoneCantUnmuteBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-microphone red"></i>
+                                        <span class="material-symbols-outlined red">mic</span>
                                         <p>Everyone can't unmute themselves</p>
                                     </div>
                                 </td>
@@ -749,7 +761,7 @@ access to use this app.
                             <tr id="everyoneCantUnhideBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-video red"></i>
+                                        <span class="material-symbols-outlined red">videocam</span>
                                         <p>Everyone can't unhide themselves</p>
                                     </div>
                                 </td>
@@ -767,7 +779,7 @@ access to use this app.
                             <tr id="everyoneCantShareScreenBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-display red"></i>
+                                        <span class="material-symbols-outlined red">desktop_windows</span>
                                         <p>Everyone can't share screen</p>
                                     </div>
                                 </td>
@@ -785,7 +797,7 @@ access to use this app.
                             <tr id="everyoneCantChatPrivatelyBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fa-solid fa-comments red"></i>
+                                        <span class="material-symbols-outlined red">forum</span>
                                         <p>Everyone can't chat privately</p>
                                     </div>
                                 </td>
@@ -803,7 +815,7 @@ access to use this app.
                             <tr id="everyoneCantChatGPTBtn">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fa-solid fa-robot red"></i>
+                                        <span class="material-symbols-outlined red">smart_toy</span>
                                         <p>Everyone can't use ChatGPT</p>
                                     </div>
                                 </td>
@@ -821,7 +833,7 @@ access to use this app.
                             <tr id="disconnectAllOnLeave">
                                 <td class="wa">
                                     <div class="title">
-                                        <i class="fas fa-users-slash red"></i>
+                                        <span class="material-symbols-outlined red">group_off</span>
                                         <p>Disconnect all upon leaving room</p>
                                     </div>
                                 </td>
@@ -846,7 +858,7 @@ access to use this app.
                                 <tr>
                                     <td class="width-180">
                                         <div class="title">
-                                            <i class="fa-solid fa-film"></i>
+                                            <span class="material-symbols-outlined">movie</span>
                                             <p>Prioritize H.264</p>
                                         </div>
                                     </td>
@@ -864,7 +876,7 @@ access to use this app.
                                 <tr>
                                     <td class="width-180">
                                         <div class="title">
-                                            <i class="fa-solid fa-user-shield"></i>
+                                            <span class="material-symbols-outlined">verified_user</span>
                                             <p>Only host</p>
                                         </div>
                                     </td>
@@ -886,7 +898,7 @@ access to use this app.
                                 <tr>
                                     <td class="width-180">
                                         <div class="title">
-                                            <i class="fas fa-cloud-arrow-up"></i>
+                                            <span class="material-symbols-outlined">cloud_upload</span>
                                             <p>Server</p>
                                         </div>
                                     </td>
@@ -904,11 +916,11 @@ access to use this app.
                             <hr />
                         </div>
                         <button id="pauseRecButton" class="hidden btn-custom">
-                            <i class="far fa-pause-circle"></i>
+                            <span class="material-symbols-outlined">pause_circle</span>
                             <p>Pause recording</p>
                         </button>
                         <button id="resumeRecButton" class="hidden btn-custom">
-                            <i class="far fa-play-circle"></i>
+                            <span class="material-symbols-outlined">play_circle</span>
                             <p>Resume recording</p>
                         </button>
                         <div id="recordingTime" class="hidden">
@@ -917,7 +929,7 @@ access to use this app.
                                 <tr>
                                     <td class="custom-width">
                                         <div class="title">
-                                            <i class="fa-solid fa-circle pulsate cr"></i>
+                                            <span class="material-symbols-outlined pulsate cr" style="font-size:16px;color:red">fiber_manual_record</span>
                                             <p>REC time:</p>
                                         </div>
                                     </td>
@@ -927,7 +939,7 @@ access to use this app.
                         </div>
                         <div id="recordingMessage" class="hidden">
                             <div class="title">
-                                <i class="fa-solid fa-ban fa-2xl"></i>
+                                <span class="material-symbols-outlined" style="font-size:32px;color:#6b7280">block</span>
                                 <p>The presenter has disabled meeting recording.</p>
                             </div>
                         </div>
@@ -943,7 +955,7 @@ access to use this app.
                                 <tr id="avatars">
                                     <td class=".width-180">
                                         <div class="title">
-                                            <i class="fa-solid fa-users-line"></i>
+                                            <span class="material-symbols-outlined">groups</span>
                                             <p>Show free avatars</p>
                                         </div>
                                     </td>
@@ -979,7 +991,8 @@ access to use this app.
                                 </div>
                                 <br />
                                 <button id="avatarVideoAIStart" class="btn-custom">
-                                    <i class="fas fa-play"></i> Start Avatar Session
+                                    <span class="material-symbols-outlined">play_arrow</span>
+                                    <p>Start Avatar Session</p>
                                 </button>
                             </div>
                         </div>
@@ -987,12 +1000,12 @@ access to use this app.
 
                     <div id="tabVideoShare" class="tabcontent">
                         <button id="videoShareButton" class="btn-custom">
-                            <i class="fab fa-youtube"></i>
+                            <span class="material-symbols-outlined">play_circle</span>
                             <p>Share a Video or Audio</p>
                         </button>
                         <br />
-                        <button id="videoCloseBtn" class="hidden">
-                            <i class="fas fa-times"></i>
+                        <button id="videoCloseBtn" class="hidden btn-custom">
+                            <span class="material-symbols-outlined">close</span>
                             <p>Close Video or Audio</p>
                         </button>
                     </div>
@@ -1007,14 +1020,14 @@ access to use this app.
                                     placeholder="rtmp://server:port/app/streamKey"
                                     readonly
                                 />
-                                <button id="copyRtmpUrlButton" class="fas fa-paste"></button>
+                                <button id="copyRtmpUrlButton"><span class="material-symbols-outlined">content_paste</span></button>
                             </div>
                             <div id="rtmpFromFile">
                                 <table class="file-table">
                                     <thead>
                                         <tr>
                                             <th>
-                                                Video Files: <i id="refreshVideoFiles" class="fa-solid fa-rotate"></i>
+                                                Video Files: <span id="refreshVideoFiles" class="material-symbols-outlined" style="font-size:16px;cursor:pointer;vertical-align:middle">refresh</span>
                                             </th>
                                         </tr>
                                     </thead>
@@ -1025,10 +1038,12 @@ access to use this app.
                                 <div id="file-name"></div>
                                 <!-- <hr /> -->
                                 <button id="startRtmpButton" class="hidden btn-custom">
-                                    <i class="fa-solid fa-play"></i>&nbsp;Start RTMP File Streaming
+                                    <span class="material-symbols-outlined">play_arrow</span>
+                                    <p>Start RTMP File Streaming</p>
                                 </button>
                                 <button id="stopRtmpButton" class="hidden btn-custom">
-                                    <i class="fas fa-stop-circle"></i>&nbsp;Stop RTMP File Streaming
+                                    <span class="material-symbols-outlined">stop_circle</span>
+                                    <p>Stop RTMP File Streaming</p>
                                 </button>
                                 <hr />
                             </div>
@@ -1041,16 +1056,19 @@ access to use this app.
                                     placeholder="https://domain/path/file.mp4"
                                 />
                                 <button id="startRtmpURLButton" class="hidden btn-custom">
-                                    <i class="fa-solid fa-play"></i>&nbsp;Start RTMP URL Streaming
+                                    <span class="material-symbols-outlined">play_arrow</span>
+                                    <p>Start RTMP URL Streaming</p>
                                 </button>
                                 <button id="stopRtmpURLButton" class="hidden btn-custom">
-                                    <i class="fas fa-stop-circle"></i>&nbsp;Stop RTMP URL Streaming
+                                    <span class="material-symbols-outlined">stop_circle</span>
+                                    <p>Stop RTMP URL Streaming</p>
                                 </button>
                                 <hr />
                             </div>
                             <div id="rtmpFromStream">
                                 <button id="streamerRtmpButton" class="hidden btn-custom">
-                                    <i class="fa-solid fa-satellite-dish"></i>&nbsp;RTMP Streamer
+                                    <span class="material-symbols-outlined">satellite_alt</span>
+                                    <p>RTMP Streamer</p>
                                 </button>
                                 <hr />
                             </div>
@@ -1065,7 +1083,7 @@ access to use this app.
                             <tr>
                                 <td>
                                     <div class="title">
-                                        <i class="fa-solid fa-user"></i>
+                                        <span class="material-symbols-outlined">person</span>
                                         <p>Username:</p>
                                         <p id="userName">UserName</p>
                                     </div>
@@ -1074,7 +1092,7 @@ access to use this app.
                             <tr>
                                 <td>
                                     <div class="title">
-                                        <i class="fa-solid fa-user-shield"></i>
+                                        <span class="material-symbols-outlined">verified_user</span>
                                         <p>Presenter:</p>
                                         <p id="isUserPresenter">true</p>
                                     </div>
@@ -1083,7 +1101,7 @@ access to use this app.
                             <tr>
                                 <td>
                                     <div class="title">
-                                        <i class="fa-solid fa-circle-info"></i>
+                                        <span class="material-symbols-outlined">info</span>
                                         <p>Extra info:</p>
                                     </div>
                                 </td>
@@ -1099,7 +1117,7 @@ access to use this app.
                     <div id="tabAspect" class="tabcontent">
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-tv"></i>
+                            <span class="material-symbols-outlined">tv</span>
                             <p>Aspect ratio:</p>
                         </div>
                         <br />
@@ -1112,7 +1130,7 @@ access to use this app.
                         </select>
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-film"></i>
+                            <span class="material-symbols-outlined">movie</span>
                             <p>Video Object fit:</p>
                         </div>
                         <br />
@@ -1125,7 +1143,7 @@ access to use this app.
                         </select>
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-circle-play"></i>
+                            <span class="material-symbols-outlined">play_circle</span>
                             <p>Video Controls:</p>
                         </div>
                         <br />
@@ -1139,7 +1157,7 @@ access to use this app.
                     <div id="tabStyling" class="tabcontent">
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-palette"></i>
+                            <span class="material-symbols-outlined">palette</span>
                             <p>Theme:</p>
                         </div>
                         <br />
@@ -1152,7 +1170,7 @@ access to use this app.
                         </select>
                         <br />
                         <div class="title">
-                            <i class="fas fa-fill-drip"></i>
+                            <span class="material-symbols-outlined">format_color_fill</span>
                             <p>Custom theme:</p>
                         </div>
                         <br />
@@ -1160,7 +1178,7 @@ access to use this app.
                         <br />
                         <div class="inline-check-box">
                             <div class="custom-width">
-                                <i class="fas fa-save"></i>
+                                <span class="material-symbols-outlined">save</span>
                                 <p>Keep custom</p>
                             </div>
                             <div class="form-check form-switch form-switch-md title">
@@ -1169,7 +1187,7 @@ access to use this app.
                         </div>
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-up-down-left-right"></i>
+                            <span class="material-symbols-outlined">open_with</span>
                             <p>Buttons bar:</p>
                         </div>
                         <br />
@@ -1180,7 +1198,7 @@ access to use this app.
                         <br />
                         <div id="pinUnpinGridDiv" class="hidden">
                             <div class="title">
-                                <i class="fa-solid fa-map-pin"></i>
+                                <span class="material-symbols-outlined">push_pin</span>
                                 <p>Pin video position:</p>
                             </div>
                             <br />
@@ -1196,7 +1214,7 @@ access to use this app.
                     <div id="tabLanguages" class="tabcontent">
                         <br />
                         <div class="title">
-                            <i class="fa-solid fa-language"></i>
+                            <span class="material-symbols-outlined">translate</span>
                             <p>Language:</p>
                         </div>
                         <br />
@@ -1219,7 +1237,7 @@ access to use this app.
             <div id="sendFileInfo"></div>
             <div id="sendFilePercentage"></div>
             <progress id="sendProgress" max="0" value="0"></progress>
-            <button id="sendAbortBtn"><i class="fas fa-stop-circle"></i>&nbsp; Abort</button>
+            <button id="sendAbortBtn"><span class="material-symbols-outlined">stop_circle</span>&nbsp; Abort</button>
         </div>
 
         <div id="receiveFileDiv" class="fadein center">
@@ -1232,7 +1250,7 @@ access to use this app.
             <div id="receiveFileInfo"></div>
             <div id="receiveFilePercentage"></div>
             <progress id="receiveProgress" max="0" value="0"></progress>
-            <button id="receiveHideBtn"><i class="fas fa-eye-slash"></i>&nbsp; Hide</button>
+            <button id="receiveHideBtn"><span class="material-symbols-outlined">visibility_off</span>&nbsp; Hide</button>
         </div>
 
         <!-- LMS Course Materials Panel -->
@@ -1283,53 +1301,34 @@ access to use this app.
         <section id="whiteboard" class="fadein hidden">
             <header id="whiteboardHeader" class="whiteboard-header">
                 <div id="whiteboardTitle" class="whiteboard-header-title">
-                    <button id="whiteboardCloseBtn" class="fas fa-times"></button>
+                    <button id="whiteboardCloseBtn"><span class="material-symbols-outlined">close</span></button>
                     <div class="form-check form-switch form-switch-md">
                         <input id="whiteboardLockButton" class="form-check-input" type="checkbox" />
                     </div>
                 </div>
                 <div id="whiteboardOptions" class="whiteboard-header-options">
-                    <button id="whiteboardGhostButton" class="fas fa-circle-half-stroke"></button>
+                    <button id="whiteboardGhostButton"><span class="material-symbols-outlined">contrast</span></button>
                     <input id="wbBackgroundColorEl" class="whiteboardColorPicker" type="color" value="#000000" />
                     <input id="wbDrawingColorEl" class="whiteboardColorPicker" type="color" value="#FFFFFF" />
-                    <button id="whiteboardPencilBtn" class="fas fa-pencil-alt"></button>
-                    <button id="whiteboardObjectBtn" class="fas fa-mouse-pointer"></button>
-                    <button id="whiteboardUndoBtn" class="fas fa-undo"></button>
-                    <button id="whiteboardRedoBtn" class="fas fa-redo"></button>
-                    <div class="dropdown">
-                        <button
-                            class="dropdown-toggle"
-                            type="button"
-                            id="whiteboardDropDownMenu"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-                            <i class="fas fa-ellipsis-vertical"></i>
-                        </button>
-                        <div class="dropdown-menu text-start" aria-labelledby="whiteboardDropDownMenu">
-                            <button id="whiteboardImgFileBtn" class="far fa-image"></button>
-                            <button id="whiteboardPdfFileBtn" class="far fa-file-pdf"></button>
-                            <button id="whiteboardImgUrlBtn" class="fas fa-link"></button>
-                            <button id="whiteboardTextBtn" class="fas fa-spell-check"></button>
-                            <button id="whiteboardLineBtn" class="fas fa-slash"></button>
-                            <button id="whiteboardRectBtn" class="far fa-square"></button>
-                            <button id="whiteboardTriangleBtn" class="fas">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="1em"
-                                    height="1em"
-                                    viewBox="0 0 24 24"
-                                    fill="#FFFFFF"
-                                >
-                                    <path d="M12 5.887l8.468 14.113h-16.936l8.468-14.113zm0-3.887l-12 20h24l-12-20z" />
-                                </svg>
-                            </button>
-                            <button id="whiteboardCircleBtn" class="far fa-circle"></button>
-                            <button id="whiteboardSaveBtn" class="fas fa-save"></button>
-                            <button id="whiteboardEraserBtn" class="fas fa-eraser"></button>
-                            <button id="whiteboardCleanBtn" class="fas fa-trash"></button>
-                        </div>
-                    </div>
+                    <button id="whiteboardPencilBtn"><span class="material-symbols-outlined">edit</span></button>
+                    <button id="whiteboardObjectBtn"><span class="material-symbols-outlined">touch_app</span></button>
+                    <button id="whiteboardUndoBtn"><span class="material-symbols-outlined">undo</span></button>
+                    <button id="whiteboardRedoBtn"><span class="material-symbols-outlined">redo</span></button>
+                    <button id="whiteboardImgFileBtn"><span class="material-symbols-outlined">image</span></button>
+                    <button id="whiteboardPdfFileBtn"><span class="material-symbols-outlined">picture_as_pdf</span></button>
+                    <button id="whiteboardImgUrlBtn"><span class="material-symbols-outlined">link</span></button>
+                    <button id="whiteboardTextBtn"><span class="material-symbols-outlined">spellcheck</span></button>
+                    <button id="whiteboardLineBtn"><span class="material-symbols-outlined">remove</span></button>
+                    <button id="whiteboardRectBtn"><span class="material-symbols-outlined">square</span></button>
+                    <button id="whiteboardTriangleBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M12 5.887l8.468 14.113h-16.936l8.468-14.113zm0-3.887l-12 20h24l-12-20z" />
+                        </svg>
+                    </button>
+                    <button id="whiteboardCircleBtn"><span class="material-symbols-outlined">circle</span></button>
+                    <button id="whiteboardSaveBtn"><span class="material-symbols-outlined">save</span></button>
+                    <button id="whiteboardEraserBtn"><span class="material-symbols-outlined">auto_fix_high</span></button>
+                    <button id="whiteboardCleanBtn"><span class="material-symbols-outlined">delete</span></button>
                 </div>
             </header>
             <main>
@@ -1345,25 +1344,25 @@ access to use this app.
                 <div id="plist" class="people-list">
                     <!-- CHAT LIST OPTIONS -->
                     <div>
-                        <button id="chatShareRoomBtn"><i class="fas fa-user-plus"></i> Invite user</button>
+                        <button id="chatShareRoomBtn"><span class="material-symbols-outlined">person_add</span> Invite user</button>
                         <button id="chatHideParticipantsList" class="float-right">
-                            <i class="fas fa-circle-arrow-left"></i>
+                            <span class="material-symbols-outlined">chevron_left</span>
                         </button>
                         <button id="participantsRaiseHandBtn" class="float-right">
-                            <i class="fas fa-hand-paper"></i>
+                            <span class="material-symbols-outlined">back_hand</span>
                         </button>
                         <button id="participantsUnreadMessagesBtn" class="float-right">
-                            <i class="fas fa-comments"></i>
+                            <span class="material-symbols-outlined">forum</span>
                         </button>
                         <button id="participantsSaveBtn" class="float-right hidden">
-                            <i class="fas fa-save"></i>
+                            <span class="material-symbols-outlined">save</span>
                         </button>
                     </div>
                     <br />
 
                     <!-- CHAT SEARCH -->
                     <div class="input-group mt5">
-                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        <span class="input-group-text"><span class="material-symbols-outlined" style="font-size:16px">search</span></span>
                         <input
                             id="searchParticipantsFromList"
                             type="text"
@@ -1401,13 +1400,13 @@ access to use this app.
                             <!-- CHAT OPTIONS -->
                             <div class="chat-option-buttons">
                                 <button id="chatTogglePin" class="hidden">
-                                    <i class="fas fa-map-pin"></i>
+                                    <span class="material-symbols-outlined">push_pin</span>
                                 </button>
                                 <button id="chatMaxButton" class="hidden">
-                                    <i class="fas fa-expand"></i>
+                                    <span class="material-symbols-outlined">fullscreen</span>
                                 </button>
                                 <button id="chatMinButton" class="hidden">
-                                    <i class="fas fa-compress"></i>
+                                    <span class="material-symbols-outlined">fullscreen_exit</span>
                                 </button>
                                 <!-- CHAT MORE OPTIONS -->
                                 <div class="dropdown">
@@ -1418,13 +1417,13 @@ access to use this app.
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        <i class="fas fa-bars"></i>
+                                        <span class="material-symbols-outlined">menu</span>
                                     </button>
                                     <ul class="dropdown-menu text-start" aria-labelledby="chatDropDownMenu">
                                         <li>
                                             <hr />
                                             <div class="title ml10">
-                                                <i class="fa-solid fa-eye"></i>
+                                                <span class="material-symbols-outlined">visibility</span>
                                                 <div class="form-check form-switch form-switch-md ml10">
                                                     <input
                                                         class="form-check-input"
@@ -1434,7 +1433,7 @@ access to use this app.
                                                     />
                                                 </div>
                                                 <div id="speechMsgDiv" class="title ml10">
-                                                    <i class="fas fa-volume-high"></i>
+                                                    <span class="material-symbols-outlined">volume_up</span>
                                                     <div class="form-check form-switch form-switch-md ml10">
                                                         <input
                                                             class="form-check-input"
@@ -1448,23 +1447,23 @@ access to use this app.
                                         </li>
                                         <li>
                                             <button id="chatGhostButton" class="btn-sm">
-                                                <i class="fas fa-circle-half-stroke"></i> Toggle bg
+                                                <span class="material-symbols-outlined">contrast</span> Toggle bg
                                             </button>
                                         </li>
                                         <li>
                                             <button id="chatSaveButton" class="btn-sm">
-                                                <i class="fas fa-save"></i> Save messages
+                                                <span class="material-symbols-outlined">save</span> Save messages
                                             </button>
                                         </li>
                                         <li>
                                             <button id="chatCleanButton" class="btn-sm">
-                                                <i class="fas fa-trash"></i> Clean messages
+                                                <span class="material-symbols-outlined">delete</span> Clean messages
                                             </button>
                                         </li>
                                     </ul>
                                 </div>
                                 <button id="chatCloseButton">
-                                    <i class="fas fa-times"></i>
+                                    <span class="material-symbols-outlined">close</span>
                                 </button>
                             </div>
                         </div>
@@ -1486,7 +1485,7 @@ access to use this app.
                         <!-- CHAT MESSAGE INPUT -->
                         <div class="input-group mb-0 w-100">
                             <div class="input-group mb-3">
-                                <span class="input-group-text"><i class="fas fa-message"></i></span>
+                                <span class="input-group-text"><span class="material-symbols-outlined" style="font-size:16px">chat</span></span>
                                 <textarea
                                     id="chatMessage"
                                     class="form-control"
@@ -1505,25 +1504,25 @@ access to use this app.
                         <!-- CHAT MESSAGE OPTIONS  -->
                         <div class="mt10">
                             <button id="chatEmojiButton" class="float-left mr5 hidden">
-                                <i class="fas fa-smile"></i>
+                                <span class="material-symbols-outlined">sentiment_satisfied</span>
                             </button>
                             <button id="chatMarkdownButton" class="float-left mr5 hidden">
-                                <i class="fab fa-markdown"></i>
+                                <span class="material-symbols-outlined">text_format</span>
                             </button>
                             <button id="chatSpeechStartButton" class="float-left mr5 hidden">
-                                <i class="fas fa-microphone-slash"></i>
+                                <span class="material-symbols-outlined">mic_off</span>
                             </button>
                             <button id="chatSpeechStopButton" class="float-left mr5 hidden">
-                                <i class="fas fa-microphone"></i>
+                                <span class="material-symbols-outlined">mic</span>
                             </button>
                             <button id="chatPasteButton" class="float-left mr5 hidden">
-                                <i class="fas fa-paste"></i>
+                                <span class="material-symbols-outlined">content_paste</span>
                             </button>
                             <button id="chatCleanTextButton" class="float-left mr5 hidden">
-                                <i class="fas fa-trash"></i>
+                                <span class="material-symbols-outlined">delete</span>
                             </button>
                             <button id="chatSendButton" class="float-right hidden">
-                                <i class="fas fa-paper-plane"></i>
+                                <span class="material-symbols-outlined">send</span>
                             </button>
                         </div>
                     </div>
@@ -1535,18 +1534,18 @@ access to use this app.
             <section id="transcriptionSection" class="transcription">
                 <header id="transcriptionHeader" class="transcription-header">
                     <div class="transcription-header-title">
-                        <button id="transcriptionSpeechStatus" class="fas fa-microphone-alt"></button>
+                        <button id="transcriptionSpeechStatus"><span class="material-symbols-outlined">mic</span></button>
                         <div class="title ml-5">
-                            <i class="fa-solid fa-infinity"></i>
+                            <span class="material-symbols-outlined">all_inclusive</span>
                             <div class="form-check form-switch form-switch-md ml-5">
                                 <input class="form-check-input" type="checkbox" id="transcriptPersistentMode" />
                             </div>
                         </div>
                     </div>
                     <div class="transcription-header-options">
-                        <button id="transcriptionTogglePinBtn" class="fas fa-map-pin"></button>
-                        <button id="transcriptionMaxBtn" class=""><i class="fas fa-expand"></i></button>
-                        <button id="transcriptionMinBtn" class="hidden"><i class="fas fa-compress"></i></button>
+                        <button id="transcriptionTogglePinBtn"><span class="material-symbols-outlined">push_pin</span></button>
+                        <button id="transcriptionMaxBtn"><span class="material-symbols-outlined">fullscreen</span></button>
+                        <button id="transcriptionMinBtn" class="hidden"><span class="material-symbols-outlined">fullscreen_exit</span></button>
                         <div class="dropdown title">
                             <button
                                 class="dropdown-toggle"
@@ -1561,7 +1560,7 @@ access to use this app.
                                 <li>
                                     <hr />
                                     <div class="title ml5">
-                                        <i class="fa-solid fa-eye"></i>
+                                        <span class="material-symbols-outlined">visibility</span>
                                         <div class="form-check form-switch form-switch-md ml-5">
                                             <input
                                                 class="form-check-input"
@@ -1575,26 +1574,26 @@ access to use this app.
                                 </li>
                                 <li>
                                     <button id="transcriptionGhostBtn">
-                                        <i class="fas fa-circle-half-stroke"></i> Toggle bg
+                                        <span class="material-symbols-outlined">contrast</span> Toggle bg
                                     </button>
                                 </li>
                                 <li>
-                                    <button id="transcriptionSaveBtn"><i class="fas fa-save"></i> Save</button>
+                                    <button id="transcriptionSaveBtn"><span class="material-symbols-outlined">save</span> Save</button>
                                 </li>
                                 <li>
-                                    <button id="transcriptionCleanBtn"><i class="fas fa-trash"></i> Clean</button>
+                                    <button id="transcriptionCleanBtn"><span class="material-symbols-outlined">delete</span> Clean</button>
                                 </li>
                             </ul>
                         </div>
-                        <button id="transcriptionCloseBtn" class="fas fa-times"></button>
+                        <button id="transcriptionCloseBtn"><span class="material-symbols-outlined">close</span></button>
                     </div>
                 </header>
                 <main id="transcriptionChat" class="transcription-chat"></main>
                 <div class="transcription-inputarea">
                     <select id="transcriptionLanguage" class="form-select text-light bg-dark"></select>
                     <select id="transcriptionDialect" class="form-select text-light bg-dark"></select>
-                    <button id="transcriptionSpeechStart" class=""><i class="fas fa-play"></i></button>
-                    <button id="transcriptionSpeechStop" class="hidden"><i class="fas fa-stop"></i></button>
+                    <button id="transcriptionSpeechStart"><span class="material-symbols-outlined">play_arrow</span></button>
+                    <button id="transcriptionSpeechStop" class="hidden"><span class="material-symbols-outlined">stop</span></button>
                 </div>
             </section>
         </section>
@@ -1615,10 +1614,10 @@ access to use this app.
                             <th></th>
                         </tr>
                         <tr id="lobbyAll">
-                            <td>&nbsp;<i class="fas fa-users fa-lg"></i></td>
+                            <td>&nbsp;<span class="material-symbols-outlined">group</span></td>
                             <td>All</td>
-                            <td><button id="lobbyAcceptAllBtn" class="fas fa-check"></button></td>
-                            <td><button id="lobbyRejectAllBtn" class="fas fa-times"></button></td>
+                            <td><button id="lobbyAcceptAllBtn"><span class="material-symbols-outlined">check</span></button></td>
+                            <td><button id="lobbyRejectAllBtn"><span class="material-symbols-outlined">close</span></button></td>
                         </tr>
                     </table>
                 </div>
