@@ -415,7 +415,6 @@ function refreshMainButtonsToolTipPlacement() {
         setTippy('transcriptionButton', 'Toggle transcription', placement);
         setTippy('whiteboardButton', 'Toggle the whiteboard', placement);
         setTippy('settingsButton', 'Toggle the settings', placement);
-        setTippy('aboutButton', 'About this project', placement);
         setTippy('exitButton', 'Leave room', placement);
     }
 }
@@ -1156,38 +1155,203 @@ async function shareRoom(useNavigator = false) {
         sound('open');
 
         Swal.fire({
-            background: swalBackground,
+            background: 'rgba(28,29,33,0.97)',
             position: 'center',
-            title: 'Share the room',
+            showConfirmButton: false,
+            showDenyButton: false,
+            showCancelButton: false,
+            width: 420,
+            padding: 0,
             html: `
-            <div id="qrRoomContainer">
-                <canvas id="qrRoom"></canvas>
-            </div>
-            <br/>
-            <p style="background:transparent; color:rgb(8, 189, 89);">Join from your mobile device</p>
-            <p style="background:transparent; color:white; font-family: Arial, Helvetica, sans-serif;">No need for apps, simply capture the QR code with your mobile camera Or Invite someone else to join by sending them the following URL</p>
-            <p style="background:transparent; color:rgb(8, 189, 89);">${RoomURL}</p>`,
-            showDenyButton: true,
-            showCancelButton: true,
-            cancelButtonColor: 'red',
-            denyButtonColor: 'green',
-            confirmButtonText: `Copy URL`,
-            denyButtonText: `Email invite`,
-            cancelButtonText: `Close`,
+            <style>
+                .swal-share-wrapper {
+                    font-family: 'Comfortaa', sans-serif;
+                    padding: 0;
+                }
+                .swal-share-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 18px 20px 14px;
+                    border-bottom: 1px solid rgba(255,255,255,0.07);
+                }
+                .swal-share-header .material-symbols-outlined {
+                    font-size: 22px;
+                    color: #1a73e8;
+                }
+                .swal-share-header h3 {
+                    margin: 0;
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #e8eaed;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .swal-share-body {
+                    padding: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 16px;
+                }
+                .swal-qr-wrap {
+                    background: #fff;
+                    border-radius: 14px;
+                    padding: 12px;
+                    display: inline-flex;
+                    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+                }
+                .swal-share-hint {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                    background: rgba(26,115,232,0.08);
+                    border: 1px solid rgba(26,115,232,0.18);
+                    border-radius: 10px;
+                    padding: 10px 14px;
+                    text-align: left;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                .swal-share-hint .material-symbols-outlined {
+                    font-size: 18px;
+                    color: #1a73e8;
+                    margin-top: 1px;
+                    flex-shrink: 0;
+                }
+                .swal-share-hint p {
+                    margin: 0;
+                    font-size: 12px;
+                    color: #9aa0a6;
+                    line-height: 1.5;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .swal-share-url-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.08);
+                    border-radius: 10px;
+                    padding: 10px 14px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                .swal-share-url-row span.url-text {
+                    flex: 1;
+                    font-size: 12px;
+                    color: #1a73e8;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .swal-share-url-row .material-symbols-outlined {
+                    font-size: 18px;
+                    color: #9aa0a6;
+                    flex-shrink: 0;
+                }
+                .swal-share-actions {
+                    display: flex;
+                    gap: 8px;
+                    width: 100%;
+                }
+                .swal-share-btn {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    padding: 10px 14px;
+                    border: none;
+                    border-radius: 10px;
+                    font-family: 'Comfortaa', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.18s ease;
+                }
+                .swal-share-btn .material-symbols-outlined {
+                    font-size: 16px;
+                }
+                .swal-share-btn-primary {
+                    background: #1a73e8;
+                    color: #fff;
+                }
+                .swal-share-btn-primary:hover {
+                    background: #1557b0;
+                }
+                .swal-share-btn-secondary {
+                    background: rgba(255,255,255,0.07);
+                    color: #e8eaed;
+                    border: 1px solid rgba(255,255,255,0.1);
+                }
+                .swal-share-btn-secondary:hover {
+                    background: rgba(255,255,255,0.12);
+                }
+                .swal-share-btn-danger {
+                    background: rgba(255,255,255,0.05);
+                    color: #9aa0a6;
+                    border: 1px solid rgba(255,255,255,0.08);
+                }
+                .swal-share-btn-danger:hover {
+                    background: rgba(234,67,53,0.15);
+                    color: #ea4335;
+                    border-color: rgba(234,67,53,0.3);
+                }
+            </style>
+            <div class="swal-share-wrapper">
+                <div class="swal-share-header">
+                    <span class="material-symbols-outlined">share</span>
+                    <h3>Share the room</h3>
+                </div>
+                <div class="swal-share-body">
+                    <div class="swal-qr-wrap">
+                        <canvas id="qrRoom"></canvas>
+                    </div>
+                    <div class="swal-share-hint">
+                        <span class="material-symbols-outlined">smartphone</span>
+                        <p>Scan the QR code with your mobile camera to join instantly — no app required</p>
+                    </div>
+                    <div class="swal-share-url-row">
+                        <span class="material-symbols-outlined">link</span>
+                        <span class="url-text">${RoomURL}</span>
+                    </div>
+                    <div class="swal-share-actions">
+                        <button class="swal-share-btn swal-share-btn-primary" id="swalCopyUrlBtn">
+                            <span class="material-symbols-outlined">content_copy</span>Copy URL
+                        </button>
+                        <button class="swal-share-btn swal-share-btn-secondary" id="swalEmailBtn">
+                            <span class="material-symbols-outlined">mail</span>Email
+                        </button>
+                        <button class="swal-share-btn swal-share-btn-danger" id="swalCloseBtn">
+                            <span class="material-symbols-outlined">close</span>Close
+                        </button>
+                    </div>
+                </div>
+            </div>`,
+            customClass: { htmlContainer: 'swal-share-html-container' },
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                copyRoomURL();
-            } else if (result.isDenied) {
-                shareRoomByEmail();
-            }
+            didOpen: () => {
+                document.getElementById('swalCopyUrlBtn').addEventListener('click', () => {
+                    copyRoomURL();
+                    Swal.close();
+                });
+                document.getElementById('swalEmailBtn').addEventListener('click', () => {
+                    Swal.close();
+                    shareRoomByEmail();
+                });
+                document.getElementById('swalCloseBtn').addEventListener('click', () => {
+                    Swal.close();
+                });
+                makeRoomQR();
+            },
+        }).then(() => {
             // share screen on join
             if (isScreenAllowed) {
                 rc.shareScreen();
             }
         });
-        makeRoomQR();
     }
 }
 
@@ -1403,7 +1567,6 @@ function roomIsReady() {
     BUTTONS.settings.lobbyButton && show(lobbyButton);
     BUTTONS.settings.sendEmailInvitation && show(sendEmailInvitation);
     if (rc.recording.recSyncServerRecording) show(roomRecordingServer);
-    BUTTONS.main.aboutButton && show(aboutButton);
     if (!DetectRTC.isMobileDevice) show(pinUnpinGridDiv);
     if (!isSpeechSynthesisSupported) hide(speechMsgDiv);
     handleButtons();
@@ -1911,9 +2074,6 @@ function handleButtons() {
     };
     unlockRoomButton.onclick = () => {
         rc.roomAction('unlock');
-    };
-    aboutButton.onclick = () => {
-        showAbout();
     };
     // restartICE.onclick = async () => {
     //     await rc.restartIce();
@@ -4381,40 +4541,3 @@ function adaptAspectRatio(participantsCount) {
 // ABOUT
 // ####################################################
 
-function showAbout() {
-    sound('open');
-
-    Swal.fire({
-        background: swalBackground,
-        imageUrl: image.about,
-        customClass: { image: 'img-about' },
-        position: 'center',
-        title: 'WebRTC SFU v1.4.80',
-        html: `
-        <br />
-        <div id="about">
-            
-            <br /><br /><br />
-            Author: <a 
-                id="linkedin-button" 
-                data-umami-event="Linkedin button" 
-                href="https://www.linkedin.com/in/alisherabbasi/" target="_blank"> 
-                Ali Sher Abbasi
-            </a>
-            <br /><br />
-            Email:<a 
-                id="email-button" 
-                data-umami-event="Email button" 
-                href="mailto:eaglelibresolutions@yahoo.com?subject=Mualim Ul Quran info"> 
-                eaglelibresolutions@yahoo.com
-            </a>
-            <br /><br />
-            <hr />
-            <span>&copy; 2024 Mualim Ul Quran, all rights reserved</span>
-            <hr />
-        </div>
-        `,
-        showClass: { popup: 'animate__animated animate__fadeInDown' },
-        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-    });
-}
