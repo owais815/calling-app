@@ -38,6 +38,9 @@
         <meta id="ogUrl" property="og:url" content="https://sfu.mirotalk.com" /> -->
 
         <!-- StyleSheet -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="../css/Root.css" />
         <link rel="stylesheet" href="../css/Room.css" />
         <link rel="stylesheet" href="../css/VideoGrid.css" />
@@ -1340,75 +1343,76 @@ access to use this app.
         <section id="chatRoom" class="chat-container container fadein hidden">
             <!-- CHAT APP -->
             <div id="chatApp" class="chat-app">
-                <!-- CHAT PEOPLE LIST -->
-                <div id="plist" class="people-list">
-                    <!-- CHAT LIST OPTIONS -->
-                    <div>
-                        <button id="chatShareRoomBtn"><span class="material-symbols-outlined">person_add</span> Invite user</button>
-                        <button id="chatHideParticipantsList" class="float-right">
-                            <span class="material-symbols-outlined">chevron_left</span>
-                        </button>
-                        <button id="participantsRaiseHandBtn" class="float-right">
-                            <span class="material-symbols-outlined">back_hand</span>
-                        </button>
-                        <button id="participantsUnreadMessagesBtn" class="float-right">
-                            <span class="material-symbols-outlined">forum</span>
-                        </button>
-                        <button id="participantsSaveBtn" class="float-right hidden">
-                            <span class="material-symbols-outlined">save</span>
-                        </button>
-                    </div>
-                    <br />
 
-                    <!-- CHAT SEARCH -->
-                    <div class="input-group mt5">
-                        <span class="input-group-text"><span class="material-symbols-outlined" style="font-size:16px">search</span></span>
+                <!-- ── PARTICIPANTS SIDEBAR ── -->
+                <div id="plist" class="people-list">
+                    <div class="plist-header">
+                        <span class="plist-title">
+                            <span class="material-symbols-outlined">group</span>
+                            Participants
+                        </span>
+                        <div class="plist-actions">
+                            <button id="chatShareRoomBtn" title="Invite user">
+                                <span class="material-symbols-outlined">person_add</span>
+                            </button>
+                            <button id="participantsRaiseHandBtn" title="Raise hand">
+                                <span class="material-symbols-outlined">back_hand</span>
+                            </button>
+                            <button id="participantsUnreadMessagesBtn" title="Unread messages">
+                                <span class="material-symbols-outlined">forum</span>
+                            </button>
+                            <button id="participantsSaveBtn" class="hidden" title="Save">
+                                <span class="material-symbols-outlined">save</span>
+                            </button>
+                            <button id="chatHideParticipantsList" title="Hide panel">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="plist-search">
+                        <span class="material-symbols-outlined">search</span>
                         <input
                             id="searchParticipantsFromList"
                             type="text"
-                            class="form-control"
-                            placeholder="Search..."
+                            placeholder="Search participants..."
                             maxlength="36"
                         />
                     </div>
 
-                    <!-- CHAT LIST -->
-                    <ul id="participantsList" class="list-unstyled chat-list mt-2 mb-0"></ul>
+                    <ul id="participantsList" class="chat-list"></ul>
                 </div>
 
-                <!-- CHAT -->
+                <!-- ── CHAT AREA ── -->
                 <div id="chat" class="chat">
-                    <!-- CHAT HEADER -->
+
+                    <!-- HEADER -->
                     <div id="chatHeader" class="chat-header clearfix">
-                        <div class="w-100">
-                            <!-- CHAT ABOUT -->
-                            <div id="chatAbout" class="text-start">
-                                <img
-                                    class="all-participants-img"
-                                    id="chatShowParticipantsList"
-                                    src="../images/participants.png"
-                                    alt="participants"
-                                />
-                                <a data-toggle="modal" data-target="#view_info">
-                                    <img src="../images/all.png" alt="avatar" />
-                                </a>
+                        <div class="chat-header-inner">
+                            <div id="chatAbout" class="chat-about-section">
+                                <button class="plist-toggle-btn" id="chatShowParticipantsList" title="Toggle participants" onclick="rc.toggleShowParticipants()">
+                                    <span class="material-symbols-outlined">group</span>
+                                </button>
+                                <div class="chat-header-avatar-wrap blue">
+                                    <span class="material-symbols-outlined">forum</span>
+                                </div>
                                 <div class="chat-about">
                                     <h6 class="mb-0">Public chat</h6>
                                 </div>
                             </div>
 
-                            <!-- CHAT OPTIONS -->
                             <div class="chat-option-buttons">
-                                <button id="chatTogglePin" class="hidden">
+                                <button id="chatTogglePin" class="hidden" title="Pin chat">
                                     <span class="material-symbols-outlined">push_pin</span>
                                 </button>
-                                <button id="chatMaxButton" class="hidden">
+                                <button id="chatMaxButton" class="hidden" title="Maximise">
                                     <span class="material-symbols-outlined">fullscreen</span>
                                 </button>
-                                <button id="chatMinButton" class="hidden">
+                                <button id="chatMinButton" class="hidden" title="Restore">
                                     <span class="material-symbols-outlined">fullscreen_exit</span>
                                 </button>
-                                <!-- CHAT MORE OPTIONS -->
+
+                                <!-- MORE OPTIONS DROPDOWN -->
                                 <div class="dropdown">
                                     <button
                                         class="dropdown-toggle"
@@ -1416,30 +1420,22 @@ access to use this app.
                                         id="chatDropDownMenu"
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
+                                        title="More options"
                                     >
-                                        <span class="material-symbols-outlined">menu</span>
+                                        <span class="material-symbols-outlined">more_vert</span>
                                     </button>
-                                    <ul class="dropdown-menu text-start" aria-labelledby="chatDropDownMenu">
+                                    <ul class="dropdown-menu dropdown-menu-end text-start" aria-labelledby="chatDropDownMenu">
                                         <li>
                                             <hr />
                                             <div class="title ml10">
                                                 <span class="material-symbols-outlined">visibility</span>
                                                 <div class="form-check form-switch form-switch-md ml10">
-                                                    <input
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        id="showChatOnMsg"
-                                                        checked
-                                                    />
+                                                    <input class="form-check-input" type="checkbox" id="showChatOnMsg" checked />
                                                 </div>
                                                 <div id="speechMsgDiv" class="title ml10">
                                                     <span class="material-symbols-outlined">volume_up</span>
                                                     <div class="form-check form-switch form-switch-md ml10">
-                                                        <input
-                                                            class="form-check-input"
-                                                            type="checkbox"
-                                                            id="speechIncomingMsg"
-                                                        />
+                                                        <input class="form-check-input" type="checkbox" id="speechIncomingMsg" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1447,85 +1443,72 @@ access to use this app.
                                         </li>
                                         <li>
                                             <button id="chatGhostButton" class="btn-sm">
-                                                <span class="material-symbols-outlined">contrast</span> Toggle bg
+                                                <span class="material-symbols-outlined">contrast</span> Toggle background
                                             </button>
                                         </li>
                                         <li>
                                             <button id="chatSaveButton" class="btn-sm">
-                                                <span class="material-symbols-outlined">save</span> Save messages
+                                                <span class="material-symbols-outlined">download</span> Save messages
                                             </button>
                                         </li>
                                         <li>
                                             <button id="chatCleanButton" class="btn-sm">
-                                                <span class="material-symbols-outlined">delete</span> Clean messages
+                                                <span class="material-symbols-outlined">delete_sweep</span> Clear all messages
                                             </button>
                                         </li>
                                     </ul>
                                 </div>
-                                <button id="chatCloseButton">
+
+                                <button id="chatCloseButton" title="Close chat">
                                     <span class="material-symbols-outlined">close</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CHAT HISTORY -->
+                    <!-- MESSAGES AREA -->
                     <div id="chatHistory" class="chat-history">
-                        <!-- CHAT MESSAGES -->
                         <ul id="chatGPTMessages" class="mb-0"></ul>
                         <ul id="chatPublicMessages" class="mb-0"></ul>
                         <ul id="chatPrivateMessages" class="mb-0"></ul>
-
-                        <!-- CHAT EMOJI -->
                         <div id="chatEmoji" class="hidden fadein chatEmojiPicker"></div>
                     </div>
 
-                    <!-- CHAT MESSAGE -->
-                    <div class="chat-message clearfix">
-                        <!-- CHAT MESSAGE INPUT -->
-                        <div class="input-group mb-0 w-100">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text"><span class="material-symbols-outlined" style="font-size:16px">chat</span></span>
-                                <textarea
-                                    id="chatMessage"
-                                    class="form-control"
-                                    placeholder="Enter text here..."
-                                    rows="1"
-                                ></textarea>
-                                <!-- <input 
-                                    id="chatMessage" 
-                                    type="text" 
-                                    class="form-control" 
-                                    placeholder="Enter text here..."
-                                > -->
-                            </div>
-                        </div>
-
-                        <!-- CHAT MESSAGE OPTIONS  -->
-                        <div class="mt10">
-                            <button id="chatEmojiButton" class="float-left mr5 hidden">
+                    <!-- INPUT AREA -->
+                    <div class="chat-input-area">
+                        <div class="chat-toolbar">
+                            <button id="chatEmojiButton" class="chat-tool-btn hidden" title="Emoji">
                                 <span class="material-symbols-outlined">sentiment_satisfied</span>
                             </button>
-                            <button id="chatMarkdownButton" class="float-left mr5 hidden">
+                            <button id="chatMarkdownButton" class="chat-tool-btn hidden" title="Markdown">
                                 <span class="material-symbols-outlined">text_format</span>
                             </button>
-                            <button id="chatSpeechStartButton" class="float-left mr5 hidden">
+                            <button id="chatSpeechStartButton" class="chat-tool-btn hidden" title="Start voice">
                                 <span class="material-symbols-outlined">mic_off</span>
                             </button>
-                            <button id="chatSpeechStopButton" class="float-left mr5 hidden">
+                            <button id="chatSpeechStopButton" class="chat-tool-btn hidden" title="Stop voice">
                                 <span class="material-symbols-outlined">mic</span>
                             </button>
-                            <button id="chatPasteButton" class="float-left mr5 hidden">
+                            <button id="chatPasteButton" class="chat-tool-btn hidden" title="Paste">
                                 <span class="material-symbols-outlined">content_paste</span>
                             </button>
-                            <button id="chatCleanTextButton" class="float-left mr5 hidden">
-                                <span class="material-symbols-outlined">delete</span>
+                            <button id="chatCleanTextButton" class="chat-tool-btn hidden" title="Clear input">
+                                <span class="material-symbols-outlined">backspace</span>
                             </button>
-                            <button id="chatSendButton" class="float-right hidden">
+                        </div>
+                        <div class="chat-input-row">
+                            <textarea
+                                id="chatMessage"
+                                class="chat-textarea"
+                                placeholder="Type a message..."
+                                rows="1"
+                            ></textarea>
+                            <button id="chatSendButton" class="chat-send-btn hidden" title="Send">
                                 <span class="material-symbols-outlined">send</span>
                             </button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
