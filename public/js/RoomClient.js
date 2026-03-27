@@ -2900,17 +2900,18 @@ class RoomClient {
 
     userLog(icon, message, position, timer = 5000) {
         const Toast = Swal.mixin({
-            background: swalBackground,
+            background: 'rgba(30,32,36,0.97)',
             toast: true,
             position: position,
             showConfirmButton: false,
             timer: timer,
             timerProgressBar: true,
+            customClass: { popup: 'lms-toast' },
         });
         switch (icon) {
             case 'html':
                 Toast.fire({
-                    icon: icon,
+                    icon: 'info',
                     html: message,
                     showClass: { popup: 'animate__animated animate__fadeInDown' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
@@ -2927,51 +2928,90 @@ class RoomClient {
     }
 
     msgPopup(type, message) {
+        const iconMap = {
+            warning: { cls: 'amber', sym: 'warning' },
+            error:   { cls: 'red',   sym: 'error' },
+            info:    { cls: 'blue',  sym: 'info' },
+            success: { cls: 'green', sym: 'check_circle' },
+        };
         switch (type) {
             case 'warning':
-            case 'error':
+            case 'error': {
+                const ic = iconMap[type];
                 Swal.fire({
-                    background: swalBackground,
+                    background: 'rgba(28,29,33,0.97)',
                     position: 'center',
-                    icon: type,
-                    title: type,
-                    text: message,
+                    width: 400,
+                    padding: 0,
+                    customClass: { htmlContainer: 'lms-swal-container', confirmButton: 'lms-swal-confirm' },
+                    html: `<div style="font-family:'Comfortaa',sans-serif;">
+                        <div class="lms-modal-header">
+                            <div class="lms-modal-icon ${ic.cls}">
+                                <span class="material-symbols-outlined" style="font-size:20px;">${ic.sym}</span>
+                            </div>
+                            <h3>${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+                        </div>
+                        <div class="lms-modal-body"><p>${message}</p></div>
+                    </div>`,
                     showClass: { popup: 'animate__animated animate__rubberBand' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                 });
                 this.sound('alert');
                 break;
+            }
             case 'info':
-            case 'success':
+            case 'success': {
+                const ic = iconMap[type] || iconMap['info'];
                 Swal.fire({
-                    background: swalBackground,
+                    background: 'rgba(28,29,33,0.97)',
                     position: 'center',
-                    icon: type,
-                    title: type,
-                    text: message,
+                    width: 400,
+                    padding: 0,
+                    customClass: { htmlContainer: 'lms-swal-container', confirmButton: 'lms-swal-confirm' },
+                    html: `<div style="font-family:'Comfortaa',sans-serif;">
+                        <div class="lms-modal-header">
+                            <div class="lms-modal-icon ${ic.cls}">
+                                <span class="material-symbols-outlined" style="font-size:20px;">${ic.sym}</span>
+                            </div>
+                            <h3>${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+                        </div>
+                        <div class="lms-modal-body"><p>${message}</p></div>
+                    </div>`,
                     showClass: { popup: 'animate__animated animate__fadeInDown' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                 });
                 break;
-            case 'html':
+            }
+            case 'html': {
                 Swal.fire({
-                    background: swalBackground,
+                    background: 'rgba(28,29,33,0.97)',
                     position: 'center',
-                    icon: type,
-                    html: message,
+                    width: 420,
+                    padding: 0,
+                    customClass: { htmlContainer: 'lms-swal-container', confirmButton: 'lms-swal-confirm' },
+                    html: `<div style="font-family:'Comfortaa',sans-serif;">
+                        <div class="lms-modal-header">
+                            <div class="lms-modal-icon blue">
+                                <span class="material-symbols-outlined" style="font-size:20px;">info</span>
+                            </div>
+                            <h3>Notice</h3>
+                        </div>
+                        <div class="lms-modal-body">${message}</div>
+                    </div>`,
                     showClass: { popup: 'animate__animated animate__fadeInDown' },
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                 });
                 break;
-            case 'toast':
+            }
+            case 'toast': {
                 const Toast = Swal.mixin({
-                    background: swalBackground,
+                    background: 'rgba(30,32,36,0.97)',
                     position: 'top-end',
-                    icon: 'info',
                     showConfirmButton: false,
                     timerProgressBar: true,
                     toast: true,
                     timer: 3000,
+                    customClass: { popup: 'lms-toast' },
                 });
                 Toast.fire({
                     icon: 'info',
@@ -2980,7 +3020,7 @@ class RoomClient {
                     hideClass: { popup: 'animate__animated animate__fadeOutUp' },
                 });
                 break;
-            // ......
+            }
             default:
                 alert(message);
         }
@@ -4723,21 +4763,40 @@ class RoomClient {
 
         Swal.fire({
             allowOutsideClick: false,
-            background: swalBackground,
-            imageAlt: 'mirotalksfu-file-sharing',
-            imageUrl: image.share,
+            background: 'rgba(28,29,33,0.97)',
             position: 'center',
-            title: 'Share file',
-            input: 'file',
+            width: 400,
+            padding: 0,
+            customClass: {
+                htmlContainer: 'lms-swal-container',
+                confirmButton: 'lms-swal-confirm',
+                denyButton: 'lms-swal-deny',
+            },
             html: `
-            <div id="dropArea">
-                <p>Drag and drop your file here</p>
+            <div style="font-family:'Comfortaa',sans-serif;">
+                <div class="lms-modal-header">
+                    <div class="lms-modal-icon blue">
+                        <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
+                    </div>
+                    <h3>Share File</h3>
+                </div>
+                <div class="lms-modal-body">
+                    <div class="lms-drop-zone" id="dropArea">
+                        <div class="lms-drop-icon">
+                            <span class="material-symbols-outlined">cloud_upload</span>
+                        </div>
+                        <p>Drag &amp; drop a file here</p>
+                        <p style="font-size:11px;margin-top:4px;">or click <strong>Choose File</strong> below</p>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <input type="file" id="lmsFileInput" accept="${this.fileSharingInput}" aria-label="Select file"
+                            style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);
+                                   background:rgba(255,255,255,0.04);color:#e8eaed;font-family:'Comfortaa',sans-serif;
+                                   font-size:12.5px;cursor:pointer;box-sizing:border-box;" />
+                    </div>
+                </div>
             </div>
             `,
-            inputAttributes: {
-                accept: this.fileSharingInput,
-                'aria-label': 'Select file',
-            },
             didOpen: () => {
                 const dropArea = document.getElementById('dropArea');
                 dropArea.addEventListener('dragenter', handleDragEnter);
@@ -4746,12 +4805,20 @@ class RoomClient {
                 dropArea.addEventListener('drop', handleDrop);
             },
             showDenyButton: true,
-            confirmButtonText: `Send`,
+            confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">send</span>Send`,
             denyButtonText: `Cancel`,
+            preConfirm: () => {
+                const fileInput = document.getElementById('lmsFileInput');
+                if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                    Swal.showValidationMessage('Please select a file first');
+                    return false;
+                }
+                return fileInput.files[0];
+            },
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.isConfirmed && result.value) {
                 this.sendFileInformations(result.value, peer_id, broadcast);
             }
         });
@@ -4759,7 +4826,7 @@ class RoomClient {
         function handleDragEnter(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.target.style.background = 'var(--body-bg)';
+            e.currentTarget.classList.add('drag-over');
         }
 
         function handleDragOver(e) {
@@ -4771,24 +4838,32 @@ class RoomClient {
         function handleDragLeave(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.target.style.background = '';
+            e.currentTarget.classList.remove('drag-over');
         }
 
         function handleDrop(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.currentTarget.classList.remove('drag-over');
             const dt = e.dataTransfer;
             const files = dt.files;
             handleFiles(files);
-            e.target.style.background = '';
         }
 
         function handleFiles(files) {
             if (files.length > 0) {
                 const file = files[0];
                 console.log('Selected file:', file);
-                Swal.close();
-                rc.sendFileInformations(file, peer_id, broadcast);
+                const lmsInput = document.getElementById('lmsFileInput');
+                if (lmsInput) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    lmsInput.files = dataTransfer.files;
+                    const dropArea = document.getElementById('dropArea');
+                    if (dropArea) {
+                        dropArea.querySelector('p').textContent = `📄 ${file.name}`;
+                    }
+                }
             }
         }
     }
