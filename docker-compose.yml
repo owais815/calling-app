@@ -13,10 +13,10 @@ services:
             # LMS shared secret — must match backend CALLING_APP_API_SECRET
             - CALLING_APP_API_SECRET=${CALLING_APP_API_SECRET:-lms_calling_secret_2026}
             - PORT=3010
+            # nginx handles SSL termination — app runs plain HTTP internally
+            - BEHIND_PROXY=true
         volumes:
             - /var/www/lms-calling/.env:/src/.env:ro
             - ./app/src/config.js:/src/app/src/config.js:ro
-            - /etc/letsencrypt/live/call.ejazmehmood.com/fullchain.pem:/src/app/ssl/cert.pem:ro
-            - /etc/letsencrypt/live/call.ejazmehmood.com/privkey.pem:/src/app/ssl/key.pem:ro
         # host network mode: required for mediasoup worker permissions + WebRTC UDP
         network_mode: host

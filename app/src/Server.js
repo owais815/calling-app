@@ -101,17 +101,25 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-const options = {
-    cert: fs.readFileSync(path.join(__dirname, config.server.ssl.cert), 'utf-8'),
-    key: fs.readFileSync(path.join(__dirname, config.server.ssl.key), 'utf-8'),
-};
-
 const corsOptions = {
     origin: config.server?.cors?.origin || '*',
     methods: config.server?.cors?.methods || ['GET', 'POST'],
 };
 
-const httpsServer = https.createServer(options, app);
+// When BEHIND_PROXY=true nginx handles SSL termination — run plain HTTP internally.
+// When running standalone (local dev / direct HTTPS) use the SSL certs.
+const BEHIND_PROXY = process.env.BEHIND_PROXY === 'true';
+
+const httpsServer = BEHIND_PROXY
+    ? http.createServer(app)
+    : https.createServer(
+          {
+              cert: fs.readFileSync(path.join(__dirname, config.server.ssl.cert), 'utf-8'),
+              key: fs.readFileSync(path.join(__dirname, config.server.ssl.key), 'utf-8'),
+          },
+          app,
+      );
+
 const io = socketIo(httpsServer, {
     maxHttpBufferSize: 1e7,
     transports: ['websocket'],
