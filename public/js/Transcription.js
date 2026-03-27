@@ -190,14 +190,20 @@ class Transcription {
         const time_stamp = rc.getTimeNow();
         const avatar_image = rc.isValidEmail(peer_name) ? rc.genGravatar(peer_name) : rc.genAvatarSvg(peer_name, 32);
 
-        // In persistent (background) mode, skip all UI — just collect transcripts
-        if (!this.isPersistentMode) {
-            if (this.isHidden) {
-                if (this.showOnMessage) {
-                    this.toggle();
-                } else {
-                    this.handleTranscriptionPopup(transcriptionData);
-                }
+        this.transcripts.push({
+            time: time_stamp,
+            name: peer_name,
+            caption: text_data,
+        });
+
+        // In persistent (background) mode, skip all UI — just collect transcripts silently
+        if (this.isPersistentMode) return;
+
+        if (this.isHidden) {
+            if (this.showOnMessage) {
+                this.toggle();
+            } else {
+                this.handleTranscriptionPopup(transcriptionData);
             }
         }
 
@@ -214,12 +220,6 @@ class Transcription {
         `;
         transcriptionChat.insertAdjacentHTML('beforeend', msgHTML);
         transcriptionChat.scrollTop += 500;
-
-        this.transcripts.push({
-            time: time_stamp,
-            name: peer_name,
-            caption: text_data,
-        });
         rc.sound('transcript');
     }
 
