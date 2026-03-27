@@ -1207,6 +1207,246 @@ th {
     background: #376df9;
 }
 
+/*--------------------------------------------------------------
+# LMS Toasts
+--------------------------------------------------------------*/
+
+.lms-toast.swal2-popup {
+    border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    background: rgba(30, 32, 36, 0.97) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45) !important;
+    padding: 10px 16px !important;
+    min-width: 280px !important;
+    max-width: 400px !important;
+}
+
+.lms-toast .swal2-title {
+    display: block !important;
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #e8eaed !important;
+    letter-spacing: 0.01em !important;
+}
+
+.lms-toast .swal2-icon {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    margin: 0 !important;
+    border-width: 2px !important;
+}
+
+.lms-toast .swal2-icon .swal2-icon-content {
+    font-size: 16px !important;
+}
+
+.lms-toast.swal2-popup .swal2-icon.swal2-success {
+    border-color: #34d399 !important;
+    color: #34d399 !important;
+}
+.lms-toast.swal2-popup .swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(52,211,153,0.3) !important;
+}
+.lms-toast.swal2-popup .swal2-icon.swal2-error {
+    border-color: #f87171 !important;
+    color: #f87171 !important;
+}
+.lms-toast.swal2-popup .swal2-icon.swal2-warning {
+    border-color: #fbbf24 !important;
+    color: #fbbf24 !important;
+}
+.lms-toast.swal2-popup .swal2-icon.swal2-info {
+    border-color: #60a5fa !important;
+    color: #60a5fa !important;
+}
+
+.lms-toast .swal2-timer-progress-bar {
+    background: linear-gradient(90deg, #376df9, #60a5fa) !important;
+    height: 3px !important;
+    border-radius: 3px !important;
+}
+
+/*--------------------------------------------------------------
+# LMS Modal (confirmation / file / info)
+--------------------------------------------------------------*/
+
+.lms-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.lms-modal-header .lms-modal-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.lms-modal-icon.blue   { background: rgba(26,115,232,0.15); color: #1a73e8; }
+.lms-modal-icon.red    { background: rgba(239,68,68,0.15);  color: #ef4444; }
+.lms-modal-icon.amber  { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.lms-modal-icon.green  { background: rgba(52,211,153,0.15); color: #34d399; }
+.lms-modal-icon.purple { background: rgba(167,139,250,0.15);color: #a78bfa; }
+
+.lms-modal-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #e8eaed;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.lms-modal-body {
+    padding: 18px 20px 8px;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.lms-modal-body p {
+    color: #9aa0a6;
+    font-size: 13px;
+    margin: 0 0 4px;
+    line-height: 1.6;
+}
+
+.lms-modal-footer-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 10px 20px 16px;
+}
+
+.lms-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lms-btn-primary {
+    background: #1a73e8;
+    color: #fff;
+}
+.lms-btn-primary:hover { background: #1558b0; }
+
+.lms-btn-danger {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239,68,68,0.25);
+}
+.lms-btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+.lms-btn-ghost {
+    background: rgba(255,255,255,0.06);
+    color: #9aa0a6;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.lms-btn-ghost:hover { background: rgba(255,255,255,0.12); }
+
+/* File drop zone */
+.lms-drop-zone {
+    margin-top: 10px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+
+.lms-drop-zone:hover,
+.lms-drop-zone.drag-over {
+    border-color: #1a73e8;
+    background: rgba(26,115,232,0.08);
+}
+
+.lms-drop-zone .lms-drop-icon {
+    font-size: 32px;
+    color: #9aa0a6;
+    margin-bottom: 6px;
+}
+
+.lms-drop-zone p {
+    margin: 4px 0;
+    font-size: 12.5px;
+    color: #9aa0a6;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.lms-drop-zone strong {
+    color: #1a73e8;
+}
+
+/* swal file-input inside lms modals */
+.swal2-file, .swal2-input {
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13px !important;
+    color: #e8eaed !important;
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    border-radius: 8px !important;
+}
+
+.swal2-file:focus, .swal2-input:focus {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.15) !important;
+    outline: none !important;
+}
+
+/* custom swal buttons */
+.swal2-confirm.lms-swal-confirm {
+    background: #1a73e8 !important;
+    border-radius: 8px !important;
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 9px 20px !important;
+    box-shadow: none !important;
+}
+.swal2-confirm.lms-swal-confirm:hover { background: #1558b0 !important; }
+
+.swal2-deny.lms-swal-deny, .swal2-cancel.lms-swal-cancel {
+    background: rgba(255,255,255,0.06) !important;
+    color: #9aa0a6 !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    border-radius: 8px !important;
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 9px 20px !important;
+    box-shadow: none !important;
+}
+.swal2-deny.lms-swal-deny-danger {
+    background: rgba(239,68,68,0.12) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239,68,68,0.2) !important;
+    border-radius: 8px !important;
+    font-family: 'Comfortaa', sans-serif !important;
+    font-size: 13px !important;
+    padding: 9px 20px !important;
+    box-shadow: none !important;
+}
+
+.lms-swal-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
 .img-about {
     margin: 0 !important;
 }
