@@ -159,7 +159,8 @@ class Transcription {
                     }, 2000);
                 } else {
                     transcription.isPersistent = false;
-                    userLog('info', 'Transcription stopped', 'top-end');
+                    // Silent stop — no toast shown
+                    console.log('[Transcription] Stopped.');
                 }
             };
 
@@ -411,9 +412,15 @@ class Transcription {
             this.selectDisabled(true);
             this.transcription.start();
         } catch (error) {
-            this.transcriptionRunning = false;
-            userLog('error', `Transcription start error ${error.message}`, 'top-end', 6000);
             console.error('Transcription start error', error);
+            if (this.isPersistentMode && this.isPersistent) {
+                // In persistent mode, retry after a delay instead of giving up
+                setTimeout(() => {
+                    if (this.transcriptionRunning) this.start();
+                }, 3000);
+            } else {
+                this.transcriptionRunning = false;
+            }
         }
     }
 
