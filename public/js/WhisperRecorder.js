@@ -31,14 +31,14 @@ class WhisperRecorder {
     start() {
         if (this.isRecording) return;
         if (typeof transcription === 'undefined' || !transcription.isSupported()) {
-            userLog('warning', 'Speech recognition not supported in this browser.', 'top-end', 5000);
+            console.warn('[WhisperRecorder] Speech recognition not supported in this browser.');
             return;
         }
         // Enable persistent mode so recognition auto-restarts on silence
         transcription.isPersistentMode = true;
         transcription.start();
         this.isRecording = true;
-        userLog('info', 'Session transcription started (Google Speech)', 'top-end', 3000);
+        console.log('[WhisperRecorder] Session transcription started (Google Speech)');
     }
 
     /** Stop recognition and upload collected text to LMS */
@@ -56,7 +56,7 @@ class WhisperRecorder {
     async _upload() {
         if (!this.lmsSessionId) return;
         if (typeof transcription === 'undefined' || !transcription.transcripts || transcription.transcripts.length === 0) {
-            userLog('info', 'No transcript text collected for this session.', 'top-end', 4000);
+            console.log('[WhisperRecorder] No transcript text collected for this session.');
             return;
         }
 
@@ -64,7 +64,7 @@ class WhisperRecorder {
             .map(t => `[${t.time}] ${t.name}: ${t.caption}`)
             .join('\n');
 
-        userLog('info', 'Saving session transcript…', 'top-end', 3000);
+        console.log('[WhisperRecorder] Saving session transcript…');
 
         try {
             const resp = await fetch('/api/v1/save-transcript', {
@@ -83,10 +83,9 @@ class WhisperRecorder {
             if (!resp.ok) {
                 throw new Error(`Server responded ${resp.status}`);
             }
-            userLog('success', 'Transcript saved! Accessible in the LMS schedule.', 'top-end', 6000);
+            console.log('[WhisperRecorder] Transcript saved successfully.');
         } catch (err) {
             console.error('[WhisperRecorder] upload error:', err);
-            userLog('error', `Transcript save failed: ${err.message}`, 'top-end', 6000);
         }
     }
 
