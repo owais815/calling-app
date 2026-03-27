@@ -3591,12 +3591,12 @@ class RoomClient {
         const chat = this.getId('chat');
         plist.classList.toggle('hidden');
         const isParticipantsListHidden = !this.isPlistOpen();
-        chat.style.marginLeft = isParticipantsListHidden ? 0 : '300px';
+        chat.style.marginLeft = isParticipantsListHidden ? 0 : '280px';
         chat.style.borderLeft = isParticipantsListHidden ? 'none' : '1px solid rgb(255 255 255 / 32%)';
         if (this.isChatPinned) elemDisplay(chat.id, isParticipantsListHidden);
         if (!this.isChatPinned) elemDisplay(chat.id, true);
         this.toggleChatHistorySize(isParticipantsListHidden && (this.isChatPinned || this.isChatMaximized));
-        plist.style.width = this.isChatPinned || this.isMobileDevice ? '100%' : '300px';
+        plist.style.width = this.isChatPinned || this.isMobileDevice ? '100%' : '280px';
         plist.style.position = this.isMobileDevice ? 'fixed' : 'absolute';
     }
 
@@ -3959,57 +3959,44 @@ class RoomClient {
         const getToName = filterXSS(toName);
         const time = this.getTimeNow();
 
-        const myMessage = getSide === 'left';
-        const messageClass = myMessage ? 'my-message' : 'other-message float-right';
-        const messageData = myMessage ? 'text-start' : 'text-end';
-        const timeAndName = myMessage
-            ? `<span class="message-data-time">${time}, ${getFromName} ( me ) </span>`
-            : `<span class="message-data-time">${time}, ${getFromName} </span>`;
+        const isMine = getSide === 'left';
+        const bubbleSide = isMine ? 'sent' : 'received';
+        const displayName = isMine ? `${getFromName} (me)` : getFromName;
 
         const formatMessage = this.formatMsg(getMsg);
         console.log('FormatMessage', formatMessage);
-        const speechButton = this.isSpeechSynthesisSupported
-            ? `<button 
-                    id="msg-speech-${chatMessagesId}" 
-                    class="mr5" 
-                    onclick="rc.speechText('${formatMessage}')">
-                    <i class="fas fa-volume-high"></i>
-                </button>`
-            : '';
 
-        const positionFirst = myMessage
-            ? `<img src="${getImg}" alt="avatar" />${timeAndName}`
-            : `${timeAndName}<img src="${getImg}" alt="avatar" />`;
+        const speechButton = this.isSpeechSynthesisSupported
+            ? `<button id="msg-speech-${chatMessagesId}" onclick="rc.speechText('${formatMessage}')">
+                   <span class="material-symbols-outlined">volume_up</span>
+               </button>`
+            : '';
 
         const message = getFromName === 'ChatGPT' ? `<pre>${getMsg}</pre>` : getMsg;
 
         const newMessageHTML = `
-            <li id="msg-${chatMessagesId}"  
-                data-from-id="${getFromId}" 
+            <li id="msg-${chatMessagesId}"
+                data-from-id="${getFromId}"
                 data-from-name="${getFromName}"
-                data-to-id="${getToId}" 
+                data-to-id="${getToId}"
                 data-to-name="${getToName}"
-                class="clearfix"
             >
-                <div class="message-data ${messageData}">
-                    ${positionFirst}
-                </div>
-                <div class="message ${messageClass}">
-                    <span class="text-start " id="${chatMessagesId}">${message}</span>
-                    <hr/>
-                    <div class="about-buttons mt5">
-                        <button 
-                            id="msg-copy-${chatMessagesId}" 
-                            class="mr5" 
-                            onclick="rc.copyToClipboard('${chatMessagesId}')">
-                            <i class="fas fa-paste"></i>
+                <div class="chat-msg-item ${bubbleSide}">
+                    <div class="chat-msg-meta">
+                        <img src="${getImg}" alt="avatar" />
+                        <span class="meta-name">${displayName}</span>
+                        <span class="meta-time">${time}</span>
+                    </div>
+                    <div class="chat-msg-bubble">
+                        <span id="${chatMessagesId}">${message}</span>
+                    </div>
+                    <div class="chat-msg-actions">
+                        <button id="msg-copy-${chatMessagesId}" onclick="rc.copyToClipboard('${chatMessagesId}')">
+                            <span class="material-symbols-outlined">content_copy</span>
                         </button>
                         ${speechButton}
-                        <button 
-                            id="msg-delete-${chatMessagesId}"   
-                            class="mr5" 
-                            onclick="rc.deleteMessage('msg-${chatMessagesId}')">
-                            <i class="fas fa-trash"></i>
+                        <button id="msg-delete-${chatMessagesId}" onclick="rc.deleteMessage('msg-${chatMessagesId}')">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </div>
                 </div>
@@ -4045,13 +4032,30 @@ class RoomClient {
 
     deleteMessage(id) {
         Swal.fire({
-            background: swalBackground,
+            background: 'rgba(28,29,33,0.97)',
             position: 'center',
-            title: 'Delete this Message?',
-            imageUrl: image.delete,
+            width: 360,
+            padding: 0,
+            customClass: {
+                htmlContainer: 'lms-swal-container',
+                confirmButton: 'lms-swal-confirm',
+                denyButton: 'lms-swal-deny-danger',
+            },
+            html: `
+            <div style="font-family:'Comfortaa',sans-serif;">
+                <div class="lms-modal-header">
+                    <div class="lms-modal-icon red">
+                        <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
+                    </div>
+                    <h3>Delete Message</h3>
+                </div>
+                <div class="lms-modal-body">
+                    <p>This message will be removed from the chat. This cannot be undone.</p>
+                </div>
+            </div>`,
             showDenyButton: true,
-            confirmButtonText: `Yes`,
-            denyButtonText: `No`,
+            confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">delete</span>Delete`,
+            denyButtonText: `Cancel`,
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
         }).then((result) => {
@@ -4235,13 +4239,30 @@ class RoomClient {
             return userLog('info', 'No chat messages to clean', 'top-end');
         }
         Swal.fire({
-            background: swalBackground,
+            background: 'rgba(28,29,33,0.97)',
             position: 'center',
-            title: 'Clean up all chat Messages?',
-            imageUrl: image.delete,
+            width: 380,
+            padding: 0,
+            customClass: {
+                htmlContainer: 'lms-swal-container',
+                confirmButton: 'lms-swal-confirm',
+                denyButton: 'lms-swal-deny-danger',
+            },
+            html: `
+            <div style="font-family:'Comfortaa',sans-serif;">
+                <div class="lms-modal-header">
+                    <div class="lms-modal-icon red">
+                        <span class="material-symbols-outlined" style="font-size:20px;">delete_sweep</span>
+                    </div>
+                    <h3>Clear All Messages</h3>
+                </div>
+                <div class="lms-modal-body">
+                    <p>This will permanently remove all messages from this chat session. This action cannot be undone.</p>
+                </div>
+            </div>`,
             showDenyButton: true,
-            confirmButtonText: `Yes`,
-            denyButtonText: `No`,
+            confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">delete_sweep</span>Clear All`,
+            denyButtonText: `Cancel`,
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
         }).then((result) => {
@@ -6642,21 +6663,27 @@ class RoomClient {
         const generateChatAboutHTML = (imgSrc, title, status = 'online', participants = '') => {
             const isSensitiveChat = !['all', 'ChatGPT'].includes(peer_id) && title.length > 15;
             const truncatedTitle = isSensitiveChat ? `${title.substring(0, 10)}*****` : title;
+            const countBadge = participants
+                ? `<span class="chat-about-count">${participants}</span>`
+                : '';
+            // Avatar: icon-based for public/private, image for ChatGPT
+            let avatarHTML;
+            if (peer_id === 'ChatGPT') {
+                avatarHTML = `<div class="chat-header-avatar-wrap purple"><img src="${imgSrc}" alt="ChatGPT" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" /></div>`;
+            } else if (peer_id === 'all') {
+                avatarHTML = `<div class="chat-header-avatar-wrap blue"><span class="material-symbols-outlined">forum</span></div>`;
+            } else {
+                avatarHTML = `<div class="chat-header-avatar-wrap green"><span class="material-symbols-outlined">person</span></div>`;
+            }
             return `
-                <img class="all-participants-img" 
-                    style="border: var(--border); width: 43px; margin-right: 5px; cursor: pointer;"
-                    id="chatShowParticipantsList" 
-                    src="${image.users}"
-                    alt="participants"
-                    onclick="rc.toggleShowParticipants()" 
-                />
-                <a data-toggle="modal" data-target="#view_info">
-                    <img src="${imgSrc}" alt="avatar" />
-                </a>
+                <button class="plist-toggle-btn" id="chatShowParticipantsList" title="Toggle participants" onclick="rc.toggleShowParticipants()">
+                    <span class="material-symbols-outlined">group</span>
+                </button>
+                ${avatarHTML}
                 <div class="chat-about">
-                    <h6 class="mb-0">${truncatedTitle}</h6>
+                    <h6 class="mb-0">${truncatedTitle}${countBadge}</h6>
                     <span class="status">
-                        <i class="fa fa-circle ${status}"></i> ${status} ${participants}
+                        <span class="${status}"></span>${status}
                     </span>
                 </div>
             `;
