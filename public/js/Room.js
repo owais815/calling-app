@@ -3557,11 +3557,16 @@ window.addEventListener('message', async (e) => {
         if (rc && rc.isChatOpen) rc.toggleChat();
         return;
     }
-    // LMS session ended → stop transcription and upload
+    // LMS session ended → stop transcription and upload via beacon (survives iframe close)
     if (e.data.type === 'lmsSessionEnd') {
         console.log('[Room] lmsSessionEnd received — stopping transcription');
         if (whisperRecorder && whisperRecorder.isActive()) {
-            await whisperRecorder.stop();
+            // Use sendBeacon for reliability — the iframe may be destroyed before an async fetch completes
+            if (typeof transcription !== 'undefined') {
+                transcription.isPersistentMode = false;
+                transcription.stop();
+            }
+            whisperRecorder.stopAndUploadSync();
         }
         return;
     }
