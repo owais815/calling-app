@@ -1395,14 +1395,34 @@ function shareRoomByEmail() {
     Swal.fire({
         allowOutsideClick: false,
         allowEscapeKey: false,
-        background: swalBackground,
-        imageUrl: image.email,
+        background: 'rgba(28,29,33,0.97)',
         position: 'center',
-        title: 'Select a Date and Time',
-        html: '<input type="text" id="datetimePicker" class="flatpickr" />',
+        width: 400,
+        padding: 0,
+        customClass: {
+            htmlContainer: 'lms-swal-container',
+            confirmButton: 'lms-swal-confirm',
+            cancelButton: 'lms-swal-cancel',
+        },
+        html: `
+        <div style="font-family:'Comfortaa',sans-serif;">
+            <div class="lms-modal-header">
+                <div class="lms-modal-icon blue">
+                    <span class="material-symbols-outlined" style="font-size:20px;">mail</span>
+                </div>
+                <h3>Invite via Email</h3>
+            </div>
+            <div class="lms-modal-body">
+                <p>Choose a date and time for the meeting, then your email client will open with a pre-filled invite.</p>
+                <input type="text" id="datetimePicker" class="flatpickr"
+                    style="width:100%;margin-top:10px;padding:9px 12px;border-radius:8px;
+                           border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+                           color:#e8eaed;font-family:'Comfortaa',sans-serif;font-size:13px;
+                           box-sizing:border-box;outline:none;" />
+            </div>
+        </div>`,
         showCancelButton: true,
-        confirmButtonText: 'OK',
-        cancelButtonColor: 'red',
+        confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">send</span>Send Invite`,
         showClass: { popup: 'animate__animated animate__fadeInDown' },
         hideClass: { popup: 'animate__animated animate__fadeOutUp' },
         preConfirm: () => {
@@ -2295,15 +2315,34 @@ function handleMediaError(mediaType, err) {
 }
 
 function popupHtmlMessage(icon, imageUrl, title, html, position, redirectURL = false) {
+    const iconMap = {
+        success: { cls: 'green', sym: 'check_circle' },
+        error:   { cls: 'red',   sym: 'error' },
+        warning: { cls: 'amber', sym: 'warning' },
+        info:    { cls: 'blue',  sym: 'info' },
+    };
+    const ic = iconMap[icon] || { cls: 'blue', sym: 'info' };
     Swal.fire({
         allowOutsideClick: false,
         allowEscapeKey: false,
-        background: swalBackground,
+        background: 'rgba(28,29,33,0.97)',
         position: position,
-        icon: icon,
-        imageUrl: imageUrl,
-        title: title,
-        html: html,
+        width: 420,
+        padding: 0,
+        customClass: {
+            htmlContainer: 'lms-swal-container',
+            confirmButton: 'lms-swal-confirm',
+        },
+        html: `
+        <div style="font-family:'Comfortaa',sans-serif;">
+            <div class="lms-modal-header">
+                <div class="lms-modal-icon ${ic.cls}">
+                    <span class="material-symbols-outlined" style="font-size:20px;">${ic.sym}</span>
+                </div>
+                <h3>${title || 'Notice'}</h3>
+            </div>
+            <div class="lms-modal-body">${html}</div>
+        </div>`,
         showClass: { popup: 'animate__animated animate__fadeInDown' },
         hideClass: { popup: 'animate__animated animate__fadeOutUp' },
     }).then((result) => {
@@ -3115,13 +3154,30 @@ function leaveFeedback() {
     Swal.fire({
         allowOutsideClick: false,
         allowEscapeKey: false,
+        background: 'rgba(28,29,33,0.97)',
+        position: 'center',
+        width: 400,
+        padding: 0,
+        customClass: {
+            htmlContainer: 'lms-swal-container',
+            confirmButton: 'lms-swal-confirm',
+            denyButton: 'lms-swal-deny',
+        },
+        html: `
+        <div style="font-family:'Comfortaa',sans-serif;">
+            <div class="lms-modal-header">
+                <div class="lms-modal-icon amber">
+                    <span class="material-symbols-outlined" style="font-size:20px;">star</span>
+                </div>
+                <h3>Rate Your Experience</h3>
+            </div>
+            <div class="lms-modal-body">
+                <p>Would you like to rate your <strong style="color:#e8eaed;">Mualim Ul Quran</strong> session? Your feedback helps us improve.</p>
+            </div>
+        </div>`,
         showDenyButton: true,
-        background: swalBackground,
-        imageUrl: image.feedback,
-        title: 'Leave a feedback',
-        text: 'Do you want to rate your Mualim Ul Quran experience?',
-        confirmButtonText: `Yes`,
-        denyButtonText: `No`,
+        confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">star</span>Rate Session`,
+        denyButtonText: `Skip`,
         showClass: { popup: 'animate__animated animate__fadeInDown' },
         hideClass: { popup: 'animate__animated animate__fadeOutUp' },
     }).then((result) => {
@@ -3145,12 +3201,13 @@ function redirectOnLeave() {
 
 function userLog(icon, message, position, timer = 3000) {
     const Toast = Swal.mixin({
-        background: swalBackground,
+        background: 'rgba(30,32,36,0.97)',
         toast: true,
         position: position,
         showConfirmButton: false,
         timer: timer,
         timerProgressBar: true,
+        customClass: { popup: 'lms-toast' },
     });
     Toast.fire({
         icon: icon,
@@ -3628,11 +3685,38 @@ function whiteboardAddObj(type) {
     switch (type) {
         case 'imgUrl':
             Swal.fire({
-                background: swalBackground,
-                title: 'Image URL',
-                input: 'text',
+                background: 'rgba(28,29,33,0.97)',
+                width: 400,
+                padding: 0,
+                customClass: {
+                    htmlContainer: 'lms-swal-container',
+                    confirmButton: 'lms-swal-confirm',
+                    cancelButton: 'lms-swal-cancel',
+                },
+                html: `
+                <div style="font-family:'Comfortaa',sans-serif;">
+                    <div class="lms-modal-header">
+                        <div class="lms-modal-icon blue">
+                            <span class="material-symbols-outlined" style="font-size:20px;">add_photo_alternate</span>
+                        </div>
+                        <h3>Image from URL</h3>
+                    </div>
+                    <div class="lms-modal-body">
+                        <p>Paste a direct image URL to add it to the whiteboard.</p>
+                        <input id="lmsImgUrlInput" type="text" placeholder="https://example.com/image.png"
+                            style="width:100%;margin-top:10px;padding:9px 12px;border-radius:8px;
+                                   border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+                                   color:#e8eaed;font-family:'Comfortaa',sans-serif;font-size:13px;
+                                   box-sizing:border-box;outline:none;" />
+                    </div>
+                </div>`,
                 showCancelButton: true,
-                confirmButtonText: 'OK',
+                confirmButtonText: 'Add Image',
+                preConfirm: () => {
+                    const val = document.getElementById('lmsImgUrlInput').value.trim();
+                    if (!val) { Swal.showValidationMessage('Please enter a URL'); return false; }
+                    return val;
+                },
                 showClass: { popup: 'animate__animated animate__fadeInDown' },
                 hideClass: { popup: 'animate__animated animate__fadeOutUp' },
             }).then((result) => {
@@ -3651,17 +3735,43 @@ function whiteboardAddObj(type) {
         case 'imgFile':
             Swal.fire({
                 allowOutsideClick: false,
-                background: swalBackground,
+                background: 'rgba(28,29,33,0.97)',
                 position: 'center',
-                title: 'Select the image',
-                input: 'file',
-                inputAttributes: {
-                    accept: wbImageInput,
-                    'aria-label': 'Select the image',
+                width: 400,
+                padding: 0,
+                customClass: {
+                    htmlContainer: 'lms-swal-container',
+                    confirmButton: 'lms-swal-confirm',
+                    denyButton: 'lms-swal-deny',
                 },
+                html: `
+                <div style="font-family:'Comfortaa',sans-serif;">
+                    <div class="lms-modal-header">
+                        <div class="lms-modal-icon blue">
+                            <span class="material-symbols-outlined" style="font-size:20px;">image</span>
+                        </div>
+                        <h3>Add Image to Board</h3>
+                    </div>
+                    <div class="lms-modal-body">
+                        <p>Select an image file to place on the whiteboard.</p>
+                        <input type="file" id="lmsWbImgInput" accept="${wbImageInput}" aria-label="Select the image"
+                            style="width:100%;margin-top:10px;padding:9px 12px;border-radius:8px;
+                                   border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+                                   color:#e8eaed;font-family:'Comfortaa',sans-serif;font-size:12.5px;
+                                   cursor:pointer;box-sizing:border-box;" />
+                    </div>
+                </div>`,
                 showDenyButton: true,
-                confirmButtonText: `OK`,
+                confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">check</span>Add`,
                 denyButtonText: `Cancel`,
+                preConfirm: () => {
+                    const f = document.getElementById('lmsWbImgInput');
+                    if (!f || !f.files || f.files.length === 0) {
+                        Swal.showValidationMessage('Please select an image file');
+                        return false;
+                    }
+                    return f.files[0];
+                },
                 showClass: { popup: 'animate__animated animate__fadeInDown' },
                 hideClass: { popup: 'animate__animated animate__fadeOutUp' },
             }).then((result) => {
@@ -3688,17 +3798,43 @@ function whiteboardAddObj(type) {
         case 'pdfFile':
             Swal.fire({
                 allowOutsideClick: false,
-                background: swalBackground,
+                background: 'rgba(28,29,33,0.97)',
                 position: 'center',
-                title: 'Select the PDF',
-                input: 'file',
-                inputAttributes: {
-                    accept: wbPdfInput,
-                    'aria-label': 'Select the PDF',
+                width: 400,
+                padding: 0,
+                customClass: {
+                    htmlContainer: 'lms-swal-container',
+                    confirmButton: 'lms-swal-confirm',
+                    denyButton: 'lms-swal-deny',
                 },
+                html: `
+                <div style="font-family:'Comfortaa',sans-serif;">
+                    <div class="lms-modal-header">
+                        <div class="lms-modal-icon red">
+                            <span class="material-symbols-outlined" style="font-size:20px;">picture_as_pdf</span>
+                        </div>
+                        <h3>Add PDF to Board</h3>
+                    </div>
+                    <div class="lms-modal-body">
+                        <p>Select a PDF file to render its pages onto the whiteboard.</p>
+                        <input type="file" id="lmsWbPdfInput" accept="${wbPdfInput}" aria-label="Select the PDF"
+                            style="width:100%;margin-top:10px;padding:9px 12px;border-radius:8px;
+                                   border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+                                   color:#e8eaed;font-family:'Comfortaa',sans-serif;font-size:12.5px;
+                                   cursor:pointer;box-sizing:border-box;" />
+                    </div>
+                </div>`,
                 showDenyButton: true,
-                confirmButtonText: `OK`,
+                confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">check</span>Load PDF`,
                 denyButtonText: `Cancel`,
+                preConfirm: () => {
+                    const f = document.getElementById('lmsWbPdfInput');
+                    if (!f || !f.files || f.files.length === 0) {
+                        Swal.showValidationMessage('Please select a PDF file');
+                        return false;
+                    }
+                    return f.files[0];
+                },
                 showClass: { popup: 'animate__animated animate__fadeInDown' },
                 hideClass: { popup: 'animate__animated animate__fadeOutUp' },
             }).then((result) => {
@@ -3959,14 +4095,30 @@ function getWhiteboardAction(action) {
 
 function confirmClearBoard() {
     Swal.fire({
-        background: swalBackground,
-        imageUrl: image.delete,
+        background: 'rgba(28,29,33,0.97)',
         position: 'center',
-        title: 'Clean the board',
-        text: 'Are you sure you want to clean the board?',
+        width: 380,
+        padding: 0,
+        customClass: {
+            htmlContainer: 'lms-swal-container',
+            confirmButton: 'lms-swal-confirm',
+            denyButton: 'lms-swal-deny-danger',
+        },
+        html: `
+        <div style="font-family:'Comfortaa',sans-serif;">
+            <div class="lms-modal-header">
+                <div class="lms-modal-icon red">
+                    <span class="material-symbols-outlined" style="font-size:20px;">delete_sweep</span>
+                </div>
+                <h3>Clear Whiteboard</h3>
+            </div>
+            <div class="lms-modal-body">
+                <p>This will erase everything on the board. This action cannot be undone.</p>
+            </div>
+        </div>`,
         showDenyButton: true,
-        confirmButtonText: `Yes`,
-        denyButtonText: `No`,
+        confirmButtonText: `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">delete</span>Clear`,
+        denyButtonText: `Cancel`,
         showClass: { popup: 'animate__animated animate__fadeInDown' },
         hideClass: { popup: 'animate__animated animate__fadeOutUp' },
     }).then((result) => {
