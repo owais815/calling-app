@@ -190,11 +190,14 @@ class Transcription {
         const time_stamp = rc.getTimeNow();
         const avatar_image = rc.isValidEmail(peer_name) ? rc.genGravatar(peer_name) : rc.genAvatarSvg(peer_name, 32);
 
-        if (this.isHidden) {
-            if (this.showOnMessage) {
-                this.toggle();
-            } else {
-                this.handleTranscriptionPopup(transcriptionData);
+        // In persistent (background) mode, skip all UI — just collect transcripts
+        if (!this.isPersistentMode) {
+            if (this.isHidden) {
+                if (this.showOnMessage) {
+                    this.toggle();
+                } else {
+                    this.handleTranscriptionPopup(transcriptionData);
+                }
             }
         }
 
