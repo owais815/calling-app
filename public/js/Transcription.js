@@ -239,6 +239,8 @@ class Transcription {
     }
 
     toggle() {
+        // In background/persistent mode the panel is never shown to the user
+        if (this.isPersistentMode) return;
         if (this.isHidden) {
             this.center();
             transcriptionRoom.style.display = 'block';

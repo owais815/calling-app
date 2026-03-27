@@ -36,6 +36,11 @@ class WhisperRecorder {
         }
         // Enable persistent mode so recognition auto-restarts on silence
         transcription.isPersistentMode = true;
+        // Force-hide the transcription panel — it must never be visible in background mode
+        if (typeof transcriptionRoom !== 'undefined') {
+            transcriptionRoom.style.display = 'none';
+            transcription.isHidden = true;
+        }
         transcription.start();
         this.isRecording = true;
         console.log('[WhisperRecorder] Session transcription started (Google Speech)');
