@@ -3134,10 +3134,7 @@ function handleRoomClientEvents() {
         if (rc.isRecording() || recordingStatus.innerText != '0s') {
             rc.saveRecording('Room event: Client save recording before to exit');
         }
-        // Auto-stop whisper transcript on room exit
-        if (whisperRecorder && whisperRecorder.isActive()) {
-            await whisperRecorder.stop();
-        }
+        // Transcription continues — only stopped by lmsSessionEnd postMessage
         if (survey && survey.enabled) {
             leaveFeedback();
         } else {
@@ -3553,11 +3550,19 @@ async function saveAttendance() {
 // ####################################################
 
 // Listen for postMessage from the LMS parent
-window.addEventListener('message', (e) => {
+window.addEventListener('message', async (e) => {
     if (!e.data) return;
     // LMS panel opened from header → close calling-app chat if open
     if (e.data.type === 'lmsCloseChat') {
         if (rc && rc.isChatOpen) rc.toggleChat();
+        return;
+    }
+    // LMS session ended → stop transcription and upload
+    if (e.data.type === 'lmsSessionEnd') {
+        console.log('[Room] lmsSessionEnd received — stopping transcription');
+        if (whisperRecorder && whisperRecorder.isActive()) {
+            await whisperRecorder.stop();
+        }
         return;
     }
 });
