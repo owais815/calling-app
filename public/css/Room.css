@@ -234,6 +234,139 @@ body {
         'opsz' 24;
 }
 
+/*--------------------------------------------------------------
+# Control Bar — Active / ON state colors (BUG-032)
+# Active = mic ON, video ON, screen sharing ON, hand raised, chat open, whiteboard open
+--------------------------------------------------------------*/
+
+/* Mic ON — green */
+#stopAudioButton {
+    background: #1e8a3c !important;
+}
+#stopAudioButton:hover {
+    background: #166d30 !important;
+}
+#stopAudioButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Mic OFF/Muted — red */
+#startAudioButton {
+    background: #c62828 !important;
+}
+#startAudioButton:hover {
+    background: #a31f1f !important;
+}
+#startAudioButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Video ON — green */
+#stopVideoButton {
+    background: #1e8a3c !important;
+}
+#stopVideoButton:hover {
+    background: #166d30 !important;
+}
+#stopVideoButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Video OFF — red */
+#startVideoButton {
+    background: #c62828 !important;
+}
+#startVideoButton:hover {
+    background: #a31f1f !important;
+}
+#startVideoButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Screen sharing ON — blue */
+#stopScreenButton {
+    background: #1a73e8 !important;
+}
+#stopScreenButton:hover {
+    background: #1558b0 !important;
+}
+#stopScreenButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Screen sharing OFF — default, no special color */
+#startScreenButton {
+    background: #3c4043;
+}
+#startScreenButton:hover {
+    background: #4a4d51;
+}
+
+/* Hand Raised — amber */
+#lowerHandButton {
+    background: #f59e0b !important;
+}
+#lowerHandButton:hover {
+    background: #d97706 !important;
+}
+#lowerHandButton .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+#lowerHandButton #lowerHandIcon {
+    animation: handPulse 1s ease-in-out infinite;
+}
+@keyframes handPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.2); }
+}
+
+/* Chat active — purple */
+#chatButton.lms-active {
+    background: #7c3aed !important;
+}
+#chatButton.lms-active:hover {
+    background: #6d28d9 !important;
+}
+#chatButton.lms-active .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Whiteboard active — teal */
+#whiteboardButton.lms-active {
+    background: #0d9488 !important;
+}
+#whiteboardButton.lms-active:hover {
+    background: #0f766e !important;
+}
+#whiteboardButton.lms-active .material-symbols-outlined {
+    color: #fff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Emoji bar button — yellow active (BUG-036) */
+#emojiBarButton {
+    /* matches other control bar buttons */
+}
+#emojiBarButton.lms-active {
+    background: rgba(245, 158, 11, 0.25) !important;
+}
+#emojiBarButton.lms-active .material-symbols-outlined {
+    color: #fbbf24 !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* More options active — gray highlight */
+#moreOptionsBtn.lms-active {
+    background: #5f6368 !important;
+}
+
 #exitButton {
     background: #ea4335 !important;
 }
@@ -1815,6 +1948,72 @@ progress {
     border: none;
     border-radius: 20px;
     padding: 0;
+}
+
+/* ── Whiteboard tool active states ────────────────────────────── */
+/* Pencil / draw mode → green */
+#whiteboardPencilBtn.lms-wb-active {
+    background: rgba(30, 138, 60, 0.25) !important;
+    box-shadow: 0 0 0 1.5px #1e8a3c inset !important;
+}
+#whiteboardPencilBtn.lms-wb-active .material-symbols-outlined {
+    color: #4caf50 !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20 !important;
+}
+
+/* Object / select mode → blue */
+#whiteboardObjectBtn.lms-wb-active {
+    background: rgba(26, 115, 232, 0.25) !important;
+    box-shadow: 0 0 0 1.5px #1a73e8 inset !important;
+}
+#whiteboardObjectBtn.lms-wb-active .material-symbols-outlined {
+    color: #4da3ff !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20 !important;
+}
+
+/* Eraser → orange-red */
+#whiteboardEraserBtn.lms-wb-active {
+    background: rgba(255, 87, 34, 0.22) !important;
+    box-shadow: 0 0 0 1.5px #ff5722 inset !important;
+}
+#whiteboardEraserBtn.lms-wb-active .material-symbols-outlined {
+    color: #ff7043 !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20 !important;
+}
+
+/* Shape/object tools (text, line, rect, triangle, circle) → purple flash */
+#whiteboardTextBtn.lms-wb-active,
+#whiteboardLineBtn.lms-wb-active,
+#whiteboardRectBtn.lms-wb-active,
+#whiteboardTriangleBtn.lms-wb-active,
+#whiteboardCircleBtn.lms-wb-active {
+    background: rgba(124, 58, 237, 0.25) !important;
+    box-shadow: 0 0 0 1.5px #7c3aed inset !important;
+}
+#whiteboardTextBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardLineBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardRectBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardTriangleBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardCircleBtn.lms-wb-active .material-symbols-outlined {
+    color: #a78bfa !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20 !important;
+}
+#whiteboardTriangleBtn.lms-wb-active svg path {
+    fill: #a78bfa !important;
+}
+
+/* Image/file/url tools → teal flash */
+#whiteboardImgFileBtn.lms-wb-active,
+#whiteboardPdfFileBtn.lms-wb-active,
+#whiteboardImgUrlBtn.lms-wb-active {
+    background: rgba(13, 148, 136, 0.22) !important;
+    box-shadow: 0 0 0 1.5px #0d9488 inset !important;
+}
+#whiteboardImgFileBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardPdfFileBtn.lms-wb-active .material-symbols-outlined,
+#whiteboardImgUrlBtn.lms-wb-active .material-symbols-outlined {
+    color: #2dd4bf !important;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20 !important;
 }
 
 /*--------------------------------------------------------------
