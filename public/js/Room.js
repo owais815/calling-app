@@ -1565,6 +1565,22 @@ function roomIsReady() {
         show(fullScreenButton);
     }
     BUTTONS.main.whiteboardButton && show(whiteboardButton);
+    // BUG-036: emoji reaction button in main control bar
+    const emojiBarButton = document.getElementById('emojiBarButton');
+    if (emojiBarButton) {
+        show(emojiBarButton);
+        emojiBarButton.onclick = () => emojiRoomButton.click();
+    }
+    // BUG-034: hide Moderator tab for non-presenter (students)
+    if (!isPresenter) {
+        const tabModeratorBtn = document.getElementById('tabModeratorBtn');
+        if (tabModeratorBtn) hide(tabModeratorBtn);
+    }
+    // BUG-035: hide Media (video share) tab
+    if (!BUTTONS.settings.tabVideoShare) {
+        const tabVideoShareBtn = document.getElementById('tabVideoShareBtn');
+        if (tabVideoShareBtn) hide(tabVideoShareBtn);
+    }
         // LMS panel buttons
         if (lmsCourseId && lmsToken && lmsApiUrl) {
             const materialsBtn = document.getElementById('lmsCourseMaterialsBtn');
@@ -1797,6 +1813,7 @@ function handleButtons() {
     };
     chatButton.onclick = () => {
         rc.toggleChat();
+        chatButton.classList.toggle('lms-active');
         if (DetectRTC.isMobileDevice) {
             rc.toggleShowParticipants();
         }
@@ -2024,6 +2041,7 @@ function handleButtons() {
     };
     whiteboardButton.onclick = () => {
         toggleWhiteboard();
+        whiteboardButton.classList.toggle('lms-active');
     };
     whiteboardPencilBtn.onclick = () => {
         whiteboardIsDrawingMode(true);
@@ -2041,28 +2059,44 @@ function handleButtons() {
         wbCanvasSaveImg();
     };
     whiteboardImgFileBtn.onclick = () => {
+        wbSetActiveTool(whiteboardImgFileBtn);
         whiteboardAddObj('imgFile');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardPdfFileBtn.onclick = () => {
+        wbSetActiveTool(whiteboardPdfFileBtn);
         whiteboardAddObj('pdfFile');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardImgUrlBtn.onclick = () => {
+        wbSetActiveTool(whiteboardImgUrlBtn);
         whiteboardAddObj('imgUrl');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardTextBtn.onclick = () => {
+        wbSetActiveTool(whiteboardTextBtn);
         whiteboardAddObj('text');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardLineBtn.onclick = () => {
+        wbSetActiveTool(whiteboardLineBtn);
         whiteboardAddObj('line');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardRectBtn.onclick = () => {
+        wbSetActiveTool(whiteboardRectBtn);
         whiteboardAddObj('rect');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardTriangleBtn.onclick = () => {
+        wbSetActiveTool(whiteboardTriangleBtn);
         whiteboardAddObj('triangle');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardCircleBtn.onclick = () => {
+        wbSetActiveTool(whiteboardCircleBtn);
         whiteboardAddObj('circle');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardEraserBtn.onclick = () => {
         whiteboardIsEraser(true);
@@ -2857,12 +2891,15 @@ function handleRoomEmojiPicker() {
     }
 
     function toggleEmojiPicker() {
+        const emojiBarBtn = document.getElementById('emojiBarButton');
         if (emojiPickerContainer.style.display === 'block') {
             emojiPickerContainer.style.display = 'none';
             setColor(emojiRoomButton, 'white');
+            if (emojiBarBtn) emojiBarBtn.classList.remove('lms-active');
         } else {
             emojiPickerContainer.style.display = 'block';
             setColor(emojiRoomButton, 'yellow');
+            if (emojiBarBtn) emojiBarBtn.classList.add('lms-active');
         }
     }
 }
@@ -3672,6 +3709,28 @@ function setWhiteboardBgColor(color) {
     whiteboardAction(data);
 }
 
+const wbModeTools = [
+    'whiteboardPencilBtn',
+    'whiteboardObjectBtn',
+    'whiteboardEraserBtn',
+    'whiteboardTextBtn',
+    'whiteboardLineBtn',
+    'whiteboardRectBtn',
+    'whiteboardTriangleBtn',
+    'whiteboardCircleBtn',
+    'whiteboardImgFileBtn',
+    'whiteboardPdfFileBtn',
+    'whiteboardImgUrlBtn',
+];
+
+function wbSetActiveTool(activeBtn) {
+    wbModeTools.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('lms-wb-active');
+    });
+    if (activeBtn) activeBtn.classList.add('lms-wb-active');
+}
+
 function whiteboardIsDrawingMode(status) {
     wbCanvas.isDrawingMode = status;
     if (status) {
@@ -3679,9 +3738,13 @@ function whiteboardIsDrawingMode(status) {
         setColor(whiteboardObjectBtn, 'white');
         setColor(whiteboardEraserBtn, 'white');
         wbIsEraser = false;
+        wbSetActiveTool(whiteboardPencilBtn);
     } else {
         setColor(whiteboardPencilBtn, 'white');
         setColor(whiteboardObjectBtn, 'green');
+        setColor(whiteboardEraserBtn, 'white');
+        wbIsEraser = false;
+        wbSetActiveTool(whiteboardObjectBtn);
     }
 }
 
@@ -3689,6 +3752,7 @@ function whiteboardIsEraser(status) {
     whiteboardIsDrawingMode(false);
     wbIsEraser = status;
     setColor(whiteboardEraserBtn, wbIsEraser ? 'green' : 'white');
+    if (wbIsEraser) wbSetActiveTool(whiteboardEraserBtn);
 }
 
 function whiteboardAddObj(type) {
