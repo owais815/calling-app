@@ -353,7 +353,7 @@ module.exports = {
         */
         buttons: {
             main: {
-                shareButton: true, // presenter
+                shareButton: false,        // BUG-037: hidden from 3-dots menu
                 hideMeButton: true,
                 startAudioButton: true,
                 startVideoButton: true,
@@ -363,7 +363,7 @@ module.exports = {
                 raiseHandButton: true,
                 transcriptionButton: true,
                 whiteboardButton: true,
-                emojiRoomButton: true,
+                emojiRoomButton: false,    // moved to main bar via emojiBarButton
                 settingsButton: true,
                 aboutButton: true, // Please keep me always visible, thank you!
                 exitButton: true,
@@ -374,10 +374,11 @@ module.exports = {
                 unlockRoomButton: true, // presenter
                 broadcastingButton: true, // presenter
                 lobbyButton: true, // presenter
-                sendEmailInvitation: true, // presenter
+                sendEmailInvitation: false, // BUG-039: hidden from Settings > Room
                 micOptionsButton: true, // presenter
                 tabRTMPStreamingBtn: true, // presenter
-                tabModerator: true, // presenter
+                tabModerator: true, // presenter (BUG-034: hidden for non-presenters in JS)
+                tabVideoShare: false,       // BUG-035: hide Media tab
                 tabRecording: true,
                 host_only_recording: true, // presenter
                 pushToTalk: true,
@@ -394,24 +395,24 @@ module.exports = {
                 fullScreenButton: true,
                 snapShotButton: true,
                 sendMessageButton: true,
-                sendFileButton: true,
-                sendVideoButton: true,
+                sendFileButton: false,      // BUG-033: hide send file
+                sendVideoButton: false,     // BUG-033: hide message video
                 muteVideoButton: true,
                 muteAudioButton: true,
                 audioVolumeInput: true, // Disabled for mobile
-                geolocationButton: true, // Presenter
-                banButton: true, // presenter
-                ejectButton: true, // presenter
+                geolocationButton: false,  // BUG-033: hide geolocation
+                banButton: false,          // BUG-033: hide ban
+                ejectButton: false,        // BUG-033: hide eject
             },
             videoOff: {
                 sendMessageButton: true,
-                sendFileButton: true,
-                sendVideoButton: true,
+                sendFileButton: false,      // BUG-033: hide send file
+                sendVideoButton: false,     // BUG-033: hide message video
                 muteAudioButton: true,
                 audioVolumeInput: true, // Disabled for mobile
-                geolocationButton: true, // Presenter
-                banButton: true, // presenter
-                ejectButton: true, // presenter
+                geolocationButton: false,  // BUG-033: hide geolocation
+                banButton: false,          // BUG-033: hide ban
+                ejectButton: false,        // BUG-033: hide eject
             },
             chat: {
                 chatPinButton: true,
@@ -424,12 +425,12 @@ module.exports = {
             },
             participantsList: {
                 saveInfoButton: true, // presenter
-                sendFileAllButton: true, // presenter
-                ejectAllButton: true, // presenter
-                sendFileButton: true, // presenter & guests
-                geoLocationButton: true, // presenter
-                banButton: true, // presenter
-                ejectButton: true, // presenter
+                sendFileAllButton: false,   // BUG-033: hide send file to all
+                ejectAllButton: false,      // BUG-033: hide eject all
+                sendFileButton: false,      // BUG-033: hide send file
+                geoLocationButton: false,   // BUG-033: hide geolocation
+                banButton: false,           // BUG-033: hide ban
+                ejectButton: false,         // BUG-033: hide eject
             },
             whiteboard: {
                 whiteboardLockButton: true, // presenter
