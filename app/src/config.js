@@ -379,6 +379,7 @@ module.exports = {
                 tabRTMPStreamingBtn: true, // presenter
                 tabModerator: true, // presenter (BUG-034: hidden for non-presenters in JS)
                 tabVideoShare: false,       // BUG-035: hide Media tab
+                tabProfile: false,          // BUG-040: hide Profile tab (exposes raw JSON/presenter flag)
                 tabRecording: true,
                 host_only_recording: true, // presenter
                 pushToTalk: true,

@@ -239,7 +239,7 @@ let recTimer = null;
 let recElapsedTime = null;
 
 let wbCanvas = null;
-let wbIsLock = false;
+let wbIsLock = true; // locked by default; teacher unlocks to allow students to draw
 let wbIsDrawing = false;
 let wbIsOpen = false;
 let wbIsRedoing = false;
@@ -355,7 +355,7 @@ function initClient() {
         setTippy('whiteboardSaveBtn', 'Save', 'bottom');
         setTippy('whiteboardEraserBtn', 'Eraser', 'bottom');
         setTippy('whiteboardCleanBtn', 'Clean', 'bottom');
-        setTippy('whiteboardLockButton', 'If enabled, participants cannot interact', 'right');
+        setTippy('whiteboardLockButton', 'Toggle to allow or block students from drawing on the whiteboard', 'right');
         setTippy('whiteboardCloseBtn', 'Close', 'right');
         setTippy('chatCleanTextButton', 'Clean', 'top');
         setTippy('chatPasteButton', 'Paste', 'top');
@@ -1581,6 +1581,11 @@ function roomIsReady() {
         const tabVideoShareBtn = document.getElementById('tabVideoShareBtn');
         if (tabVideoShareBtn) hide(tabVideoShareBtn);
     }
+    // BUG-040: hide Profile tab
+    if (!BUTTONS.settings.tabProfile) {
+        const tabProfileBtn = document.getElementById('tabProfileBtn');
+        if (tabProfileBtn) hide(tabProfileBtn);
+    }
         // LMS panel buttons
         if (lmsCourseId && lmsToken && lmsApiUrl) {
             const materialsBtn = document.getElementById('lmsCourseMaterialsBtn');
@@ -2104,6 +2109,13 @@ function handleButtons() {
     whiteboardCleanBtn.onclick = () => {
         confirmClearBoard();
     };
+    // BUG-042: lock toggle — only presenter (teacher) sees this
+    if (!isPresenter) {
+        elemDisplay('whiteboardTitle', false);
+    } else {
+        // start checked = locked; unchecking = allow students to interact
+        whiteboardLockButton.checked = true;
+    }
     whiteboardLockButton.onchange = () => {
         wbIsLock = !wbIsLock;
         whiteboardAction(getWhiteboardAction(wbIsLock ? 'lock' : 'unlock'));
