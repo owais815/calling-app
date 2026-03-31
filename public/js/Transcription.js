@@ -210,18 +210,7 @@ class Transcription {
     }
 
     toggle() {
-        // In background/persistent mode the panel is never shown to the user
-        if (this.isPersistentMode) return;
-        if (this.isHidden) {
-            this.center();
-            transcriptionRoom.style.display = 'block';
-            rc.sound('open');
-        } else {
-            transcriptionRoom.style.display = 'none';
-        }
-        this.isHidden = !this.isHidden;
-        if (this.isPinned) this.unpinned();
-        resizeTranscriptionRoom();
+        // Panel permanently hidden — transcription is a silent audit feature
     }
 
     toggleBg() {
@@ -259,11 +248,8 @@ class Transcription {
     }
 
     togglePinUnpin() {
-        if (rc.isChatPinned) {
-            return userLog('info', 'Please unpin the chat that appears to be currently pinned', 'top-end');
-        }
+        if (rc.isChatPinned) return;
         this.isPinned ? this.unpinned() : this.pinned();
-        rc.sound('click');
     }
 
     isPin() {
@@ -315,45 +301,11 @@ class Transcription {
     }
 
     save() {
-        if (this.transcripts.length != 0) {
-            const a = document.createElement('a');
-            a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.transcripts, null, 1));
-            a.download = getDataTimeString() + room_id + '-TRANSCRIPTIONS.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            rc.sound('download');
-        } else {
-            userLog('info', "There isn't transcriptions to save", 'top-end');
-        }
+        // No-op — transcripts are uploaded server-side by WhisperRecorder
     }
 
     delete() {
-        if (this.transcripts.length != 0) {
-            Swal.fire({
-                background: swalBackground,
-                position: 'center',
-                title: 'Clean up all transcripts?',
-                imageUrl: image.delete,
-                showDenyButton: true,
-                confirmButtonText: `Yes`,
-                denyButtonText: `No`,
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let captions = transcriptionChat.firstChild;
-                    while (captions) {
-                        transcriptionChat.removeChild(captions);
-                        captions = transcriptionChat.firstChild;
-                    }
-                    this.transcripts = [];
-                    rc.sound('delete');
-                }
-            });
-        } else {
-            userLog('info', "There isn't transcriptions to delete", 'top-end');
-        }
+        this.transcripts = [];
     }
 
     updateCountry() {
