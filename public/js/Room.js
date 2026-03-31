@@ -412,7 +412,7 @@ function refreshMainButtonsToolTipPlacement() {
         setTippy('emojiRoomButton', 'Toggle emoji reaction', placement);
         setTippy('swapCameraButton', 'Swap the camera', placement);
         setTippy('chatButton', 'Toggle the chat', placement);
-        setTippy('transcriptionButton', 'Toggle transcription', placement);
+        // transcriptionButton tooltip removed — button is hidden
         setTippy('whiteboardButton', 'Toggle the whiteboard', placement);
         setTippy('settingsButton', 'Toggle the settings', placement);
         setTippy('exitButton', 'Leave room', placement);
@@ -1595,10 +1595,7 @@ function roomIsReady() {
             const attendanceBtn = document.getElementById('lmsAttendanceBtn');
             if (attendanceBtn) show(attendanceBtn);
         }
-        if (whisperRecorder) {
-            const whisperBtn = document.getElementById('whisperTranscriptBtn');
-            if (whisperBtn) show(whisperBtn);
-        }
+        // whisperTranscriptBtn intentionally NOT shown — transcription is a hidden audit feature
     BUTTONS.main.settingsButton && show(settingsButton);
     isAudioAllowed ? show(stopAudioButton) : BUTTONS.main.startAudioButton && show(startAudioButton);
     isVideoAllowed ? show(stopVideoButton) : BUTTONS.main.startVideoButton && show(startVideoButton);
@@ -1823,27 +1820,8 @@ function handleButtons() {
             rc.toggleShowParticipants();
         }
     };
-    transcriptionButton.onclick = () => {
-        transcription.toggle();
-    };
-
-    // Whisper transcript toggle
-    const whisperBtn = document.getElementById('whisperTranscriptBtn');
-    const whisperLabel = document.getElementById('whisperTranscriptLabel');
-    if (whisperBtn && whisperRecorder) {
-        whisperBtn.onclick = async () => {
-            if (whisperRecorder.isActive()) {
-                whisperBtn.disabled = true;
-                if (whisperLabel) whisperLabel.textContent = 'Saving Transcript…';
-                await whisperRecorder.stop();
-                whisperBtn.disabled = false;
-                if (whisperLabel) whisperLabel.textContent = 'Start Transcript';
-            } else {
-                whisperRecorder.start();
-                if (whisperLabel) whisperLabel.textContent = 'Stop Transcript';
-            }
-        };
-    }
+    // transcriptionButton and whisperTranscriptBtn onclick removed —
+    // transcription is a hidden audit feature with no manual user controls
     transcriptionCloseBtn.onclick = () => {
         transcription.toggle();
     };
@@ -2680,21 +2658,7 @@ function handleSelects() {
         lS.setSettings(localStorageSettings);
         e.target.blur();
     };
-    // transcript
-    transcriptPersistentMode.onchange = (e) => {
-        transcription.isPersistentMode = e.currentTarget.checked;
-        rc.roomMessage('transcriptIsPersistentMode', transcription.isPersistentMode);
-        localStorageSettings.transcript_persistent_mode = transcription.isPersistentMode;
-        lS.setSettings(localStorageSettings);
-        e.target.blur();
-    };
-    transcriptShowOnMsg.onchange = (e) => {
-        transcription.showOnMessage = e.currentTarget.checked;
-        rc.roomMessage('transcriptShowOnMsg', transcription.showOnMessage);
-        localStorageSettings.transcript_show_on_msg = transcription.showOnMessage;
-        lS.setSettings(localStorageSettings);
-        e.target.blur();
-    };
+    // transcript settings UI handlers removed — transcription is a hidden audit feature
     // whiteboard options
     wbDrawingColorEl.onchange = () => {
         wbCanvas.freeDrawingBrush.color = wbDrawingColorEl.value;
