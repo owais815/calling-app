@@ -7,9 +7,6 @@ WORKDIR /src
 # Set environment variable to skip downloading prebuilt workers
 ENV MEDIASOUP_SKIP_WORKER_PREBUILT_DOWNLOAD="true"
 
-# Skip ngrok binary download during npm install (ngrok only used when explicitly enabled)
-ENV NGROK_SKIP_BINARY_DOWNLOAD="1"
-
 # Install necessary system packages and dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -20,8 +17,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and install npm dependencies
+# Use --ignore-scripts to skip ngrok's postinstall binary download (not needed in production)
+# Then rebuild mediasoup separately so its C++ worker gets compiled from source
 COPY package.json .
-RUN npm install
+RUN npm install --ignore-scripts && npm rebuild mediasoup
 
 # Cleanup unnecessary packages and files
 RUN apt-get purge -y --auto-remove build-essential python3-pip \
