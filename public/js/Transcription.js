@@ -103,13 +103,12 @@ class Transcription {
             this.transcription.lang = transcriptionDialect.value;
 
             this.transcription.onstart = function () {
-                console.log('Transcription started');
+                console.log('[Transcription] Started (hidden/audit mode)');
                 hide(transcriptionSpeechStart);
                 show(transcriptionSpeechStop);
                 setColor(transcriptionSpeechStatus, 'lime');
-                !transcription.isPersistentMode
-                    ? userLog('info', 'Transcription started', 'top-end')
-                    : (transcription.isPersistent = true);
+                if (transcription.isPersistentMode) transcription.isPersistent = true;
+                // No toast — transcription is a hidden audit feature
             };
 
             this.transcription.onresult = (e) => {
@@ -138,9 +137,8 @@ class Transcription {
             };
 
             this.transcription.onerror = function (event) {
-                console.error('Transcription error', event.error);
-                if (!transcription.isPersistent || !transcription.isPersistentMode)
-                    userLog('error', `Transcription error ${event.error}`, 'top-end', 6000);
+                // Silent — transcription is a hidden audit feature; errors must not surface to users
+                console.warn('[Transcription] Error (hidden):', event.error);
             };
 
             this.transcription.onend = function () {
@@ -174,53 +172,26 @@ class Transcription {
     }
 
     sendTranscript(transcriptionData) {
-        if (rc.thereAreParticipants()) {
-            //console.log('TRANSCRIPTION SEND', transcriptionData);
-            rc.emitCmd(transcriptionData);
-        }
+        // Transcription is a hidden audit feature — do not broadcast to participants.
+        // All speech is captured locally by the teacher's WhisperRecorder.
+        void transcriptionData;
     }
 
     handleTranscript(transcriptionData) {
-        console.log('TRANSCRIPTION TEXT', transcriptionData.text_data);
-
+        // Transcription is a fully hidden audit feature — no UI, no sound, no popups.
+        // Just accumulate entries silently for WhisperRecorder to upload at session end.
         transcriptionData.text_data = filterXSS(transcriptionData.text_data);
         transcriptionData.peer_name = filterXSS(transcriptionData.peer_name);
 
         const { peer_name, text_data } = transcriptionData;
         const time_stamp = rc.getTimeNow();
-        const avatar_image = rc.isValidEmail(peer_name) ? rc.genGravatar(peer_name) : rc.genAvatarSvg(peer_name, 32);
 
         this.transcripts.push({
             time: time_stamp,
             name: peer_name,
             caption: text_data,
         });
-
-        // In persistent (background) mode, skip all UI — just collect transcripts silently
-        if (this.isPersistentMode) return;
-
-        if (this.isHidden) {
-            if (this.showOnMessage) {
-                this.toggle();
-            } else {
-                this.handleTranscriptionPopup(transcriptionData);
-            }
-        }
-
-        const msgHTML = `
-        <div class="msg-transcription left-msg-transcription">
-            <img class="msg-transcription-img" src="${avatar_image}" />
-            <div class="msg-transcription-bubble">
-                <div class="msg-transcription-info">
-                    <div class="msg-transcription-info-name">${peer_name} : ${time_stamp}</div>
-                </div>
-                <div class="msg-transcription-text">${text_data}</div>
-            </div>
-        </div>
-        `;
-        transcriptionChat.insertAdjacentHTML('beforeend', msgHTML);
-        transcriptionChat.scrollTop += 500;
-        rc.sound('transcript');
+        // No panel, no popup, no toast, no sound.
     }
 
     handleTranscriptionPopup(transcriptionData, duration = 5000) {
