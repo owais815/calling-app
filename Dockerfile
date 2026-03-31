@@ -7,6 +7,9 @@ WORKDIR /src
 # Set environment variable to skip downloading prebuilt workers
 ENV MEDIASOUP_SKIP_WORKER_PREBUILT_DOWNLOAD="true"
 
+# Skip ngrok binary download during npm install (ngrok only used when explicitly enabled)
+ENV NGROK_SKIP_BINARY_DOWNLOAD="1"
+
 # Install necessary system packages and dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
