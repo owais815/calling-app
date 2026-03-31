@@ -361,7 +361,7 @@ module.exports = {
                 swapCameraButton: true,
                 chatButton: true,
                 raiseHandButton: true,
-                transcriptionButton: true,
+                transcriptionButton: false, // hidden — transcription is a silent audit feature
                 whiteboardButton: true,
                 emojiRoomButton: false,    // moved to main bar via emojiBarButton
                 settingsButton: true,
