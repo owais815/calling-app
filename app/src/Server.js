@@ -70,6 +70,11 @@ const Peer = require('./Peer');
 const ServerApi = require('./ServerApi');
 const Logger = require('./Logger');
 const log = new Logger('Server');
+
+// Warn early if transcript save target is still localhost — will fail on a multi-server production setup
+if (!process.env.LMS_API_URL) {
+    console.warn('[Config] LMS_API_URL is not set — transcript saves will target http://localhost:8080. Set LMS_API_URL in .env for production.');
+}
 const yaml = require('js-yaml');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = yaml.load(fs.readFileSync(path.join(__dirname, '/../api/swagger.yaml'), 'utf8'));
