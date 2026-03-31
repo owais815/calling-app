@@ -5507,20 +5507,10 @@ class RoomClient {
                 this.userLog('info', `${icons.speech} Speech incoming messages ${status}`, 'top-end');
                 break;
             case 'transcriptIsPersistentMode':
-                userLog('info', `${icons.transcript} Persistent transcription mode active: ${active}`, 'top-end');
+                // silent — hidden audit feature
                 break;
             case 'transcriptShowOnMsg':
-                active
-                    ? userLog(
-                          'info',
-                          `${icons.transcript} Transcript will be shown, when you receive a message`,
-                          'top-end',
-                      )
-                    : userLog(
-                          'info',
-                          `${icons.transcript} Transcript not will be shown, when you receive a message`,
-                          'top-end',
-                      );
+                // silent — hidden audit feature
                 break;
             case 'audio_start_muted':
                 this.userLog('info', `${icons.moderator} Moderator: everyone starts muted ${status}`, 'top-end');
