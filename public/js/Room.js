@@ -2091,8 +2091,8 @@ function handleButtons() {
     if (!isPresenter) {
         elemDisplay('whiteboardTitle', false);
     } else {
-        // start checked = locked; unchecking = allow students to interact
-        whiteboardLockButton.checked = true;
+        // unchecked = locked (not allowing students to draw); checked = unlocked (allow)
+        whiteboardLockButton.checked = false;
     }
     whiteboardLockButton.onchange = () => {
         wbIsLock = !wbIsLock;
@@ -2742,7 +2742,7 @@ function handleSelects() {
 // ####################################################
 
 function handleInputs() {
-    chatMessage.onkeyup = (e) => {
+    chatMessage.onkeydown = (e) => {
         if (e.keyCode === 13 && (DetectRTC.isMobileDevice || !e.shiftKey)) {
             e.preventDefault();
             chatSendButton.click();

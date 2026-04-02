@@ -3690,6 +3690,7 @@ class RoomClient {
         chatRoom.style.transform = 'translate(-50%, -50%)';
         chatRoom.style.top = '50%';
         chatRoom.style.left = '50%';
+        chatRoom.classList.remove('chat-pinned');
     }
 
     chatPinned() {
@@ -3700,6 +3701,7 @@ class RoomClient {
         chatRoom.style.transform = null;
         document.documentElement.style.setProperty('--msger-width', '25%');
         document.documentElement.style.setProperty('--msger-height', '100%');
+        chatRoom.classList.add('chat-pinned');
     }
 
     toggleChatEmoji() {

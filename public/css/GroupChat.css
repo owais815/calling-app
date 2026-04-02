@@ -36,6 +36,17 @@
     font-family: 'Poppins', sans-serif;
 }
 
+/* When chat is pinned flush against the right screen edge — flatten the right-side corners */
+.chat-container.chat-pinned {
+    border-radius: 14px 0 0 14px;
+    border-right: none;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+}
+
+.chat-container.chat-pinned .chat-app .chat {
+    border-radius: 0;
+}
+
 /* ---- Chat App ---- */
 .chat-app {
     position: absolute;
