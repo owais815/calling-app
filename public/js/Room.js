@@ -416,6 +416,9 @@ function refreshMainButtonsToolTipPlacement() {
         setTippy('chatButton', 'Toggle the chat', placement);
         // transcriptionButton tooltip removed — button is hidden
         setTippy('whiteboardButton', 'Toggle the whiteboard', placement);
+        setTippy('lmsCourseMaterialsBtn', 'Course materials', placement);
+        setTippy('lmsAttendanceBtn', 'Attendance', placement);
+        setTippy('lmsStarBtn', 'Give achievement star', placement);
         setTippy('settingsButton', 'Toggle the settings', placement);
         setTippy('exitButton', 'Leave room', placement);
     }
@@ -1599,13 +1602,24 @@ function roomIsReady() {
         if (tabProfileBtn) hide(tabProfileBtn);
     }
         // LMS panel buttons
-        if (lmsCourseId && lmsToken && lmsApiUrl) {
-            const materialsBtn = document.getElementById('lmsCourseMaterialsBtn');
-            if (materialsBtn) show(materialsBtn);
-        }
         if (lmsSessionId && lmsToken && lmsApiUrl && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
             const attendanceBtn = document.getElementById('lmsAttendanceBtn');
-            if (attendanceBtn) show(attendanceBtn);
+            if (attendanceBtn) {
+                show(attendanceBtn);
+                attendanceBtn.onclick = () => toggleLmsPanel('attendance');
+            }
+            const starBtn = document.getElementById('lmsStarBtn');
+            if (starBtn) {
+                show(starBtn);
+                starBtn.onclick = () => showStarPicker();
+            }
+        }
+        if (lmsCourseId && lmsToken && lmsApiUrl) {
+            const materialsBtn = document.getElementById('lmsCourseMaterialsBtn');
+            if (materialsBtn) {
+                show(materialsBtn);
+                materialsBtn.onclick = () => toggleLmsPanel('materials');
+            }
         }
         // whisperTranscriptBtn intentionally NOT shown — transcription is a hidden audit feature
     BUTTONS.main.settingsButton && show(settingsButton);
@@ -3614,6 +3628,84 @@ async function saveAttendance() {
 // ####################################################
 // LMS PANELS (Course Materials + Attendance)
 // ####################################################
+
+// ####################################################
+// ACHIEVEMENT STAR PICKER
+// ####################################################
+
+async function showStarPicker() {
+    if (!rc.thereAreParticipants()) {
+        rc.userLog('info', 'No students in the room', 'top-end');
+        return;
+    }
+    const peers = await getRoomPeers();
+    // Only non-presenter peers can receive stars (i.e. students)
+    const students = [];
+    for (const [pid, peer] of peers.entries()) {
+        if (!peer.peer_info.peer_presenter) {
+            students.push({ id: pid, name: peer.peer_info.peer_name });
+        }
+    }
+    if (students.length === 0) {
+        rc.userLog('info', 'No students in the room to reward', 'top-end');
+        return;
+    }
+
+    const listHtml = students.map(s => `
+        <button
+            class="lms-star-pick-btn"
+            data-pid="${s.id}"
+            data-name="${escapeHtml(s.name)}"
+            style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;
+                   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+                   border-radius:8px;color:#fff;cursor:pointer;font-size:14px;text-align:left;
+                   transition:background 0.15s;"
+            onmouseover="this.style.background='rgba(251,191,36,0.18)'"
+            onmouseout="this.style.background='rgba(255,255,255,0.06)'"
+        >
+            <span class="material-symbols-outlined" style="color:#fbbf24;font-size:20px">star</span>
+            ${escapeHtml(s.name.slice(0, 28))}
+        </button>
+    `).join('');
+
+    Swal.fire({
+        background: 'rgba(28,29,33,0.97)',
+        position: 'center',
+        width: 340,
+        padding: 0,
+        customClass: { htmlContainer: 'lms-swal-container' },
+        showConfirmButton: false,
+        showCloseButton: true,
+        html: `
+            <div style="font-family:'Comfortaa',sans-serif;padding:20px 16px 8px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                    <span class="material-symbols-outlined" style="color:#fbbf24;font-size:22px">star</span>
+                    <span style="font-size:15px;font-weight:600;color:#fff;">Give Achievement Star</span>
+                </div>
+                <div style="font-size:12px;color:#9aa0a6;margin-bottom:12px;">
+                    Select a student — a star celebration will appear on their screen.
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">${listHtml}</div>
+            </div>
+        `,
+        didOpen: () => {
+            document.querySelectorAll('.lms-star-pick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pid = btn.dataset.pid;
+                    const sname = btn.dataset.name;
+                    rc.emitCmd({
+                        type: 'starAchievement',
+                        peer_id: pid,
+                        broadcast: false,
+                        peer_name: peer_name,   // teacher's name shown on student screen
+                    });
+                    Swal.close();
+                    rc.userLog('success', `⭐ Achievement star sent to ${sname}`, 'top-end');
+                });
+            });
+        },
+    });
+}
 
 // Listen for postMessage from the LMS parent
 window.addEventListener('message', async (e) => {
