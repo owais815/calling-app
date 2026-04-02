@@ -245,6 +245,7 @@ let wbIsOpen = false;
 let wbIsRedoing = false;
 let wbIsEraser = false;
 let wbIsBgTransparent = false;
+let wbPointerActive = false; // laser pointer mode
 let wbPop = [];
 let coords = {};
 
@@ -341,6 +342,7 @@ function initClient() {
         setTippy('wbBackgroundColorEl', 'Background color', 'bottom');
         setTippy('wbDrawingColorEl', 'Drawing color', 'bottom');
         setTippy('whiteboardPencilBtn', 'Drawing mode', 'bottom');
+        setTippy('whiteboardPointerBtn', 'Laser pointer', 'bottom');
         setTippy('whiteboardObjectBtn', 'Object mode', 'bottom');
         setTippy('whiteboardUndoBtn', 'Undo', 'bottom');
         setTippy('whiteboardRedoBtn', 'Redo', 'bottom');
@@ -944,6 +946,12 @@ async function whoAreYou() {
         console.error('04 ----> AXIOS GET CONFIG ERROR', error.message);
     }
 
+    // Snapshot is admin-only — hide it for teachers and students.
+    if (lmsUserRole && lmsUserRole !== 'admin') {
+        BUTTONS.producerVideo.snapShotButton = false;
+        BUTTONS.consumerVideo.snapShotButton = false;
+    }
+
     if (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia) {
         BUTTONS.main.startScreenButton && show(initStartScreenButton);
     }
@@ -1320,9 +1328,10 @@ async function shareRoom(useNavigator = false) {
                         <button class="swal-share-btn swal-share-btn-primary" id="swalCopyUrlBtn">
                             <span class="material-symbols-outlined">content_copy</span>Copy URL
                         </button>
+                        ${lmsUserRole === 'admin' ? `
                         <button class="swal-share-btn swal-share-btn-secondary" id="swalEmailBtn">
                             <span class="material-symbols-outlined">mail</span>Email
-                        </button>
+                        </button>` : ''}
                         <button class="swal-share-btn swal-share-btn-danger" id="swalCloseBtn">
                             <span class="material-symbols-outlined">close</span>Close
                         </button>
@@ -1337,10 +1346,13 @@ async function shareRoom(useNavigator = false) {
                     copyRoomURL();
                     Swal.close();
                 });
-                document.getElementById('swalEmailBtn').addEventListener('click', () => {
-                    Swal.close();
-                    shareRoomByEmail();
-                });
+                const emailBtn = document.getElementById('swalEmailBtn');
+                if (emailBtn) {
+                    emailBtn.addEventListener('click', () => {
+                        Swal.close();
+                        shareRoomByEmail();
+                    });
+                }
                 document.getElementById('swalCloseBtn').addEventListener('click', () => {
                     Swal.close();
                 });
@@ -2087,9 +2099,50 @@ function handleButtons() {
     whiteboardCleanBtn.onclick = () => {
         confirmClearBoard();
     };
-    // BUG-042: lock toggle — only presenter (teacher) sees this
+
+    // Laser pointer — presenter only
+    const whiteboardPointerBtn = document.getElementById('whiteboardPointerBtn');
     if (!isPresenter) {
+        if (whiteboardPointerBtn) elemDisplay('whiteboardPointerBtn', false);
+    } else if (whiteboardPointerBtn) {
+        whiteboardPointerBtn.onclick = () => {
+            wbPointerActive = !wbPointerActive;
+            whiteboardPointerBtn.classList.toggle('wbActiveBtn', wbPointerActive);
+            if (!wbPointerActive) {
+                // Notify others that pointer ended
+                if (rc.thereAreParticipants()) {
+                    rc.socket.emit('whiteboardAction', { peer_name: peer_name, action: 'pointerEnd' });
+                }
+            }
+        };
+
+        // Track mouse over the whiteboard main area and broadcast normalized coords
+        const wbMain = document.querySelector('#whiteboard main') || document.getElementById('wbCanvas');
+        if (wbMain) {
+            wbMain.addEventListener('mousemove', (e) => {
+                if (!wbPointerActive || !rc.thereAreParticipants()) return;
+                const rect = wbMain.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width).toFixed(4);
+                const y = ((e.clientY - rect.top) / rect.height).toFixed(4);
+                rc.socket.emit('whiteboardAction', { peer_name: peer_name, action: 'pointer', x, y });
+            });
+            wbMain.addEventListener('mouseleave', () => {
+                if (!wbPointerActive) return;
+                if (rc.thereAreParticipants()) {
+                    rc.socket.emit('whiteboardAction', { peer_name: peer_name, action: 'pointerEnd' });
+                }
+            });
+        }
+    }
+
+    // Whiteboard visibility init: non-presenters start fully locked
+    if (!isPresenter) {
+        // Hide the entire title row (lock toggle is presenter-only)
         elemDisplay('whiteboardTitle', false);
+        // Hide the drawing toolbar and the whiteboard-open button —
+        // they will appear only when teacher sends 'unlock'
+        elemDisplay('whiteboardOptions', false);
+        elemDisplay('whiteboardButton', false);
     } else {
         // unchecked = locked (not allowing students to draw); checked = unlocked (allow)
         whiteboardLockButton.checked = false;
@@ -4128,12 +4181,22 @@ function wbCanvasToJson() {
 }
 
 function JsonToWbCanvas(json) {
-    if (!wbIsOpen) toggleWhiteboard();
-    wbCanvas.loadFromJSON(json);
-    wbCanvas.renderAll();
-    if (!isPresenter && !wbCanvas.isDrawingMode && wbIsLock) {
-        wbDrawing(false);
-    }
+    // Load canvas data immediately (fabric works even when hidden).
+    // Use the callback form so renderAll runs AFTER the JSON is fully parsed,
+    // preventing the blank-canvas flash.
+    wbCanvas.loadFromJSON(json, () => {
+        wbCanvas.renderAll();
+        // If the student is locked, ensure drawing is disabled on the loaded canvas.
+        if (!isPresenter && wbIsLock) {
+            wbDrawing(false);
+        }
+    });
+
+    // Do NOT auto-open the whiteboard here — the 'unlock' socket action is the
+    // authoritative signal to show the board. If the board is already open
+    // (teacher resync while student is viewing), we just updated the content above.
+    // If it's closed, it will open when the accompanying 'unlock' action arrives.
+    // Exception: if it's already open and unlocked, keep it open (no-op needed).
 }
 
 function getWhiteboardAction(action) {
@@ -4207,25 +4270,48 @@ function whiteboardAction(data, emit = true) {
             break;
         case 'lock':
             if (!isPresenter) {
-                elemDisplay('whiteboardTitle', false);
+                wbIsLock = true;
+                wbDrawing(false);
+                // Close the whiteboard entirely — student should not see the board when locked
+                if (wbIsOpen) toggleWhiteboard();
+                // Also hide controls so they don't flash when whiteboard re-opens
                 elemDisplay('whiteboardOptions', false);
                 elemDisplay('whiteboardButton', false);
-                wbDrawing(false);
-                wbIsLock = true;
             }
             break;
         case 'unlock':
             if (!isPresenter) {
-                elemDisplay('whiteboardTitle', true, 'flex');
+                wbIsLock = false;
+                // Open the whiteboard if it isn't already visible
+                if (!wbIsOpen) toggleWhiteboard();
+                // Show drawing toolbar and the open/close toggle button.
+                // NOTE: whiteboardTitle (lock toggle) is presenter-only — never shown to students.
                 elemDisplay('whiteboardOptions', true, 'inline');
                 elemDisplay('whiteboardButton', true);
                 wbDrawing(true);
-                wbIsLock = false;
             }
             break;
         case 'close':
             if (wbIsOpen) toggleWhiteboard();
             break;
+        case 'pointer': {
+            // Show laser dot on receivers' screens (not the presenter's own screen)
+            if (isPresenter) break;
+            const dot = document.getElementById('wbPointerDot');
+            const wbMain = document.querySelector('#whiteboard main');
+            if (dot && wbMain) {
+                const rect = wbMain.getBoundingClientRect();
+                dot.style.left = (parseFloat(data.x) * rect.width) + 'px';
+                dot.style.top = (parseFloat(data.y) * rect.height) + 'px';
+                dot.style.display = 'block';
+            }
+            break;
+        }
+        case 'pointerEnd': {
+            const dot = document.getElementById('wbPointerDot');
+            if (dot) dot.style.display = 'none';
+            break;
+        }
         default:
             break;
         //...
