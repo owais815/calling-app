@@ -6126,6 +6126,9 @@ class RoomClient {
             case 'ejectAll':
                 this.exit();
                 break;
+            case 'starAchievement':
+                this.handleStarAchievement(cmd);
+                break;
             default:
                 break;
             //...
@@ -6148,6 +6151,146 @@ class RoomClient {
                 emojiDisplay.remove();
             }, duration);
         }
+    }
+
+    handleStarAchievement(cmd) {
+        const overlay = document.getElementById('achievementOverlay');
+        if (!overlay) return;
+
+        // Inject keyframe style once
+        if (!document.getElementById('lmsAchievementStyle')) {
+            const style = document.createElement('style');
+            style.id = 'lmsAchievementStyle';
+            style.textContent = `
+                @keyframes lmsAchPop {
+                    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                    65%  { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+                    100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+                }
+                @keyframes lmsAchFade {
+                    0%   { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Clean up any previous animation still running
+        overlay.innerHTML = '';
+        overlay.style.display = 'block';
+
+        // Canvas for star particles
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        overlay.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const cx = W / 2, cy = H / 2;
+
+        // Center message bubble
+        const msgEl = document.createElement('div');
+        msgEl.style.cssText = `
+            position: absolute;
+            top: 50%; left: 50%;
+            text-align: center;
+            pointer-events: none;
+            animation: lmsAchPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        `;
+        const teacherName = (cmd.peer_name || 'Teacher').slice(0, 24);
+        msgEl.innerHTML = `
+            <div style="font-size:72px;line-height:1;filter:drop-shadow(0 0 18px #fbbf24)">⭐</div>
+            <div style="font-size:22px;font-weight:700;color:#fff;
+                        text-shadow:0 2px 10px rgba(0,0,0,0.9);margin-top:10px;">
+                Achievement!
+            </div>
+            <div style="font-size:14px;color:#fde68a;margin-top:6px;
+                        text-shadow:0 1px 6px rgba(0,0,0,0.8);">
+                from ${teacherName}
+            </div>
+        `;
+        overlay.appendChild(msgEl);
+
+        // Star particles
+        const COLORS = ['#FFD700','#FFA500','#FF6B35','#FFB347','#FFFFA0','#ffffff','#FF85C2','#85D4FF'];
+        const particles = Array.from({ length: 90 }, () => {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 4 + Math.random() * 9;
+            return {
+                x: cx, y: cy,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 3,
+                size: 6 + Math.random() * 14,
+                color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                rot: Math.random() * Math.PI * 2,
+                rotV: (Math.random() - 0.5) * 0.25,
+                alpha: 1,
+            };
+        });
+
+        const drawStar = (x, y, size, rot, alpha, color) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rot);
+            ctx.globalAlpha = Math.max(0, alpha);
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const outer = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const inner = outer + Math.PI / 5;
+                if (i === 0) ctx.moveTo(Math.cos(outer) * size, Math.sin(outer) * size);
+                else         ctx.lineTo(Math.cos(outer) * size, Math.sin(outer) * size);
+                ctx.lineTo(Math.cos(inner) * size * 0.42, Math.sin(inner) * size * 0.42);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        };
+
+        const TOTAL = 210; // ~3.5s at 60fps
+        const FADE_START = 140;
+        let frame = 0;
+        let rafId;
+
+        const animate = () => {
+            ctx.clearRect(0, 0, W, H);
+            particles.forEach(p => {
+                p.vy += 0.2;      // gravity
+                p.vx *= 0.985;    // air resistance
+                p.vy *= 0.985;
+                p.x  += p.vx;
+                p.y  += p.vy;
+                p.rot += p.rotV;
+                p.alpha = frame < FADE_START ? 1 : 1 - (frame - FADE_START) / (TOTAL - FADE_START);
+                drawStar(p.x, p.y, p.size, p.rot, p.alpha, p.color);
+            });
+
+            frame++;
+            if (frame < TOTAL) {
+                rafId = requestAnimationFrame(animate);
+            } else {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+            }
+        };
+        rafId = requestAnimationFrame(animate);
+
+        // Fade out the center message in the last second
+        setTimeout(() => {
+            if (msgEl.parentNode) {
+                msgEl.style.animation = 'lmsAchFade 0.8s ease-out forwards';
+            }
+        }, 2700);
+
+        // Safety cleanup if something goes wrong
+        setTimeout(() => {
+            cancelAnimationFrame(rafId);
+            overlay.style.display = 'none';
+            overlay.innerHTML = '';
+        }, 4000);
     }
 
     // ####################################################
