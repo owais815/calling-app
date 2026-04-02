@@ -354,6 +354,13 @@ function initClient() {
         setTippy('whiteboardRectBtn', 'Add rectangle', 'bottom');
         setTippy('whiteboardTriangleBtn', 'Add triangle', 'bottom');
         setTippy('whiteboardCircleBtn', 'Add circle', 'bottom');
+        setTippy('whiteboardArrowBtn', 'Add arrow', 'bottom');
+        setTippy('whiteboardDiamondBtn', 'Add diamond', 'bottom');
+        setTippy('whiteboardPentagonBtn', 'Add pentagon', 'bottom');
+        setTippy('whiteboardHexagonBtn', 'Add hexagon', 'bottom');
+        setTippy('whiteboardStarShapeBtn', 'Add star', 'bottom');
+        setTippy('whiteboardRightTriBtn', 'Add right triangle', 'bottom');
+        setTippy('whiteboardParaBtn', 'Add parallelogram', 'bottom');
         setTippy('whiteboardSaveBtn', 'Save', 'bottom');
         setTippy('whiteboardEraserBtn', 'Eraser', 'bottom');
         setTippy('whiteboardCleanBtn', 'Clean', 'bottom');
@@ -2107,6 +2114,41 @@ function handleButtons() {
         whiteboardAddObj('circle');
         setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
+    document.getElementById('whiteboardArrowBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardArrowBtn'));
+        whiteboardAddObj('arrow');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardDiamondBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardDiamondBtn'));
+        whiteboardAddObj('diamond');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardPentagonBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardPentagonBtn'));
+        whiteboardAddObj('pentagon');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardHexagonBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardHexagonBtn'));
+        whiteboardAddObj('hexagon');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardStarShapeBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardStarShapeBtn'));
+        whiteboardAddObj('starShape');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardRightTriBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardRightTriBtn'));
+        whiteboardAddObj('rightTri');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
+    document.getElementById('whiteboardParaBtn').onclick = () => {
+        wbSetActiveTool(document.getElementById('whiteboardParaBtn'));
+        whiteboardAddObj('parallelogram');
+        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+    };
     whiteboardEraserBtn.onclick = () => {
         whiteboardIsEraser(true);
     };
@@ -3839,6 +3881,13 @@ const wbModeTools = [
     'whiteboardRectBtn',
     'whiteboardTriangleBtn',
     'whiteboardCircleBtn',
+    'whiteboardArrowBtn',
+    'whiteboardDiamondBtn',
+    'whiteboardPentagonBtn',
+    'whiteboardHexagonBtn',
+    'whiteboardStarShapeBtn',
+    'whiteboardRightTriBtn',
+    'whiteboardParaBtn',
     'whiteboardImgFileBtn',
     'whiteboardPdfFileBtn',
     'whiteboardImgUrlBtn',
@@ -3874,6 +3923,27 @@ function whiteboardIsEraser(status) {
     wbIsEraser = status;
     setColor(whiteboardEraserBtn, wbIsEraser ? 'green' : 'white');
     if (wbIsEraser) wbSetActiveTool(whiteboardEraserBtn);
+}
+
+// Returns points for a regular polygon (n sides) centred in a square of side 2*r.
+function wbPolygonPoints(sides, r) {
+    const pts = [];
+    for (let i = 0; i < sides; i++) {
+        const a = (2 * Math.PI * i / sides) - Math.PI / 2;
+        pts.push({ x: r + r * Math.cos(a), y: r + r * Math.sin(a) });
+    }
+    return pts;
+}
+
+// Returns 2*points alternating outer/inner vertices for a star shape.
+function wbStarPoints(points, outerR, innerR) {
+    const pts = [];
+    for (let i = 0; i < points * 2; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const a = (i * Math.PI / points) - Math.PI / 2;
+        pts.push({ x: outerR + r * Math.cos(a), y: outerR + r * Math.sin(a) });
+    }
+    return pts;
 }
 
 function whiteboardAddObj(type) {
@@ -4103,6 +4173,85 @@ function whiteboardAddObj(type) {
                 strokeWidth: wbCanvas.freeDrawingBrush.width,
             });
             addWbCanvasObj(triangle);
+            break;
+        case 'arrow':
+            // Right-pointing block arrow (120 × 60 bounding box)
+            const arrow = new fabric.Path('M 0 20 L 75 20 L 75 0 L 120 30 L 75 60 L 75 40 L 0 40 Z', {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+                strokeLineJoin: 'round',
+            });
+            addWbCanvasObj(arrow);
+            break;
+        case 'diamond':
+            // 4-vertex diamond — symmetric rhombus
+            const diamond = new fabric.Polygon([
+                { x: 70, y: 0 },
+                { x: 140, y: 60 },
+                { x: 70, y: 120 },
+                { x: 0, y: 60 },
+            ], {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+            });
+            addWbCanvasObj(diamond);
+            break;
+        case 'pentagon':
+            const pentagon = new fabric.Polygon(wbPolygonPoints(5, 65), {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+            });
+            addWbCanvasObj(pentagon);
+            break;
+        case 'hexagon':
+            const hexagon = new fabric.Polygon(wbPolygonPoints(6, 65), {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+            });
+            addWbCanvasObj(hexagon);
+            break;
+        case 'starShape':
+            // 5-pointed star: outerR=70, innerR=30
+            const starShape = new fabric.Polygon(wbStarPoints(5, 70, 30), {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+                strokeLineJoin: 'round',
+            });
+            addWbCanvasObj(starShape);
+            break;
+        case 'rightTri':
+            // Right-angle triangle: right angle at bottom-left
+            const rightTri = new fabric.Polygon([
+                { x: 0, y: 0 },
+                { x: 0, y: 120 },
+                { x: 150, y: 120 },
+            ], {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+                strokeLineJoin: 'round',
+            });
+            addWbCanvasObj(rightTri);
+            break;
+        case 'parallelogram':
+            // Parallelogram leaning right
+            const para = new fabric.Polygon([
+                { x: 40, y: 0 },
+                { x: 160, y: 0 },
+                { x: 120, y: 80 },
+                { x: 0, y: 80 },
+            ], {
+                fill: 'transparent',
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+                strokeLineJoin: 'round',
+            });
+            addWbCanvasObj(para);
             break;
         default:
             break;
