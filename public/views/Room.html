@@ -232,6 +232,9 @@ access to use this app.
             </button>
             <button id="chatButton" class="hidden"><span class="material-symbols-outlined">chat</span></button>
             <button id="whiteboardButton" class="hidden"><span class="material-symbols-outlined">draw</span></button>
+            <button id="lmsCourseMaterialsBtn" class="hidden"><span class="material-symbols-outlined">menu_book</span></button>
+            <button id="lmsAttendanceBtn" class="hidden"><span class="material-symbols-outlined">assignment_turned_in</span></button>
+            <button id="lmsStarBtn" class="hidden"><span class="material-symbols-outlined">star</span></button>
             <button id="emojiBarButton" class="hidden"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
 <button id="moreOptionsBtn"><span class="material-symbols-outlined">more_vert</span></button>
             <!-- End call -->
@@ -1600,6 +1603,9 @@ access to use this app.
         </section>
 
         <div id="transcriptionPopup" class="transcriptio-popup"></div>
+
+        <!-- Achievement star overlay — appears on student screen when teacher gives a star -->
+        <div id="achievementOverlay" style="display:none;position:fixed;inset:0;z-index:99998;pointer-events:none;overflow:hidden;"></div>
 
         <section id="lobby" class="fadein center">
             <header id="lobbyHeader" class="lobby-header">
