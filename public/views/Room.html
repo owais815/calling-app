@@ -1318,6 +1318,7 @@ access to use this app.
                     <input id="wbBackgroundColorEl" class="whiteboardColorPicker" type="color" value="#000000" />
                     <input id="wbDrawingColorEl" class="whiteboardColorPicker" type="color" value="#FFFFFF" />
                     <button id="whiteboardPencilBtn"><span class="material-symbols-outlined">edit</span></button>
+                    <button id="whiteboardPointerBtn" title="Laser Pointer"><span class="material-symbols-outlined">stylus</span></button>
                     <button id="whiteboardObjectBtn"><span class="material-symbols-outlined">touch_app</span></button>
                     <button id="whiteboardUndoBtn"><span class="material-symbols-outlined">undo</span></button>
                     <button id="whiteboardRedoBtn"><span class="material-symbols-outlined">redo</span></button>
@@ -1338,8 +1339,21 @@ access to use this app.
                     <button id="whiteboardCleanBtn"><span class="material-symbols-outlined">delete</span></button>
                 </div>
             </header>
-            <main>
+            <main style="position:relative;">
                 <canvas id="wbCanvas"></canvas>
+                <!-- Laser pointer dot — positioned over the canvas, shown on all peers when teacher points -->
+                <div id="wbPointerDot" style="
+                    display:none;
+                    position:absolute;
+                    width:18px;height:18px;
+                    border-radius:50%;
+                    background:rgba(255,50,50,0.85);
+                    box-shadow:0 0 0 4px rgba(255,50,50,0.35), 0 0 12px 4px rgba(255,80,80,0.5);
+                    pointer-events:none;
+                    transform:translate(-50%,-50%);
+                    transition:left 0.05s linear, top 0.05s linear;
+                    z-index:9999;
+                "></div>
             </main>
         </section>
 
