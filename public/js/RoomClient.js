@@ -242,6 +242,7 @@ class RoomClient {
         this.producerTransport = null;
         this.consumerTransport = null;
         this.device = null;
+        this._iceRestartTimer = null;
 
         this.isMobileDevice = DetectRTC.isMobileDevice;
         this.isScreenShareSupported =
@@ -663,20 +664,30 @@ class RoomClient {
                     break;
                 case 'connected':
                     console.log('Producer Transport connected', { id: this.producerTransport.id });
+                    // Cancel any pending ICE restart — transport recovered on its own.
+                    if (this._iceRestartTimer) {
+                        clearTimeout(this._iceRestartTimer);
+                        this._iceRestartTimer = null;
+                    }
                     break;
                 case 'disconnected':
                     console.log('Producer Transport disconnected', { id: this.producerTransport.id });
-                    /*
-                    this.restartIce();
-
-                    popupHtmlMessage(
-                        null,
-                        image.network,
-                        'Producer Transport disconnected',
-                        'Check Your Network Connectivity (Restarted ICE)',
-                        'center',
-                    );
-                    */
+                    // Give ICE 3 seconds to self-recover. If still disconnected, restart ICE
+                    // so audio resumes without requiring a full page reload. This fixes the
+                    // bug where a brief network blip silences the user's mic permanently until
+                    // they manually leave and rejoin the room.
+                    if (!this._iceRestartTimer) {
+                        this._iceRestartTimer = setTimeout(async () => {
+                            this._iceRestartTimer = null;
+                            if (
+                                this.producerTransport &&
+                                this.producerTransport.connectionState === 'disconnected'
+                            ) {
+                                console.warn('Producer Transport still disconnected — restarting ICE');
+                                await this.restartIce();
+                            }
+                        }, 3000);
+                    }
                     break;
                 case 'failed':
                     console.warn('Producer Transport failed', { id: this.producerTransport.id });
@@ -746,20 +757,28 @@ class RoomClient {
                     break;
                 case 'connected':
                     console.log('Consumer Transport connected', { id: this.consumerTransport.id });
+                    if (this._iceRestartTimer) {
+                        clearTimeout(this._iceRestartTimer);
+                        this._iceRestartTimer = null;
+                    }
                     break;
                 case 'disconnected':
                     console.log('Consumer Transport disconnected', { id: this.consumerTransport.id });
-                /*
-                    this.restartIce();
-
-                    popupHtmlMessage(
-                        null,
-                        image.network,
-                        'Consumer Transport disconnected',
-                        'Check Your Network Connectivity (Restarted ICE)',
-                        'center',
-                    );
-                    */
+                    // Reuse the same debounced ICE restart timer as the producer transport.
+                    // restartIce() handles both transports in one call.
+                    if (!this._iceRestartTimer) {
+                        this._iceRestartTimer = setTimeout(async () => {
+                            this._iceRestartTimer = null;
+                            if (
+                                this.consumerTransport &&
+                                this.consumerTransport.connectionState === 'disconnected'
+                            ) {
+                                console.warn('Consumer Transport still disconnected — restarting ICE');
+                                await this.restartIce();
+                            }
+                        }, 3000);
+                    }
+                    break;
                 case 'failed':
                     console.warn('Consumer Transport failed', { id: this.consumerTransport.id });
 
@@ -1067,7 +1086,7 @@ class RoomClient {
     }
 
     getReconnectDirectJoinURL() {
-        const { peer_audio, peer_video, peer_screen, peer_token } = this.peer_info;
+        const { peer_video, peer_screen, peer_token } = this.peer_info;
         const baseUrl = `${window.location.origin}/join`;
         // Strip the last LMS-added suffix (pattern: -[alphanumeric]{3,10} at end of name)
         // and replace it with a fresh timestamp+random suffix so each reconnect uses a
@@ -1079,7 +1098,12 @@ class RoomClient {
             room: this.room_id,
             roomPassword: this.RoomPassword,
             name: freshName,
-            audio: peer_audio,
+            // Always rejoin with audio=true regardless of prior mute state.
+            // peer_info.peer_audio tracks the current mute/unmute toggle, not hardware
+            // capability. If the user was muted (by moderator, broadcasting mode, or
+            // manually) when they disconnected, using peer_audio=false here would make
+            // them rejoin with audio permanently paused and voice not working.
+            audio: true,
             video: peer_video,
             screen: peer_screen,
             notify: 0,
@@ -2570,6 +2594,10 @@ class RoomClient {
 
         const clean = () => {
             this._isConnected = false;
+            if (this._iceRestartTimer) {
+                clearTimeout(this._iceRestartTimer);
+                this._iceRestartTimer = null;
+            }
             if (this.consumerTransport) this.consumerTransport.close();
             if (this.producerTransport) this.producerTransport.close();
             this.socket.off('disconnect');
