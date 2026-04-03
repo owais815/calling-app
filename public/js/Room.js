@@ -249,6 +249,11 @@ let wbPointerActive = false; // laser pointer mode
 let wbPop = [];
 let coords = {};
 
+// Line drawing mode (Paint-style: click to set start, move, click to set end)
+let wbLineMode = false;
+let wbLineTempObj = null;
+let wbLineStartPoint = null;
+
 let isButtonsVisible = false;
 let isButtonsBarOver = false;
 
@@ -2100,9 +2105,18 @@ function handleButtons() {
         setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
     };
     whiteboardLineBtn.onclick = () => {
-        wbSetActiveTool(whiteboardLineBtn);
-        whiteboardAddObj('line');
-        setTimeout(() => wbSetActiveTool(whiteboardObjectBtn), 400);
+        if (wbLineMode) {
+            wbCancelLineMode();
+        } else {
+            whiteboardIsDrawingMode(false);
+            wbCanvas.selection = false;
+            wbCanvas.defaultCursor = 'crosshair';
+            wbCanvas.hoverCursor = 'crosshair';
+            wbLineMode = true;
+            wbLineStartPoint = null;
+            wbLineTempObj = null;
+            wbSetActiveTool(whiteboardLineBtn);
+        }
     };
     whiteboardRectBtn.onclick = () => {
         wbSetActiveTool(whiteboardRectBtn);
@@ -2595,6 +2609,11 @@ function handleSelects() {
         rc.roomMessage('ptt', isPushToTalkActive);
         console.log(`Push-to-talk enabled: ${isPushToTalkActive}`);
     };
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && wbLineMode) {
+            wbCancelLineMode();
+        }
+    });
     document.addEventListener('keydown', async (e) => {
         if (!isPushToTalkActive) return;
         if (e.code === 'Space') {
@@ -3899,11 +3918,28 @@ const wbModeTools = [
 ];
 
 function wbSetActiveTool(activeBtn) {
+    if (wbLineMode && activeBtn !== whiteboardLineBtn) {
+        wbCancelLineMode();
+    }
     wbModeTools.forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('lms-wb-active');
     });
     if (activeBtn) activeBtn.classList.add('lms-wb-active');
+}
+
+function wbCancelLineMode() {
+    wbLineMode = false;
+    if (wbLineTempObj) {
+        wbCanvas.remove(wbLineTempObj);
+        wbCanvas.requestRenderAll();
+        wbLineTempObj = null;
+    }
+    wbLineStartPoint = null;
+    wbCanvas.selection = true;
+    wbCanvas.defaultCursor = 'default';
+    wbCanvas.hoverCursor = 'move';
+    wbCanvas.isDrawingMode = false;
 }
 
 function whiteboardIsDrawingMode(status) {
@@ -4340,8 +4376,8 @@ function setupWhiteboardLocalListners() {
     wbCanvas.on('mouse:up', function () {
         mouseUp();
     });
-    wbCanvas.on('mouse:move', function () {
-        mouseMove();
+    wbCanvas.on('mouse:move', function (e) {
+        mouseMove(e);
     });
     wbCanvas.on('object:added', function () {
         objectAdded();
@@ -4349,6 +4385,48 @@ function setupWhiteboardLocalListners() {
 }
 
 function mouseDown(e) {
+    if (wbLineMode) {
+        const pointer = wbCanvas.getPointer(e.e);
+        if (!wbLineStartPoint) {
+            // First click: anchor the start point, create preview line
+            wbLineStartPoint = { x: pointer.x, y: pointer.y };
+            wbLineTempObj = new fabric.Line(
+                [pointer.x, pointer.y, pointer.x, pointer.y],
+                {
+                    stroke: wbCanvas.freeDrawingBrush.color,
+                    strokeWidth: wbCanvas.freeDrawingBrush.width,
+                    selectable: false,
+                    evented: false,
+                    hasControls: false,
+                    hasBorders: false,
+                    originX: 'left',
+                    originY: 'top',
+                }
+            );
+            wbCanvas.add(wbLineTempObj);
+        } else {
+            // Second click: finalize the line
+            const x1 = wbLineStartPoint.x;
+            const y1 = wbLineStartPoint.y;
+            const x2 = pointer.x;
+            const y2 = pointer.y;
+            wbCanvas.remove(wbLineTempObj);
+            wbLineTempObj = null;
+            wbLineStartPoint = null;
+            wbLineMode = false;
+            wbCanvas.selection = true;
+            wbCanvas.defaultCursor = 'default';
+            wbCanvas.hoverCursor = 'move';
+            const finalLine = new fabric.Line([x1, y1, x2, y2], {
+                stroke: wbCanvas.freeDrawingBrush.color,
+                strokeWidth: wbCanvas.freeDrawingBrush.width,
+                originX: 'left',
+                originY: 'top',
+            });
+            addWbCanvasObj(finalLine);
+        }
+        return;
+    }
     wbIsDrawing = true;
     if (wbIsEraser && e.target) {
         wbCanvas.remove(e.target);
@@ -4361,11 +4439,17 @@ function mouseUp() {
     wbCanvasToJson();
 }
 
-function mouseMove() {
+function mouseMove(e) {
+    if (wbLineMode && wbLineTempObj && wbLineStartPoint) {
+        const pointer = wbCanvas.getPointer(e.e);
+        wbLineTempObj.set({ x2: pointer.x, y2: pointer.y });
+        wbCanvas.requestRenderAll();
+        return;
+    }
     if (wbIsEraser) {
         wbCanvas.hoverCursor = 'not-allowed';
         return;
-    } else {
+    } else if (!wbLineMode) {
         wbCanvas.hoverCursor = 'move';
     }
     if (!wbIsDrawing) return;
