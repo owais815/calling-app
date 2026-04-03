@@ -2056,8 +2056,18 @@ function handleButtons() {
         rc.hideFileTransfer();
     };
     whiteboardButton.onclick = () => {
+        const wasOpen = wbIsOpen;
         toggleWhiteboard();
         whiteboardButton.classList.toggle('lms-active');
+        if (isPresenter) {
+            if (wbIsOpen) {
+                // Just opened — push canvas + lock state to all students
+                wbUpdate();
+            } else if (wasOpen && rc.thereAreParticipants()) {
+                // Just closed — tell all students to close their board too
+                rc.socket.emit('whiteboardAction', getWhiteboardAction('close'));
+            }
+        }
     };
     whiteboardPencilBtn.onclick = () => {
         whiteboardIsDrawingMode(true);
@@ -4422,22 +4432,19 @@ function wbCanvasToJson() {
 }
 
 function JsonToWbCanvas(json) {
-    // Load canvas data immediately (fabric works even when hidden).
-    // Use the callback form so renderAll runs AFTER the JSON is fully parsed,
-    // preventing the blank-canvas flash.
+    // Use the callback form so renderAll fires AFTER the JSON is fully parsed,
+    // preventing a blank-canvas flash.
     wbCanvas.loadFromJSON(json, () => {
         wbCanvas.renderAll();
-        // If the student is locked, ensure drawing is disabled on the loaded canvas.
-        if (!isPresenter && wbIsLock) {
-            wbDrawing(false);
-        }
+        // Ensure drawing stays disabled on the loaded objects when student is locked.
+        if (!isPresenter && wbIsLock) wbDrawing(false);
     });
 
-    // Do NOT auto-open the whiteboard here — the 'unlock' socket action is the
-    // authoritative signal to show the board. If the board is already open
-    // (teacher resync while student is viewing), we just updated the content above.
-    // If it's closed, it will open when the accompanying 'unlock' action arrives.
-    // Exception: if it's already open and unlocked, keep it open (no-op needed).
+    // Teacher has the board open — open it on this side too.
+    if (!wbIsOpen) toggleWhiteboard();
+
+    // Show the student's own board-toggle button so they can minimise/restore.
+    if (!isPresenter) elemDisplay('whiteboardButton', true);
 }
 
 function getWhiteboardAction(action) {
@@ -4513,27 +4520,31 @@ function whiteboardAction(data, emit = true) {
             if (!isPresenter) {
                 wbIsLock = true;
                 wbDrawing(false);
-                // Close the whiteboard entirely — student should not see the board when locked
-                if (wbIsOpen) toggleWhiteboard();
-                // Also hide controls so they don't flash when whiteboard re-opens
+                // Only hide the drawing toolbar — board stays visible so students
+                // can still see what the teacher is drawing.
                 elemDisplay('whiteboardOptions', false);
-                elemDisplay('whiteboardButton', false);
             }
             break;
         case 'unlock':
             if (!isPresenter) {
                 wbIsLock = false;
-                // Open the whiteboard if it isn't already visible
-                if (!wbIsOpen) toggleWhiteboard();
-                // Show drawing toolbar and the open/close toggle button.
-                // NOTE: whiteboardTitle (lock toggle) is presenter-only — never shown to students.
+                // Show drawing toolbar — board is already open (teacher opened it).
                 elemDisplay('whiteboardOptions', true, 'inline');
-                elemDisplay('whiteboardButton', true);
                 wbDrawing(true);
             }
             break;
         case 'close':
             if (wbIsOpen) toggleWhiteboard();
+            if (!isPresenter) {
+                // Reset student state: hide toolbar and main-bar toggle button,
+                // lock drawing so it's clean for the next session.
+                elemDisplay('whiteboardOptions', false);
+                elemDisplay('whiteboardButton', false);
+                wbIsLock = true;
+            } else {
+                // Teacher closed via the X button inside the board — sync button active state.
+                whiteboardButton.classList.remove('lms-active');
+            }
             break;
         case 'pointer': {
             // Show laser dot on receivers' screens (not the presenter's own screen)
