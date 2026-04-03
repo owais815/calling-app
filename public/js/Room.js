@@ -424,8 +424,8 @@ function refreshMainButtonsToolTipPlacement() {
         // transcriptionButton tooltip removed — button is hidden
         setTippy('whiteboardButton', 'Toggle the whiteboard', placement);
         setTippy('lmsCourseMaterialsBtn', 'Course materials', placement);
-        setTippy('lmsAttendanceBtn', 'Attendance', placement);
         setTippy('lmsStarBtn', 'Give achievement star', placement);
+        setTippy('fullScreenButton', 'Full screen', placement);
         setTippy('settingsButton', 'Toggle the settings', placement);
         setTippy('exitButton', 'Leave room', placement);
     }
@@ -1610,11 +1610,6 @@ function roomIsReady() {
     }
         // LMS panel buttons
         if (lmsSessionId && lmsToken && lmsApiUrl && (lmsUserRole === 'teacher' || lmsUserRole === 'admin')) {
-            const attendanceBtn = document.getElementById('lmsAttendanceBtn');
-            if (attendanceBtn) {
-                show(attendanceBtn);
-                attendanceBtn.onclick = () => toggleLmsPanel('attendance');
-            }
             const starBtn = document.getElementById('lmsStarBtn');
             if (starBtn) {
                 show(starBtn);
