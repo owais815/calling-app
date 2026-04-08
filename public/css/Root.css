@@ -42,3 +42,14 @@
     outline: none;
     font-family: 'Comfortaa';
 }
+
+/* ── Responsive variable overrides ── */
+@media screen and (max-width: 767px) {
+    :root {
+        --msger-width: calc(100vw - 20px);
+        --msger-height: calc(100vh - 160px);
+        --transcription-width: calc(100vw - 20px);
+        --transcription-height: 320px;
+        --vmi-wh: 22vw;
+    }
+}

@@ -244,9 +244,24 @@ input[type='range'] {
     .username {
         font-size: 12px;
     }
+
+    /* Adjust video container height to match smaller control bar (42px buttons) */
+    #videoMediaContainer,
+    #videoPinMediaContainer {
+        height: calc(100% - 74px);
+    }
 }
+
 @media screen and (max-width: 500px) {
     .username {
         font-size: 10px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    /* Adjust video container height to match even smaller control bar (38px buttons) */
+    #videoMediaContainer,
+    #videoPinMediaContainer {
+        height: calc(100% - 66px);
     }
 }

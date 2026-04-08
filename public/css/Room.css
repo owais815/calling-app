@@ -2472,3 +2472,74 @@ z-index:
 }
 .lms-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .lms-save-btn:not(:disabled):hover { background: #2563eb; }
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Control Bar, Menus, Modals
+--------------------------------------------------------------*/
+
+/* Tablet / large phone (≤ 768px) */
+@media screen and (max-width: 768px) {
+    /* Init modal: cap at viewport width with safe margin */
+    .init-modal-size {
+        width: calc(100vw - 32px) !important;
+    }
+
+    /* Init layout: always stacked on tablets */
+    .init-user {
+        display: block;
+    }
+}
+
+/* Small phones (≤ 600px) — shrink control bar buttons */
+@media screen and (max-width: 600px) {
+    #control {
+        padding: 6px 14px;
+        gap: 6px;
+        border-radius: 28px;
+    }
+
+    #control button,
+    #moreOptionsBtn {
+        width: 42px;
+        height: 42px;
+    }
+
+    #control button .material-symbols-outlined,
+    #moreOptionsBtn .material-symbols-outlined {
+        font-size: 19px;
+    }
+
+    /* More options menu: full-width anchored to viewport edges */
+    .more-options-menu {
+        bottom: 76px;
+        left: 16px;
+        right: 16px;
+        transform: none;
+        width: auto;
+        min-width: unset;
+    }
+}
+
+/* Very small phones (≤ 400px) — shrink further */
+@media screen and (max-width: 400px) {
+    #control {
+        padding: 5px 10px;
+        gap: 4px;
+        border-radius: 24px;
+    }
+
+    #control button,
+    #moreOptionsBtn {
+        width: 38px;
+        height: 38px;
+    }
+
+    #control button .material-symbols-outlined,
+    #moreOptionsBtn .material-symbols-outlined {
+        font-size: 17px;
+    }
+
+    .more-options-menu {
+        bottom: 68px;
+    }
+}

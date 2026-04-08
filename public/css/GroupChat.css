@@ -814,3 +814,44 @@ input[type='text'] {
 .form-check-input {
     cursor: pointer;
 }
+
+/* ============================================================
+   Mobile Responsive — GroupChat
+   ============================================================ */
+@media screen and (max-width: 767px) {
+    /* Container: fluid width/height via Root.css variables (already 100vw-20px / 100vh-160px) */
+    .chat-container {
+        min-width: unset;
+        min-height: unset;
+        border-radius: 10px;
+    }
+
+    /* People sidebar: full-width overlay (hidden by default, toggled by JS) */
+    .chat-app .people-list {
+        width: 100%;
+        z-index: 20;
+    }
+
+    /* Chat main area: full width so it fills when sidebar is hidden */
+    .chat-app .chat {
+        margin-left: 0;
+    }
+
+    /* Chat history: flexible height — no more fixed 490px */
+    .chat .chat-history {
+        min-height: 0;
+        max-height: none;
+        flex: 1;
+    }
+
+    /* Message bubbles: allow wider on narrow screens */
+    .chat-msg-item {
+        max-width: 92%;
+    }
+
+    /* Chat header: tighter on mobile */
+    .chat .chat-header {
+        height: 54px;
+        max-height: 54px;
+    }
+}
