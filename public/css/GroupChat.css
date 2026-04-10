@@ -851,6 +851,7 @@ input[type='text'] {
     .chat-app .people-list {
         width: 100%;
         z-index: 20;
+        bottom: 74px; /* stop above the fixed control bar so it never blocks it */
     }
 
     /* Chat main area: full width so it fills when sidebar is hidden */
@@ -891,5 +892,9 @@ input[type='text'] {
         bottom: 66px !important;
         height: calc(100vh - 66px) !important;
         max-height: calc(100vh - 66px) !important;
+    }
+
+    .chat-app .people-list {
+        bottom: 66px; /* match control bar height at very small phones */
     }
 }

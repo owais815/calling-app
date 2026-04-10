@@ -173,7 +173,7 @@ body {
 --------------------------------------------------------------*/
 
 #control {
-    z-index: 3;
+    z-index: 100; /* raised from 3 — always above content panels (whiteboard:4, chat:5, lms-panels:50) */
     position: absolute;
     display: flex;
     padding: 10px 20px;
@@ -488,7 +488,7 @@ body {
 --------------------------------------------------------------*/
 
 #mySettings {
-    z-index: 6;
+    z-index: 200; /* raised from 6 — must appear above control bar (100) when open */
     position: absolute;
     margin: auto;
     padding: 0;
@@ -2490,18 +2490,39 @@ z-index:
     }
 }
 
-/* Small phones (≤ 600px) — full-width scrollable bar, shrink buttons */
+/* Small phones (≤ 600px) — fixed bottom bar, full-width, scrollable */
 @media screen and (max-width: 600px) {
     #control {
-        /* Full-width edge-to-edge — no horizontal overflow possible */
+        /*
+         * KEY FIX — use position:fixed so the bar is always anchored to
+         * the visual viewport bottom, independent of browser chrome
+         * (address bar show/hide) that was causing intermittent click failures
+         * with the old position:absolute + top:94% approach.
+         */
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+
         padding: 6px 10px;
+        /* iOS home-indicator safe area */
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
         gap: 6px;
         border-radius: 0;
-        /* Scroll if buttons still overflow (many features visible simultaneously) */
+        justify-content: center;
+
+        /*
+         * Allow horizontal scroll only — tells the browser not to wait and
+         * see if a vertical-tap might be a horizontal swipe before firing
+         * the click event (eliminates the scroll-detection tap-delay).
+         */
+        touch-action: pan-x;
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: none;
-        justify-content: flex-start;
     }
 
     #control::-webkit-scrollbar {
@@ -2513,6 +2534,11 @@ z-index:
         width: 42px;
         height: 42px;
         flex-shrink: 0;
+        /*
+         * Suppress 300 ms tap-delay and pinch-zoom on each button so
+         * taps register instantly rather than waiting for gesture disambiguation.
+         */
+        touch-action: manipulation;
     }
 
     #control button .material-symbols-outlined,
@@ -2520,8 +2546,9 @@ z-index:
         font-size: 19px;
     }
 
-    /* More options menu: full-width anchored to viewport edges */
+    /* More options menu: slide up from above the fixed bar */
     .more-options-menu {
+        position: fixed !important;
         bottom: 74px;
         left: 0;
         right: 0;
@@ -2536,6 +2563,7 @@ z-index:
 @media screen and (max-width: 400px) {
     #control {
         padding: 5px 8px;
+        padding-bottom: max(5px, env(safe-area-inset-bottom));
         gap: 4px;
     }
 
@@ -2551,7 +2579,7 @@ z-index:
     }
 
     .more-options-menu {
-        bottom: 66px;
+        bottom: 62px;
     }
 }
 
