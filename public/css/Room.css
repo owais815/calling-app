@@ -2490,18 +2490,29 @@ z-index:
     }
 }
 
-/* Small phones (≤ 600px) — shrink control bar buttons */
+/* Small phones (≤ 600px) — full-width scrollable bar, shrink buttons */
 @media screen and (max-width: 600px) {
     #control {
-        padding: 6px 14px;
+        /* Full-width edge-to-edge — no horizontal overflow possible */
+        padding: 6px 10px;
         gap: 6px;
-        border-radius: 28px;
+        border-radius: 0;
+        /* Scroll if buttons still overflow (many features visible simultaneously) */
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        justify-content: flex-start;
+    }
+
+    #control::-webkit-scrollbar {
+        display: none;
     }
 
     #control button,
     #moreOptionsBtn {
         width: 42px;
         height: 42px;
+        flex-shrink: 0;
     }
 
     #control button .material-symbols-outlined,
@@ -2511,21 +2522,21 @@ z-index:
 
     /* More options menu: full-width anchored to viewport edges */
     .more-options-menu {
-        bottom: 76px;
-        left: 16px;
-        right: 16px;
+        bottom: 74px;
+        left: 0;
+        right: 0;
         transform: none;
         width: auto;
         min-width: unset;
+        border-radius: 12px 12px 0 0;
     }
 }
 
-/* Very small phones (≤ 400px) — shrink further */
+/* Very small phones (≤ 400px) — shrink buttons further */
 @media screen and (max-width: 400px) {
     #control {
-        padding: 5px 10px;
+        padding: 5px 8px;
         gap: 4px;
-        border-radius: 24px;
     }
 
     #control button,
@@ -2540,6 +2551,227 @@ z-index:
     }
 
     .more-options-menu {
-        bottom: 68px;
+        bottom: 66px;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Whiteboard
+--------------------------------------------------------------*/
+
+/* Whiteboard height: match VideoGrid's calc for each breakpoint */
+@media screen and (max-width: 600px) {
+    #whiteboard {
+        height: calc(100% - 74px);
+        padding: 6px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    #whiteboard {
+        height: calc(100% - 66px);
+        padding: 4px;
+    }
+}
+
+/* Tablet & phone: stack title row above a horizontally-scrollable toolbar */
+@media screen and (max-width: 768px) {
+    .whiteboard-header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        padding: 6px 8px;
+        gap: 4px;
+        cursor: default; /* no drag on touch */
+    }
+
+    /* Title row (close btn + lock toggle) spans full width */
+    #whiteboardTitle {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    /* Lock toggle label: slightly smaller */
+    #whiteboardTitle label {
+        font-size: 11px !important;
+    }
+
+    /* Toolbar: single horizontal row that scrolls — preserves canvas height */
+    .whiteboard-header-options {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+        flex: unset;
+    }
+
+    .whiteboard-header-options::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Smaller tool buttons */
+    .whiteboard-header-options button {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+    }
+
+    .whiteboard-header-options button .material-symbols-outlined {
+        font-size: 20px;
+    }
+
+    .whiteboard-header-options button svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Color pickers: compact */
+    .whiteboardColorPicker {
+        width: 26px;
+        height: 22px;
+        flex-shrink: 0;
+    }
+
+    /* chat-pinned mode: whiteboard takes full width (chat overlays on mobile) */
+    #whiteboard.wb-chat-pinned {
+        width: 100%;
+    }
+}
+
+/* Very small phones: shrink buttons a bit more */
+@media screen and (max-width: 400px) {
+    .whiteboard-header {
+        padding: 4px 6px;
+        gap: 3px;
+    }
+
+    .whiteboard-header-options button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .whiteboard-header-options button .material-symbols-outlined {
+        font-size: 17px;
+    }
+
+    .whiteboard-header-options button svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .whiteboardColorPicker {
+        width: 24px;
+        height: 20px;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — LMS Panels (Materials + Attendance)
+--------------------------------------------------------------*/
+
+@media screen and (max-width: 768px) {
+    .lms-panel {
+        width: 100vw;
+        /* Lift off the control bar so the save/close buttons aren't hidden */
+        bottom: 74px;
+    }
+
+    /* Attendance stats row: wrap to two lines on narrow screens */
+    .lms-att-stats {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .lms-att-bulk {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .lms-panel {
+        bottom: 66px;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Settings Modal
+--------------------------------------------------------------*/
+
+@media screen and (max-width: 768px) {
+    /* Cap height so it doesn't go off-screen on small phones */
+    #mySettings {
+        min-height: auto;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Move emoji / star / fullscreen to 3-dots menu
+--------------------------------------------------------------*/
+
+/* Desktop: mobile-menu-only items are always hidden */
+.mobile-menu-only {
+    display: none !important;
+}
+
+/* Mobile (≤ 600px): show mobile-menu-only items that are not hidden by JS,
+   and hide their counterpart control-bar buttons */
+@media screen and (max-width: 600px) {
+    /* Move these three buttons out of the control bar */
+    #emojiBarButton,
+    #lmsStarBtn,
+    #fullScreenButton {
+        display: none !important;
+    }
+
+    /* Show mobile-menu-only items (unless JS also marked them hidden) */
+    .mobile-menu-only:not(.hidden) {
+        display: flex !important;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Control Bar overflow guard
+--------------------------------------------------------------*/
+
+/* On very narrow phones (≤ 360px) allow the bar to scroll horizontally
+   so buttons are never clipped off the edge */
+@media screen and (max-width: 360px) {
+    #control {
+        max-width: calc(100vw - 16px);
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        scrollbar-width: none;
+    }
+
+    #control::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/*--------------------------------------------------------------
+# Mobile Responsive — Init Modal (pre-join screen)
+--------------------------------------------------------------*/
+
+@media screen and (max-width: 600px) {
+    /* Shrink preview video a bit to free space for selects */
+    .init-video-container video {
+        height: 180px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .init-video-container video {
+        height: 150px;
     }
 }

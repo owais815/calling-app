@@ -1590,6 +1590,15 @@ function roomIsReady() {
             if (!document.fullscreenElement) rc.isDocumentOnFullScreen = false;
         };
         show(fullScreenButton);
+        // Mirror fullscreen in the mobile 3-dots menu
+        const mobileMenuFullscreenBtn = document.getElementById('mobileMenuFullscreenBtn');
+        if (mobileMenuFullscreenBtn) {
+            show(mobileMenuFullscreenBtn);
+            mobileMenuFullscreenBtn.onclick = () => {
+                rc.toggleFullScreen();
+                moreOptionsMenu.classList.add('hidden');
+            };
+        }
     }
     BUTTONS.main.whiteboardButton && show(whiteboardButton);
     // BUG-036: emoji reaction button in main control bar
@@ -1597,6 +1606,15 @@ function roomIsReady() {
     if (emojiBarButton) {
         show(emojiBarButton);
         emojiBarButton.onclick = () => emojiRoomButton.click();
+    }
+    // Mirror emoji in the mobile 3-dots menu
+    const mobileMenuEmojiBtn = document.getElementById('mobileMenuEmojiBtn');
+    if (mobileMenuEmojiBtn) {
+        show(mobileMenuEmojiBtn);
+        mobileMenuEmojiBtn.onclick = () => {
+            emojiRoomButton.click();
+            moreOptionsMenu.classList.add('hidden');
+        };
     }
     // BUG-034: hide Moderator tab for non-presenter (students)
     if (!isPresenter) {
@@ -1619,6 +1637,15 @@ function roomIsReady() {
             if (starBtn) {
                 show(starBtn);
                 starBtn.onclick = () => showStarPicker();
+            }
+            // Mirror star in the mobile 3-dots menu
+            const mobileMenuStarBtn = document.getElementById('mobileMenuStarBtn');
+            if (mobileMenuStarBtn) {
+                show(mobileMenuStarBtn);
+                mobileMenuStarBtn.onclick = () => {
+                    showStarPicker();
+                    moreOptionsMenu.classList.add('hidden');
+                };
             }
         }
         if (lmsCourseId && lmsToken && lmsApiUrl) {
@@ -3829,6 +3856,9 @@ function toggleWhiteboard() {
         if (rc.isChatPinned) {
             whiteboard.classList.add('wb-chat-pinned');
         }
+        // Re-size the canvas now that the whiteboard section is visible —
+        // at init time the element was hidden so clientWidth/Height were 0.
+        setupWhiteboardCanvasSize();
     } else {
         videoMediaContainer.style.display = '';
         whiteboard.classList.remove('wb-chat-pinned');
@@ -3859,9 +3889,25 @@ function setupWhiteboardCanvas() {
 }
 
 function setupWhiteboardCanvasSize() {
+    const wbEl = document.getElementById('whiteboard');
+    const headerEl = document.getElementById('whiteboardHeader');
+
+    // When the whiteboard is visible use its actual dimensions so the canvas
+    // fills the available drawing area (height-aware).  At cold-init the
+    // element is hidden so clientWidth/Height are 0 — fall back to window.
+    let availW = window.innerWidth;
+    let availH = window.innerHeight;
+
+    if (wbEl && wbEl.clientWidth > 0) {
+        const padding = 20;
+        const hdrH = headerEl ? headerEl.offsetHeight + padding : 110;
+        availW = wbEl.clientWidth - padding;
+        availH = wbEl.clientHeight - hdrH;
+    }
+
     let optimalSize = [wbWidth, wbHeight];
-    let scaleFactorX = window.innerWidth / optimalSize[0];
-    let scaleFactorY = window.innerHeight / optimalSize[1];
+    let scaleFactorX = availW / optimalSize[0];
+    let scaleFactorY = availH / optimalSize[1];
     if (scaleFactorX < scaleFactorY && scaleFactorX < 1) {
         wbCanvas.setWidth(optimalSize[0] * scaleFactorX);
         wbCanvas.setHeight(optimalSize[1] * scaleFactorX);

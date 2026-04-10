@@ -819,11 +819,32 @@ input[type='text'] {
    Mobile Responsive — GroupChat
    ============================================================ */
 @media screen and (max-width: 767px) {
-    /* Container: fluid width/height via Root.css variables (already 100vw-20px / 100vh-160px) */
+    /* Container: fluid width/height via Root.css variables */
     .chat-container {
         min-width: unset;
         min-height: unset;
         border-radius: 10px;
+        /* Ensure chat never overlaps the control bar at the bottom */
+        max-height: calc(100vh - 74px);
+    }
+
+    /*
+     * chatPinned() hardcodes --msger-width: 25% and --msger-height: 100% via JS.
+     * On mobile a 25%-wide panel (≈94px on a 375px phone) looks like nothing opened.
+     * Override with !important to beat the JS-set inline CSS variable.
+     */
+    .chat-container.chat-pinned {
+        width: 100vw !important;
+        min-width: unset !important;
+        left: 0 !important;
+        right: 0 !important;
+        /* Leave room for the control bar (matches VideoGrid + whiteboard calcs) */
+        bottom: 74px !important;
+        height: calc(100vh - 74px) !important;
+        max-height: calc(100vh - 74px) !important;
+        border-radius: 0 !important;
+        border-right: none !important;
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5) !important;
     }
 
     /* People sidebar: full-width overlay (hidden by default, toggled by JS) */
@@ -853,5 +874,22 @@ input[type='text'] {
     .chat .chat-header {
         height: 54px;
         max-height: 54px;
+    }
+
+    /* Input area: ensure it's reachable above the iOS/Android soft keyboard */
+    .chat .chat-input-area {
+        position: relative;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .chat-container {
+        max-height: calc(100vh - 66px);
+    }
+
+    .chat-container.chat-pinned {
+        bottom: 66px !important;
+        height: calc(100vh - 66px) !important;
+        max-height: calc(100vh - 66px) !important;
     }
 }

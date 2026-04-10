@@ -47,9 +47,30 @@
 @media screen and (max-width: 767px) {
     :root {
         --msger-width: calc(100vw - 20px);
-        --msger-height: calc(100vh - 160px);
+        /* Chat height: viewport minus top padding + mobile control bar (74px) */
+        --msger-height: calc(100vh - 100px);
+        --wb-width: calc(100vw - 12px);
+        --wb-height: calc(100vh - 130px);
         --transcription-width: calc(100vw - 20px);
         --transcription-height: 320px;
         --vmi-wh: 22vw;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    :root {
+        /* Control bar: span full width, no horizontal centering */
+        --btns-left: 0px;
+        --btns-right: 0px;
+        --btns-width: 100%;
+        --btns-transform: translateY(-50%);
+        --btns-margin-left: 0px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    :root {
+        --msger-height: calc(100vh - 88px);
+        --wb-height: calc(100vh - 118px);
     }
 }
