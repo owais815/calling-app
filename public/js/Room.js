@@ -287,6 +287,17 @@ window.addEventListener('pagehide', () => {
     }
 });
 
+// Re-fit the whiteboard canvas whenever the viewport changes (orientation flip,
+// mobile browser chrome show/hide, etc.).  Debounced to avoid thrashing Fabric.
+let _wbResizeTimer = null;
+window.addEventListener('resize', () => {
+    if (!wbIsOpen || !wbCanvas) return;
+    clearTimeout(_wbResizeTimer);
+    _wbResizeTimer = setTimeout(() => {
+        setupWhiteboardCanvasSize();
+    }, 150);
+});
+
 function initClient() {
     setTheme();
 
@@ -1553,6 +1564,9 @@ function roomIsReady() {
         hide(refreshVideoDevices);
         hide(refreshAudioDevices);
         BUTTONS.main.swapCameraButton && show(swapCameraButton);
+        if (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia) {
+            BUTTONS.main.startScreenButton && show(startScreenButton);
+        }
         rc.chatMaximize();
         hide(chatTogglePin);
         hide(chatMaxButton);
@@ -3908,7 +3922,17 @@ function setupWhiteboardCanvasSize() {
     let optimalSize = [wbWidth, wbHeight];
     let scaleFactorX = availW / optimalSize[0];
     let scaleFactorY = availH / optimalSize[1];
-    if (scaleFactorX < scaleFactorY && scaleFactorX < 1) {
+
+    // Portrait mobile: the optimal size is landscape 1200×600, so scaling by width
+    // leaves a huge dead area below the canvas (≈480px of undrawn background on a
+    // 375px-wide phone).  Instead, fill the full available area and zoom by the
+    // horizontal scale — drawings sync correctly; we just get more vertical space.
+    if (availH > availW && scaleFactorX < 1) {
+        wbCanvas.setWidth(availW);
+        wbCanvas.setHeight(availH);
+        wbCanvas.setZoom(scaleFactorX);
+        setWhiteboardSize(availW, availH);
+    } else if (scaleFactorX < scaleFactorY && scaleFactorX < 1) {
         wbCanvas.setWidth(optimalSize[0] * scaleFactorX);
         wbCanvas.setHeight(optimalSize[1] * scaleFactorX);
         wbCanvas.setZoom(scaleFactorX);
