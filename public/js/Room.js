@@ -4590,7 +4590,13 @@ function JsonToWbCanvas(json) {
     });
 
     // Teacher has the board open — open it on this side too.
-    if (!wbIsOpen) toggleWhiteboard();
+    // Notify students only on first open (not on every canvas update).
+    if (!wbIsOpen) {
+        if (!isPresenter) {
+            userLog('info', `<i class="fas fa-chalkboard-teacher"></i> Teacher opened the whiteboard`, 'top-end', 4000);
+        }
+        toggleWhiteboard();
+    }
 
     // Show the student's own board-toggle button so they can minimise/restore.
     if (!isPresenter) elemDisplay('whiteboardButton', true);
@@ -4644,13 +4650,8 @@ function whiteboardAction(data, emit = true) {
         if (rc.thereAreParticipants()) {
             rc.socket.emit('whiteboardAction', data);
         }
-    } else {
-        userLog(
-            'info',
-            `${data.peer_name} <i class="fas fa-chalkboard-teacher"></i> whiteboard action: ${data.action}`,
-            'top-end',
-        );
     }
+    // No notification here — open notification is handled in JsonToWbCanvas.
 
     switch (data.action) {
         case 'bgcolor':
