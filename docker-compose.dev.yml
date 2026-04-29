@@ -1,0 +1,19 @@
+services:
+  mirotalksfu-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mirotalksfu-dev
+    hostname: mirotalksfu-dev
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - MEDIASOUP_ANNOUNCED_IP=${MEDIASOUP_ANNOUNCED_IP}
+      - CALLING_APP_API_SECRET=${CALLING_APP_API_SECRET:-lms_calling_secret_2026}
+      - PORT=3011
+      - BEHIND_PROXY=true
+    volumes:
+      - /var/www/lms-calling-dev/.env:/src/.env:ro
+      - ./app/src/config.dev.js:/src/app/src/config.js:ro
+    # host network required for mediasoup WebRTC UDP — dev uses ports 3011 + 40100-40200
+    network_mode: host
