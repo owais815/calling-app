@@ -1317,7 +1317,7 @@ function startServer() {
 
             const room = roomList.get(socket.room_id);
 
-            const { peer_name, peer_id, peer_uuid, peer_token, os_name, os_version, browser_name, browser_version } =
+            const { peer_name, peer_id, peer_uuid, peer_token, os_name, os_version, browser_name, browser_version, peer_image } =
                 data.peer_info;
 
             let is_presenter = true;
@@ -1444,6 +1444,7 @@ function startServer() {
                 room.broadCast(socket.id, 'roomLobby', {
                     peer_id: peer_id,
                     peer_name: peer_name,
+                    peer_image: peer_image || null,
                     lobby_status: 'waiting',
                 });
                 return cb('isLobby');

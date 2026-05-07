@@ -190,11 +190,12 @@ let room_id = getRoomId();
 // ####################################################
 
 const _lmsQs = new URLSearchParams(window.location.search);
-const lmsSessionId = _lmsQs.get('lmsSessionId') || '';
-const lmsCourseId  = _lmsQs.get('lmsCourseId')  || '';
-const lmsToken     = _lmsQs.get('lmsToken')      || '';
-const lmsApiUrl    = _lmsQs.get('lmsApiUrl')     || '';
-const lmsUserRole  = (_lmsQs.get('lmsUserRole')  || '').toLowerCase();
+const lmsSessionId    = _lmsQs.get('lmsSessionId')    || '';
+const lmsCourseId     = _lmsQs.get('lmsCourseId')     || '';
+const lmsToken        = _lmsQs.get('lmsToken')         || '';
+const lmsApiUrl       = _lmsQs.get('lmsApiUrl')        || '';
+const lmsUserRole     = (_lmsQs.get('lmsUserRole')     || '').toLowerCase();
+const lmsProfileImage = _lmsQs.get('lmsProfileImage')  || '';
 
 let lmsAttendanceSheet = null;
 let lmsAttendanceStatuses = {};
@@ -896,6 +897,7 @@ function getPeerInfo() {
         peer_recording: isRecording,
         peer_video_privacy: isVideoPrivacyActive,
         peer_hand: false,
+        peer_image: lmsProfileImage || null,
         is_desktop_device: !DetectRTC.isMobileDevice && !isTabletDevice && !isIPadDevice,
         is_mobile_device: DetectRTC.isMobileDevice,
         is_tablet_device: isTabletDevice,
@@ -1526,7 +1528,14 @@ function joinRoom(peer_name, room_id) {
 }
 
 function roomIsReady() {
-    if (rc.isValidEmail(peer_name)) {
+    if (lmsProfileImage) {
+        myProfileAvatar.style.borderRadius = `50px`;
+        myProfileAvatar.setAttribute('src', lmsProfileImage);
+        myProfileAvatar.onerror = () => {
+            myProfileAvatar.onerror = null;
+            myProfileAvatar.setAttribute('src', rc.genAvatarSvg(peer_name, 64));
+        };
+    } else if (rc.isValidEmail(peer_name)) {
         myProfileAvatar.style.borderRadius = `50px`;
         myProfileAvatar.setAttribute('src', rc.genGravatar(peer_name));
     } else {
@@ -4865,18 +4874,19 @@ function getParticipantsList(peers) {
         const peer_geoLocation = _PEER.geoLocation;
         const peer_sendFile = _PEER.sendFile;
         const peer_id = peer_info.peer_id;
-        const avatarImg = getParticipantAvatar(peer_name);
+        const avatarImg = getParticipantAvatar(peer_name, peer_info.peer_image);
 
         // NOT ME
         if (socket.id !== peer_id) {
             // PRESENTER HAS MORE OPTIONS
             if (isRulesActive && isPresenter) {
                 li += `
-                <li 
+                <li
                     id='${peer_id}'
-                    data-to-id="${peer_id}" 
+                    data-to-id="${peer_id}"
                     data-to-name="${peer_name}"
-                    class="clearfix" 
+                    data-peer-image="${peer_info.peer_image || ''}"
+                    class="clearfix"
                     onclick="rc.showPeerAboutAndMessages(this.id, '${peer_name}', event)"
                 >
                     <img
@@ -4944,11 +4954,12 @@ function getParticipantsList(peers) {
             } else {
                 // GUEST USER
                 li += `
-                <li 
-                    id='${peer_id}' 
+                <li
+                    id='${peer_id}'
                     data-to-id="${peer_id}"
                     data-to-name="${peer_name}"
-                    class="clearfix" 
+                    data-peer-image="${peer_info.peer_image || ''}"
+                    class="clearfix"
                     onclick="rc.showPeerAboutAndMessages(this.id, '${peer_name}', event)"
                 >
                 <img 
@@ -5041,10 +5052,9 @@ function refreshParticipantsCount(count, adapt = true) {
     if (adapt) adaptAspectRatio(count);
 }
 
-function getParticipantAvatar(peerName) {
-    if (rc.isValidEmail(peerName)) {
-        return rc.genGravatar(peerName);
-    }
+function getParticipantAvatar(peerName, peerImage) {
+    if (peerImage) return peerImage;
+    if (rc.isValidEmail(peerName)) return rc.genGravatar(peerName);
     return rc.genAvatarSvg(peerName, 32);
 }
 

@@ -1110,8 +1110,15 @@ class RoomClient {
             isPresenter: isPresenter,
         };
         if (peer_token) queryParams.token = peer_token;
+        // Preserve LMS integration params across reconnects
+        if (lmsSessionId)    queryParams.lmsSessionId    = lmsSessionId;
+        if (lmsCourseId)     queryParams.lmsCourseId     = lmsCourseId;
+        if (lmsToken)        queryParams.lmsToken        = lmsToken;
+        if (lmsApiUrl)       queryParams.lmsApiUrl       = lmsApiUrl;
+        if (lmsUserRole)     queryParams.lmsUserRole     = lmsUserRole;
+        if (lmsProfileImage) queryParams.lmsProfileImage = lmsProfileImage;
         const url = `${baseUrl}?${Object.entries(queryParams)
-            .map(([key, value]) => `${key}=${value}`)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
             .join('&')}`;
         return url;
     }
@@ -2236,7 +2243,7 @@ class RoomClient {
                 elem.controls = isVideoControlsOn;
                 elem.autoplay = true;
                 elem.className = '';
-                elem.poster = image.poster;
+                elem.poster = peer_info.peer_image || image.poster;
                 elem.style.objectFit = remoteIsScreen || isBroadcastingEnabled ? 'contain' : 'var(--videoObjFit)';
                 vb = document.createElement('div');
                 vb.setAttribute('id', remotePeerId + '__vb');
@@ -2540,7 +2547,7 @@ class RoomClient {
         }
         this.handleDD(d.id, peer_id, !remotePeer);
         this.popupPeerInfo(p.id, peer_info);
-        this.setVideoAvatarImgName(i.id, peer_name);
+        this.setVideoAvatarImgName(i.id, peer_name, peer_info.peer_image || null);
         this.getId(i.id).style.display = 'block';
         handleAspectRatio();
         if (isParticipantsListOpen) getRoomParticipants();
@@ -2734,8 +2741,17 @@ class RoomClient {
         }
     }
 
-    setVideoAvatarImgName(elemId, peer_name) {
+    setVideoAvatarImgName(elemId, peer_name, peer_image = null) {
         let elem = this.getId(elemId);
+        if (peer_image) {
+            elem.setAttribute('src', peer_image);
+            elem.onerror = () => {
+                // Profile image failed to load — fall back to initials SVG
+                elem.onerror = null;
+                elem.setAttribute('src', this.genAvatarSvg(peer_name, 250));
+            };
+            return;
+        }
         if (cfg.useAvatarSvg) {
             rc.isValidEmail(peer_name)
                 ? elem.setAttribute('src', this.genGravatar(peer_name))
@@ -3811,12 +3827,13 @@ class RoomClient {
             to_peer_id: 'ChatGPT',
             to_peer_name: 'ChatGPT',
             peer_msg: peer_msg,
+            peer_image: this.peer_info.peer_image || null,
         };
 
         if (isChatGPTOn) {
             console.log('Send message:', data);
             this.socket.emit('message', data);
-            this.setMsgAvatar('left', this.peer_name);
+            this.setMsgAvatar('left', this.peer_name, this.peer_info.peer_image || null);
             this.appendMessage(
                 'left',
                 this.leftMsgAvatar,
@@ -3872,7 +3889,7 @@ class RoomClient {
             }
             console.log('Send message:', data);
             this.socket.emit('message', data);
-            this.setMsgAvatar('left', this.peer_name);
+            this.setMsgAvatar('left', this.peer_name, this.peer_info.peer_image || null);
             this.appendMessage(
                 'left',
                 this.leftMsgAvatar,
@@ -3917,10 +3934,11 @@ class RoomClient {
                     to_peer_id: to_peer_id,
                     to_peer_name: toPeerName,
                     peer_msg: peer_msg,
+                    peer_image: this.peer_info.peer_image || null,
                 };
                 console.log('Send message:', data);
                 this.socket.emit('message', data);
-                this.setMsgAvatar('left', this.peer_name);
+                this.setMsgAvatar('left', this.peer_name, this.peer_info.peer_image || null);
                 this.appendMessage(
                     'left',
                     this.leftMsgAvatar,
@@ -3937,7 +3955,7 @@ class RoomClient {
 
     async showMessage(data) {
         if (!this.isChatOpen && this.showChatOnMessage) await this.toggleChat();
-        this.setMsgAvatar('right', data.peer_name);
+        this.setMsgAvatar('right', data.peer_name, data.peer_image || null);
         this.appendMessage(
             'right',
             this.rightMsgAvatar,
@@ -3973,8 +3991,8 @@ class RoomClient {
         }
     }
 
-    setMsgAvatar(avatar, peerName) {
-        let avatarImg = rc.isValidEmail(peerName) ? this.genGravatar(peerName) : this.genAvatarSvg(peerName, 32);
+    setMsgAvatar(avatar, peerName, peerImage = null) {
+        let avatarImg = peerImage || (rc.isValidEmail(peerName) ? this.genGravatar(peerName) : this.genAvatarSvg(peerName, 32));
         avatar === 'left' ? (this.leftMsgAvatar = avatarImg) : (this.rightMsgAvatar = avatarImg);
     }
 
@@ -4934,11 +4952,12 @@ class RoomClient {
                 peer_id: peer_id,
                 broadcast: broadcast,
                 peer_name: this.peer_name,
+                peer_image: this.peer_info.peer_image || null,
                 fileName: this.fileToSend.name,
                 fileSize: this.fileToSend.size,
                 fileType: this.fileToSend.type,
             };
-            this.setMsgAvatar('left', this.peer_name);
+            this.setMsgAvatar('left', this.peer_name, this.peer_info.peer_image || null);
             this.appendMessage(
                 'left',
                 this.leftMsgAvatar,
@@ -4980,7 +4999,7 @@ class RoomClient {
             html.newline +
             ' File size: ' +
             this.bytesToSize(this.incomingFileInfo.fileSize);
-        this.setMsgAvatar('right', this.incomingFileInfo.peer_name);
+        this.setMsgAvatar('right', this.incomingFileInfo.peer_name, this.incomingFileInfo.peer_image || null);
         this.appendMessage(
             'right',
             this.rightMsgAvatar,
@@ -5625,7 +5644,10 @@ class RoomClient {
                     let lobbyTr = '';
                     let peer_id = data.peer_id;
                     let peer_name = data.peer_name;
-                    let avatarImg = rc.isValidEmail(peer_name)
+                    let peer_image = data.peer_image || null;
+                    let avatarImg = peer_image
+                        ? peer_image
+                        : rc.isValidEmail(peer_name)
                         ? this.genGravatar(peer_name)
                         : this.genAvatarSvg(peer_name, 32);
                     let lobbyTb = this.getId('lobbyTb');
@@ -5634,9 +5656,10 @@ class RoomClient {
                     let lobbyAcceptId = `${peer_name}___${peer_id}___lobbyAccept`;
                     let lobbyRejectId = `${peer_name}___${peer_id}___lobbyReject`;
 
+                    const lobbyFallbackImg = rc.isValidEmail(peer_name) ? this.genGravatar(peer_name) : this.genAvatarSvg(peer_name, 32);
                     lobbyTr += `
                     <tr id='${peer_id}'>
-                        <td><img src="${avatarImg}" /></td>
+                        <td><img src="${avatarImg}" onerror="this.onerror=null;this.src='${lobbyFallbackImg}'" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" /></td>
                         <td>${peer_name}</td>
                         <td><button id='${lobbyAcceptId}' onclick="rc.lobbyAction(this.id, 'accept')">${lobbyAccept}</button></td>
                         <td><button id='${lobbyRejectId}' onclick="rc.lobbyAction(this.id, 'reject')">${lobbyReject}</button></td>
@@ -6821,7 +6844,9 @@ class RoomClient {
         const chatPrivateMessages = this.getId('chatPrivateMessages');
         const messagePrivateListItems = chatPrivateMessages.getElementsByTagName('li');
         const participantsListItems = participantsList.getElementsByTagName('li');
-        const avatarImg = getParticipantAvatar(peer_name);
+        // Read peer_image stored as a data attribute on the participant list item
+        const peerImgForHeader = (participant && participant.getAttribute('data-peer-image')) || null;
+        const avatarImg = getParticipantAvatar(peer_name, peerImgForHeader);
 
         const generateChatAboutHTML = (imgSrc, title, status = 'online', participants = '') => {
             const isSensitiveChat = !['all', 'ChatGPT'].includes(peer_id) && title.length > 15;
@@ -6836,7 +6861,9 @@ class RoomClient {
             } else if (peer_id === 'all') {
                 avatarHTML = `<div class="chat-header-avatar-wrap blue"><span class="material-symbols-outlined">forum</span></div>`;
             } else {
-                avatarHTML = `<div class="chat-header-avatar-wrap green"><span class="material-symbols-outlined">person</span></div>`;
+                avatarHTML = imgSrc
+                    ? `<div class="chat-header-avatar-wrap" style="background:none"><img src="${imgSrc}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span class=\\'material-symbols-outlined\\'>person</span>';this.parentElement.style.background='';this.parentElement.classList.add(\\'green\\')" /></div>`
+                    : `<div class="chat-header-avatar-wrap green"><span class="material-symbols-outlined">person</span></div>`;
             }
             return `
                 <button class="plist-toggle-btn" id="chatShowParticipantsList" title="Toggle participants" onclick="rc.toggleShowParticipants()">
