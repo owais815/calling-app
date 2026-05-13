@@ -4386,25 +4386,151 @@ class RoomClient {
 
     recordingOptions(options, audioMixerTracks) {
         Swal.fire({
-            background: swalBackground,
-            position: 'top',
-            imageUrl: image.recording,
-            title: 'Recording options',
-            showDenyButton: true,
-            showCancelButton: true,
-            cancelButtonColor: 'red',
-            denyButtonColor: 'green',
-            confirmButtonText: `Camera`,
-            denyButtonText: `Screen/Window`,
-            cancelButtonText: `Cancel`,
-            showClass: { popup: 'animate__animated animate__fadeInDown' },
-            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.startMobileRecording(options, audioMixerTracks);
-            } else if (result.isDenied) {
-                this.startDesktopRecording(options, audioMixerTracks);
-            }
+            background: 'rgba(18,20,24,0.98)',
+            position: 'center',
+            showConfirmButton: false,
+            showDenyButton: false,
+            showCancelButton: false,
+            width: 380,
+            padding: 0,
+            backdrop: 'rgba(0,0,0,0.6)',
+            html: `
+            <style>
+                .rec-wrap { font-family: 'Comfortaa', sans-serif; }
+                .rec-header {
+                    display: flex; align-items: center; gap: 14px;
+                    padding: 20px 22px 16px;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                }
+                .rec-icon-badge {
+                    width: 42px; height: 42px; border-radius: 12px;
+                    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                    box-shadow: 0 4px 16px rgba(239,68,68,0.4);
+                    animation: recPulse 2s infinite;
+                }
+                @keyframes recPulse {
+                    0%,100% { box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
+                    50%     { box-shadow: 0 4px 24px rgba(239,68,68,0.7); }
+                }
+                .rec-icon-badge .material-symbols-outlined {
+                    font-size: 22px; color: #fff;
+                    font-variation-settings: 'FILL' 1;
+                }
+                .rec-header-text h3 {
+                    margin: 0 0 3px; font-size: 15px; font-weight: 700;
+                    color: #f1f3f4; font-family: 'Comfortaa', sans-serif;
+                }
+                .rec-header-text p {
+                    margin: 0; font-size: 11px; color: #6b7280;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .rec-body {
+                    padding: 20px 22px;
+                    display: flex; flex-direction: column; gap: 10px;
+                }
+                .rec-option {
+                    display: flex; align-items: center; gap: 14px;
+                    background: rgba(255,255,255,0.04);
+                    border: 1px solid rgba(255,255,255,0.08);
+                    border-radius: 12px; padding: 14px 16px;
+                    cursor: pointer; transition: all 0.15s ease;
+                    text-align: left; width: 100%; box-sizing: border-box;
+                }
+                .rec-option:hover {
+                    background: rgba(255,255,255,0.08);
+                    border-color: rgba(255,255,255,0.15);
+                    transform: translateY(-1px);
+                }
+                .rec-option-icon {
+                    width: 38px; height: 38px; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                }
+                .rec-option-icon .material-symbols-outlined {
+                    font-size: 20px; font-variation-settings: 'FILL' 1;
+                }
+                .rec-opt-cam { background: rgba(59,130,246,0.15); }
+                .rec-opt-cam .material-symbols-outlined { color: #60a5fa; }
+                .rec-opt-screen { background: rgba(34,197,94,0.12); }
+                .rec-opt-screen .material-symbols-outlined { color: #4ade80; }
+                .rec-option-text h4 {
+                    margin: 0 0 2px; font-size: 13px; font-weight: 700;
+                    color: #f1f3f4; font-family: 'Comfortaa', sans-serif;
+                }
+                .rec-option-text p {
+                    margin: 0; font-size: 11px; color: #6b7280;
+                    font-family: 'Comfortaa', sans-serif; line-height: 1.4;
+                }
+                .rec-option-arrow {
+                    margin-left: auto; font-size: 18px; color: #374151; flex-shrink: 0;
+                    transition: color 0.15s;
+                }
+                .rec-option:hover .rec-option-arrow { color: #6b7280; }
+                .rec-cancel {
+                    display: flex; align-items: center; justify-content: center; gap: 6px;
+                    background: transparent; color: #4b5563;
+                    border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+                    padding: 10px; width: 100%; box-sizing: border-box;
+                    font-family: 'Comfortaa', sans-serif; font-size: 12px; font-weight: 600;
+                    cursor: pointer; transition: all 0.15s; margin-top: 2px;
+                }
+                .rec-cancel .material-symbols-outlined { font-size: 15px; }
+                .rec-cancel:hover { background: rgba(255,255,255,0.05); color: #9aa0a6; }
+            </style>
+            <div class="rec-wrap">
+                <div class="rec-header">
+                    <div class="rec-icon-badge">
+                        <span class="material-symbols-outlined">radio_button_checked</span>
+                    </div>
+                    <div class="rec-header-text">
+                        <h3>Recording Source</h3>
+                        <p>Choose what to capture</p>
+                    </div>
+                </div>
+                <div class="rec-body">
+                    <button class="rec-option" id="recCamBtn">
+                        <div class="rec-option-icon rec-opt-cam">
+                            <span class="material-symbols-outlined">videocam</span>
+                        </div>
+                        <div class="rec-option-text">
+                            <h4>Camera</h4>
+                            <p>Record your webcam video and audio</p>
+                        </div>
+                        <span class="material-symbols-outlined rec-option-arrow">chevron_right</span>
+                    </button>
+                    <button class="rec-option" id="recScreenBtn">
+                        <div class="rec-option-icon rec-opt-screen">
+                            <span class="material-symbols-outlined">screen_share</span>
+                        </div>
+                        <div class="rec-option-text">
+                            <h4>Screen / Window</h4>
+                            <p>Capture your display or a specific window</p>
+                        </div>
+                        <span class="material-symbols-outlined rec-option-arrow">chevron_right</span>
+                    </button>
+                    <button class="rec-cancel" id="recCancelBtn">
+                        <span class="material-symbols-outlined">close</span>Cancel
+                    </button>
+                </div>
+            </div>`,
+            customClass: { htmlContainer: 'swal-share-html-container' },
+            showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
+            didOpen: () => {
+                document.getElementById('recCamBtn').addEventListener('click', () => {
+                    Swal.close();
+                    this.startMobileRecording(options, audioMixerTracks);
+                });
+                document.getElementById('recScreenBtn').addEventListener('click', () => {
+                    Swal.close();
+                    this.startDesktopRecording(options, audioMixerTracks);
+                });
+                document.getElementById('recCancelBtn').addEventListener('click', () => {
+                    Swal.close();
+                });
+            },
         });
     }
 
@@ -4654,17 +4780,80 @@ class RoomClient {
     showRecordingInfo(recType, recordingInfo, recordingMsg = '') {
         if (window.localStorage.isReconnected === 'false') {
             Swal.fire({
-                background: swalBackground,
+                background: 'rgba(18,20,24,0.98)',
                 position: 'center',
-                icon: 'success',
-                title: 'Recording',
-                html: `<div style="text-align: left;">
-                🔴 ${recType} Recording Info: 
-                ${recordingInfo}
-                ${recordingMsg}
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+                width: 400,
+                padding: 0,
+                backdrop: 'rgba(0,0,0,0.6)',
+                customClass: {
+                    confirmButton: 'rec-info-ok-btn',
+                    htmlContainer: 'swal-share-html-container',
+                },
+                html: `
+                <style>
+                    .rec-info-wrap { font-family: 'Comfortaa', sans-serif; }
+                    .rec-info-header {
+                        display: flex; align-items: center; gap: 14px;
+                        padding: 20px 22px 16px;
+                        border-bottom: 1px solid rgba(255,255,255,0.06);
+                    }
+                    .rec-info-badge {
+                        width: 42px; height: 42px; border-radius: 12px;
+                        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+                        display: flex; align-items: center; justify-content: center;
+                        flex-shrink: 0;
+                        box-shadow: 0 4px 16px rgba(34,197,94,0.35);
+                    }
+                    .rec-info-badge .material-symbols-outlined {
+                        font-size: 22px; color: #fff;
+                        font-variation-settings: 'FILL' 1;
+                    }
+                    .rec-info-header-text h3 {
+                        margin: 0 0 3px; font-size: 15px; font-weight: 700;
+                        color: #f1f3f4; font-family: 'Comfortaa', sans-serif;
+                    }
+                    .rec-info-header-text p {
+                        margin: 0; font-size: 11px; color: #6b7280;
+                        font-family: 'Comfortaa', sans-serif;
+                    }
+                    .rec-info-body {
+                        padding: 18px 22px 20px;
+                        text-align: left;
+                        font-family: 'Comfortaa', sans-serif;
+                        font-size: 12px; color: #9aa0a6;
+                        line-height: 1.8;
+                    }
+                    .rec-info-body ul { margin: 0; padding-left: 18px; }
+                    .rec-info-body li { color: #bdc1c6; }
+                    .rec-info-ok-btn {
+                        background: #22c55e !important; color: #fff !important;
+                        border: none !important; border-radius: 10px !important;
+                        padding: 10px 28px !important;
+                        font-family: 'Comfortaa', sans-serif !important;
+                        font-size: 13px !important; font-weight: 700 !important;
+                        margin-bottom: 16px !important;
+                        box-shadow: 0 2px 10px rgba(34,197,94,0.3) !important;
+                    }
+                </style>
+                <div class="rec-info-wrap">
+                    <div class="rec-info-header">
+                        <div class="rec-info-badge">
+                            <span class="material-symbols-outlined">task_alt</span>
+                        </div>
+                        <div class="rec-info-header-text">
+                            <h3>Recording Saved</h3>
+                            <p>${recType} recording completed</p>
+                        </div>
+                    </div>
+                    <div class="rec-info-body">
+                        ${recordingInfo}
+                        ${recordingMsg}
+                    </div>
                 </div>`,
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+                showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+                hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
             });
         }
     }
