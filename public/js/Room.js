@@ -190,11 +190,12 @@ let room_id = getRoomId();
 // ####################################################
 
 const _lmsQs = new URLSearchParams(window.location.search);
-const lmsSessionId = _lmsQs.get('lmsSessionId') || '';
-const lmsCourseId  = _lmsQs.get('lmsCourseId')  || '';
-const lmsToken     = _lmsQs.get('lmsToken')      || '';
-const lmsApiUrl    = _lmsQs.get('lmsApiUrl')     || '';
-const lmsUserRole  = (_lmsQs.get('lmsUserRole')  || '').toLowerCase();
+const lmsSessionId    = _lmsQs.get('lmsSessionId')    || '';
+const lmsCourseId     = _lmsQs.get('lmsCourseId')     || '';
+const lmsToken        = _lmsQs.get('lmsToken')         || '';
+const lmsApiUrl       = _lmsQs.get('lmsApiUrl')        || '';
+const lmsUserRole     = (_lmsQs.get('lmsUserRole')     || '').toLowerCase();
+const lmsProfileImage = _lmsQs.get('lmsProfileImage')  || '';
 
 let lmsAttendanceSheet = null;
 let lmsAttendanceStatuses = {};
@@ -896,6 +897,7 @@ function getPeerInfo() {
         peer_recording: isRecording,
         peer_video_privacy: isVideoPrivacyActive,
         peer_hand: false,
+        peer_image: lmsProfileImage || null,
         is_desktop_device: !DetectRTC.isMobileDevice && !isTabletDevice && !isIPadDevice,
         is_mobile_device: DetectRTC.isMobileDevice,
         is_tablet_device: isTabletDevice,
@@ -1189,185 +1191,190 @@ async function shareRoom(useNavigator = false) {
         sound('open');
 
         Swal.fire({
-            background: 'rgba(28,29,33,0.97)',
+            background: 'rgba(18,20,24,0.98)',
             position: 'center',
             showConfirmButton: false,
             showDenyButton: false,
             showCancelButton: false,
-            width: 420,
+            width: 400,
             padding: 0,
+            backdrop: 'rgba(0,0,0,0.6)',
             html: `
             <style>
-                .swal-share-wrapper {
-                    font-family: 'Comfortaa', sans-serif;
-                    padding: 0;
-                }
-                .swal-share-header {
+                .shr-wrap { font-family: 'Comfortaa', sans-serif; }
+                .shr-header {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
-                    padding: 18px 20px 14px;
-                    border-bottom: 1px solid rgba(255,255,255,0.07);
+                    gap: 14px;
+                    padding: 20px 22px 16px;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
                 }
-                .swal-share-header .material-symbols-outlined {
-                    font-size: 22px;
-                    color: #1a73e8;
+                .shr-icon-badge {
+                    width: 42px; height: 42px;
+                    border-radius: 12px;
+                    background: linear-gradient(135deg, #1a73e8 0%, #0b57d0 100%);
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                    box-shadow: 0 4px 16px rgba(26,115,232,0.4);
                 }
-                .swal-share-header h3 {
+                .shr-icon-badge .material-symbols-outlined {
+                    font-size: 22px; color: #fff;
+                    font-variation-settings: 'FILL' 1;
+                }
+                .shr-header-text h3 {
+                    margin: 0 0 3px;
+                    font-size: 15px; font-weight: 700;
+                    color: #f1f3f4;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .shr-header-text p {
                     margin: 0;
-                    font-size: 15px;
-                    font-weight: 600;
-                    color: #e8eaed;
+                    font-size: 11px; color: #6b7280;
                     font-family: 'Comfortaa', sans-serif;
                 }
-                .swal-share-body {
-                    padding: 20px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 16px;
+                .shr-body {
+                    padding: 22px 22px 20px;
+                    display: flex; flex-direction: column;
+                    align-items: center; gap: 16px;
                 }
-                .swal-qr-wrap {
+                .shr-qr-frame {
                     background: #fff;
-                    border-radius: 14px;
-                    padding: 12px;
+                    border-radius: 18px;
+                    padding: 14px;
                     display: inline-flex;
-                    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+                    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
                 }
-                .swal-share-hint {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 10px;
-                    background: rgba(26,115,232,0.08);
-                    border: 1px solid rgba(26,115,232,0.18);
-                    border-radius: 10px;
-                    padding: 10px 14px;
-                    text-align: left;
-                    width: 100%;
-                    box-sizing: border-box;
-                }
-                .swal-share-hint .material-symbols-outlined {
-                    font-size: 18px;
-                    color: #1a73e8;
-                    margin-top: 1px;
-                    flex-shrink: 0;
-                }
-                .swal-share-hint p {
-                    margin: 0;
-                    font-size: 12px;
-                    color: #9aa0a6;
-                    line-height: 1.5;
+                .shr-qr-caption {
+                    font-size: 11px; color: #6b7280;
                     font-family: 'Comfortaa', sans-serif;
+                    letter-spacing: 0.4px;
+                    margin-top: -6px;
                 }
-                .swal-share-url-row {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: rgba(255,255,255,0.05);
-                    border: 1px solid rgba(255,255,255,0.08);
-                    border-radius: 10px;
-                    padding: 10px 14px;
-                    width: 100%;
-                    box-sizing: border-box;
+                .shr-divider {
+                    display: flex; align-items: center; gap: 10px; width: 100%;
                 }
-                .swal-share-url-row span.url-text {
-                    flex: 1;
-                    font-size: 12px;
-                    color: #1a73e8;
+                .shr-divider hr {
+                    flex: 1; border: none;
+                    border-top: 1px solid rgba(255,255,255,0.07); margin: 0;
+                }
+                .shr-divider span {
+                    font-size: 11px; color: #4b5563;
+                    font-family: 'Comfortaa', sans-serif;
                     white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    font-family: 'Comfortaa', sans-serif;
                 }
-                .swal-share-url-row .material-symbols-outlined {
-                    font-size: 18px;
-                    color: #9aa0a6;
-                    flex-shrink: 0;
-                }
-                .swal-share-actions {
-                    display: flex;
-                    gap: 8px;
-                    width: 100%;
-                }
-                .swal-share-btn {
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 6px;
-                    padding: 10px 14px;
-                    border: none;
-                    border-radius: 10px;
-                    font-family: 'Comfortaa', sans-serif;
-                    font-size: 12px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.18s ease;
-                }
-                .swal-share-btn .material-symbols-outlined {
-                    font-size: 16px;
-                }
-                .swal-share-btn-primary {
-                    background: #1a73e8;
-                    color: #fff;
-                }
-                .swal-share-btn-primary:hover {
-                    background: #1557b0;
-                }
-                .swal-share-btn-secondary {
-                    background: rgba(255,255,255,0.07);
-                    color: #e8eaed;
-                    border: 1px solid rgba(255,255,255,0.1);
-                }
-                .swal-share-btn-secondary:hover {
-                    background: rgba(255,255,255,0.12);
-                }
-                .swal-share-btn-danger {
-                    background: rgba(255,255,255,0.05);
-                    color: #9aa0a6;
+                .shr-url-box {
+                    display: flex; align-items: center; gap: 9px;
+                    background: rgba(255,255,255,0.04);
                     border: 1px solid rgba(255,255,255,0.08);
+                    border-radius: 10px;
+                    padding: 10px 14px;
+                    width: 100%; box-sizing: border-box;
+                    cursor: pointer;
+                    transition: background 0.15s, border-color 0.15s;
                 }
-                .swal-share-btn-danger:hover {
-                    background: rgba(234,67,53,0.15);
-                    color: #ea4335;
-                    border-color: rgba(234,67,53,0.3);
+                .shr-url-box:hover {
+                    background: rgba(255,255,255,0.07);
+                    border-color: rgba(255,255,255,0.14);
+                }
+                .shr-url-box .material-symbols-outlined {
+                    font-size: 16px; color: #4b5563; flex-shrink: 0;
+                }
+                .shr-url-box .shr-url-text {
+                    flex: 1; font-size: 12px; color: #8ab4f8;
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                    font-family: 'Comfortaa', sans-serif;
+                }
+                .shr-url-box .shr-copy-icon {
+                    font-size: 15px; color: #4b5563; flex-shrink: 0;
+                    transition: color 0.15s;
+                }
+                .shr-url-box:hover .shr-copy-icon { color: #8ab4f8; }
+                .shr-actions {
+                    display: flex; gap: 8px; width: 100%;
+                }
+                .shr-btn {
+                    flex: 1;
+                    display: flex; align-items: center; justify-content: center; gap: 6px;
+                    padding: 11px 10px;
+                    border: none; border-radius: 10px;
+                    font-family: 'Comfortaa', sans-serif;
+                    font-size: 12px; font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                }
+                .shr-btn .material-symbols-outlined {
+                    font-size: 16px;
+                    font-variation-settings: 'FILL' 1;
+                }
+                .shr-btn-copy {
+                    background: #1a73e8; color: #fff;
+                    box-shadow: 0 2px 10px rgba(26,115,232,0.35);
+                }
+                .shr-btn-copy:hover {
+                    background: #1558d0;
+                    box-shadow: 0 4px 14px rgba(26,115,232,0.45);
+                    transform: translateY(-1px);
+                }
+                .shr-btn-email {
+                    background: rgba(255,255,255,0.06); color: #bdc1c6;
+                    border: 1px solid rgba(255,255,255,0.09);
+                }
+                .shr-btn-email:hover {
+                    background: rgba(255,255,255,0.10); color: #e8eaed;
+                }
+                .shr-btn-close {
+                    background: transparent; color: #4b5563;
+                    border: 1px solid rgba(255,255,255,0.07);
+                }
+                .shr-btn-close:hover {
+                    background: rgba(255,255,255,0.05); color: #9aa0a6;
                 }
             </style>
-            <div class="swal-share-wrapper">
-                <div class="swal-share-header">
-                    <span class="material-symbols-outlined">share</span>
-                    <h3>Share the room</h3>
+            <div class="shr-wrap">
+                <div class="shr-header">
+                    <div class="shr-icon-badge">
+                        <span class="material-symbols-outlined">group_add</span>
+                    </div>
+                    <div class="shr-header-text">
+                        <h3>Invite to Meeting</h3>
+                        <p>Share the link or scan the QR code</p>
+                    </div>
                 </div>
-                <div class="swal-share-body">
-                    <div class="swal-qr-wrap">
+                <div class="shr-body">
+                    <div class="shr-qr-frame">
                         <canvas id="qrRoom"></canvas>
                     </div>
-                    <div class="swal-share-hint">
-                        <span class="material-symbols-outlined">smartphone</span>
-                        <p>Scan the QR code with your mobile camera to join instantly — no app required</p>
+                    <span class="shr-qr-caption">Scan with your camera to join</span>
+                    <div class="shr-divider">
+                        <hr/><span>or copy the link</span><hr/>
                     </div>
-                    <div class="swal-share-url-row">
+                    <div class="shr-url-box" id="swalUrlBox">
                         <span class="material-symbols-outlined">link</span>
-                        <span class="url-text">${RoomURL}</span>
+                        <span class="shr-url-text">${RoomURL}</span>
+                        <span class="material-symbols-outlined shr-copy-icon">content_copy</span>
                     </div>
-                    <div class="swal-share-actions">
-                        <button class="swal-share-btn swal-share-btn-primary" id="swalCopyUrlBtn">
-                            <span class="material-symbols-outlined">content_copy</span>Copy URL
+                    <div class="shr-actions">
+                        <button class="shr-btn shr-btn-copy" id="swalCopyUrlBtn">
+                            <span class="material-symbols-outlined">content_copy</span>Copy Link
                         </button>
                         ${lmsUserRole === 'admin' ? `
-                        <button class="swal-share-btn swal-share-btn-secondary" id="swalEmailBtn">
+                        <button class="shr-btn shr-btn-email" id="swalEmailBtn">
                             <span class="material-symbols-outlined">mail</span>Email
                         </button>` : ''}
-                        <button class="swal-share-btn swal-share-btn-danger" id="swalCloseBtn">
+                        <button class="shr-btn shr-btn-close" id="swalCloseBtn">
                             <span class="material-symbols-outlined">close</span>Close
                         </button>
                     </div>
                 </div>
             </div>`,
-            customClass: { htmlContainer: 'swal-share-html-container' },
-            showClass: { popup: 'animate__animated animate__fadeInDown' },
-            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+            customClass: { htmlContainer: 'swal-share-html-container', popup: 'shr-popup' },
+            showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
             didOpen: () => {
+                document.getElementById('swalUrlBox').addEventListener('click', () => {
+                    copyRoomURL();
+                    Swal.close();
+                });
                 document.getElementById('swalCopyUrlBtn').addEventListener('click', () => {
                     copyRoomURL();
                     Swal.close();
@@ -1385,7 +1392,6 @@ async function shareRoom(useNavigator = false) {
                 makeRoomQR();
             },
         }).then(() => {
-            // share screen on join
             if (isScreenAllowed) {
                 rc.shareScreen();
             }
@@ -1526,7 +1532,14 @@ function joinRoom(peer_name, room_id) {
 }
 
 function roomIsReady() {
-    if (rc.isValidEmail(peer_name)) {
+    if (lmsProfileImage) {
+        myProfileAvatar.style.borderRadius = `50px`;
+        myProfileAvatar.setAttribute('src', lmsProfileImage);
+        myProfileAvatar.onerror = () => {
+            myProfileAvatar.onerror = null;
+            myProfileAvatar.setAttribute('src', rc.genAvatarSvg(peer_name, 64));
+        };
+    } else if (rc.isValidEmail(peer_name)) {
         myProfileAvatar.style.borderRadius = `50px`;
         myProfileAvatar.setAttribute('src', rc.genGravatar(peer_name));
     } else {
@@ -4865,18 +4878,19 @@ function getParticipantsList(peers) {
         const peer_geoLocation = _PEER.geoLocation;
         const peer_sendFile = _PEER.sendFile;
         const peer_id = peer_info.peer_id;
-        const avatarImg = getParticipantAvatar(peer_name);
+        const avatarImg = getParticipantAvatar(peer_name, peer_info.peer_image);
 
         // NOT ME
         if (socket.id !== peer_id) {
             // PRESENTER HAS MORE OPTIONS
             if (isRulesActive && isPresenter) {
                 li += `
-                <li 
+                <li
                     id='${peer_id}'
-                    data-to-id="${peer_id}" 
+                    data-to-id="${peer_id}"
                     data-to-name="${peer_name}"
-                    class="clearfix" 
+                    data-peer-image="${peer_info.peer_image || ''}"
+                    class="clearfix"
                     onclick="rc.showPeerAboutAndMessages(this.id, '${peer_name}', event)"
                 >
                     <img
@@ -4944,11 +4958,12 @@ function getParticipantsList(peers) {
             } else {
                 // GUEST USER
                 li += `
-                <li 
-                    id='${peer_id}' 
+                <li
+                    id='${peer_id}'
                     data-to-id="${peer_id}"
                     data-to-name="${peer_name}"
-                    class="clearfix" 
+                    data-peer-image="${peer_info.peer_image || ''}"
+                    class="clearfix"
                     onclick="rc.showPeerAboutAndMessages(this.id, '${peer_name}', event)"
                 >
                 <img 
@@ -5041,10 +5056,9 @@ function refreshParticipantsCount(count, adapt = true) {
     if (adapt) adaptAspectRatio(count);
 }
 
-function getParticipantAvatar(peerName) {
-    if (rc.isValidEmail(peerName)) {
-        return rc.genGravatar(peerName);
-    }
+function getParticipantAvatar(peerName, peerImage) {
+    if (peerImage) return peerImage;
+    if (rc.isValidEmail(peerName)) return rc.genGravatar(peerName);
     return rc.genAvatarSvg(peerName, 32);
 }
 
