@@ -1,14 +1,9 @@
 'use strict';
 
 /**
- * MiroTalk SFU - Client component
+ * Mualim Ul Quran - Client component
  *
- * @link    GitHub: https://github.com/miroslavpejic85/mirotalksfu
- * @link    Official Live demo: https://sfu.mirotalk.com
- * @license For open source use: AGPLv3
- * @license For commercial or closed source, contact us at license.mirotalk@gmail.com or purchase directly via CodeCanyon
- * @license CodeCanyon: https://codecanyon.net/item/mirotalk-sfu-webrtc-realtime-video-conferences/40769970
- * @author  Ali Sher Abbasi - miroslav.pejic.85@gmail.com
+ * @author  Ali Sher Abbasi
  * @version 1.4.80
  *
  */
@@ -422,7 +417,7 @@ class RoomClient {
                 }
                 // Username-collision check removed: LMS always supplies a unique
                 // per-join name (timestamp + random suffix), so blocking on duplicate
-                // names only causes false positives when MiroTalk's async peer cleanup
+                // names only causes false positives when async peer cleanup
                 // races against a fast rejoin. Peers are keyed by socket-id anyway, so
                 // two peers with the same display name coexist without any real conflict.
                 await this.joinAllowed(room);
@@ -572,10 +567,15 @@ class RoomClient {
 
         console.log('07.2 Participants Count ---->', participantsCount);
 
-        if (this.isScreenAllowed) {
-            this.shareScreen();
+        // notify && participantsCount == 1 ? shareRoom() : sound('joined');
+        if (notify && participantsCount == 1) {
+            shareRoom();
+        } else {
+            if (this.isScreenAllowed) {
+                this.shareScreen();
+            }
+            sound('joined');
         }
-        sound('joined');
     }
 
     async loadDevice(routerRtpCapabilities) {
@@ -1073,7 +1073,7 @@ class RoomClient {
         this.exit(true);
         // Always navigate to a fresh URL with a new unique name.
         // Using location.reload() reuses the exact same name from the URL, which races
-        // against MiroTalk's async peer-cleanup on the server: the old peer (same name)
+        // against async peer-cleanup on the server: the old peer (same name)
         // may still be in the room when the reloaded page tries to join, triggering
         // "Username already in use". Generating a new name suffix on every reconnect
         // guarantees uniqueness and eliminates the collision entirely.
@@ -5328,7 +5328,7 @@ class RoomClient {
                     title: 'Received file',
                     text: this.incomingFileInfo.fileName + ' size ' + this.bytesToSize(this.incomingFileInfo.fileSize),
                     imageUrl: e.target.result,
-                    imageAlt: 'mirotalksfu-file-img-download',
+                    imageAlt: 'file-img-download',
                     showDenyButton: true,
                     confirmButtonText: `Save`,
                     denyButtonText: `Cancel`,
