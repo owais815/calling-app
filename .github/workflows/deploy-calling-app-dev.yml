@@ -42,7 +42,8 @@ jobs:
             ENVEOF
 
             # ── Build and restart dev Docker container ───────────────────────
-            docker compose -f docker-compose.dev.yml down || true
+            docker compose -f docker-compose.dev.yml down --remove-orphans || true
+            docker rm -f mirotalksfu-dev 2>/dev/null || true
             docker compose -f docker-compose.dev.yml build --no-cache
             docker compose -f docker-compose.dev.yml up -d
 
