@@ -936,45 +936,8 @@ th {
 }
 
 @media screen and (max-width: 830px) {
-    .tab {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        justify-content: flex-start;
-        border-right: none !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        padding: 6px 8px;
-        gap: 2px;
-        /* hide scrollbar but keep functionality */
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    .tab::-webkit-scrollbar {
-        display: none;
-    }
-    .tab button {
-        width: auto !important;
-        flex: 0 0 auto;
-        min-width: 48px;
-        padding: 8px 10px;
-    }
     .tabActions {
         width: 100%;
-    }
-    .tabButtonText {
-        display: none !important;
-    }
-}
-
-@media screen and (max-width: 540px) {
-    .tab {
-        padding: 4px 6px;
-    }
-    .tab button {
-        min-width: 44px;
-        padding: 7px 8px;
     }
 }
 
@@ -1043,6 +1006,40 @@ th {
 .tabcontent button i {
     font-size: 16px;
     color: #9aa0a6;
+}
+
+/* ── Mobile tab bar — placed AFTER base rules so cascade overrides work ── */
+@media screen and (max-width: 830px) {
+    .tab {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 6px 8px;
+        gap: 2px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .tab::-webkit-scrollbar { display: none; }
+    .tab button {
+        width: auto;
+        flex: 0 0 auto;
+        min-width: 46px;
+        padding: 8px 10px;
+        flex-direction: row;
+    }
+    .tabButtonText { display: none; }
+}
+
+@media screen and (max-width: 480px) {
+    .tab button {
+        min-width: 40px;
+        padding: 7px 8px;
+    }
 }
 
 .tabcontent button {
