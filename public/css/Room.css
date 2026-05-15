@@ -939,12 +939,26 @@ th {
     .tab {
         width: 100%;
         flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
         border-right: none !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        padding: 8px 4px;
+        padding: 6px 8px;
         gap: 2px;
+        /* hide scrollbar but keep functionality */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .tab::-webkit-scrollbar {
+        display: none;
+    }
+    .tab button {
+        width: auto !important;
+        flex: 0 0 auto;
+        min-width: 48px;
+        padding: 8px 10px;
     }
     .tabActions {
         width: 100%;
@@ -956,7 +970,11 @@ th {
 
 @media screen and (max-width: 540px) {
     .tab {
-        display: flex;
+        padding: 4px 6px;
+    }
+    .tab button {
+        min-width: 44px;
+        padding: 7px 8px;
     }
 }
 
