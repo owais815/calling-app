@@ -44,8 +44,11 @@ jobs:
             # ── Build and restart Docker container ───────────────────────────
             docker compose down --remove-orphans || true
             docker rm -f mirotalksfu 2>/dev/null || true
-            docker compose build --no-cache
+            docker compose build
             docker compose up -d
+
+            # ── Clean up dangling images from previous build ─────────────────
+            docker image prune -f
 
             # ── Verify ───────────────────────────────────────────────────────
             echo "Container status:"
